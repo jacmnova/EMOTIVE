@@ -12,6 +12,7 @@ use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\QuestionariosController;
 use App\Http\Controllers\UsuarioFormularioController;
 use App\Http\Controllers\GestorController;
+use App\Http\Controllers\CalculosController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -75,3 +76,6 @@ Route::post('/usuario-formulario/finalizar', [DadosController::class, 'finalizar
 Route::get('/meurelatorio/show/{id}', [DadosController::class, 'relatorioShow'])->name('relatorio.show');
 
 Route::get('/variaveis/formulario/{id}', [VariavelController::class, 'getPorFormulario']);
+
+Route::put('/calculos/status/{id}', [CalculosController::class, 'status'])->name('calculos.status');
+Route::resource('calculos', CalculosController::class);

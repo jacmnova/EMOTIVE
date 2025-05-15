@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('descricao', 200);
             $table->string('operador', 20);
             $table->text('formula');
+            $table->boolean('ativo')->default(true);
             $table->timestamps();
         });
     }

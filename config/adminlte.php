@@ -318,34 +318,40 @@ return [
         [
             'text' => 'Usuários',
             'url' => 'usuarios',
-            'icon' => 'fa-solid fa-address-book',
+            'icon' => 'fa-solid fa-users-gear',
             'can' => 'admin',
         ],
 
         [
             'text' => 'Clientes',
             'url' => 'clientes',
-            'icon' => 'fa-solid fa-address-book',
+            'icon' => 'fa-solid fa-handshake',
             'can' => 'admin',
         ],
 
         [
             'text' => 'Formulários',
              'url' => 'formularios',
-             'icon' => 'fa-solid fa-file-circle-plus',
+             'icon' => 'fa-solid fa-clipboard-list',
              'can' => 'admin',
         ],
 
         [
             'text' => 'Variaveis',
             'url' => 'variaveis',
-            'icon' => 'fa-solid fa-spell-check',
+            'icon' => 'fa-solid fa-code',
             'can' => 'admin',
         ],
         [
             'text' => 'Perguntas',
             'url' => 'perguntas',
-            'icon' => 'fa-solid fa-question',
+            'icon' => 'fa-solid fa-question-circle',
+            'can' => 'admin',
+        ],
+        [
+            'text' => 'Cálculos',
+            'url' => 'calculos',
+            'icon' => 'fa-solid fa-square-root-variable',
             'can' => 'admin',
         ],
 
@@ -355,13 +361,13 @@ return [
         [
             'text' => 'Lista Usuários',
             'url' => 'gestao-usuarios',
-            'icon' => 'fa-solid fa-address-book',
+            'icon' => 'fa-solid fa-user-check',
             'can' => 'gestor',
         ],
         [
             'text' => 'Lista Formulários',
             'url' => 'lista-formularios',
-            'icon' => 'fa-solid fa-address-book',
+            'icon' => 'fa-solid fa-clipboard-check',
             'can' => 'gestor',
         ],
 
@@ -371,13 +377,13 @@ return [
         [
             'text' => 'profile',
             'url' => 'dados',
-            'icon' => 'fas fa-fw fa-user',
+            'icon' => 'fa-solid fa-user',
             'can' => 'usuario',
         ],
         [
             'text' => 'Questionario',
             'url' => 'meusquestionarios',
-            'icon' => 'fa-solid fa-book-open',
+            'icon' => 'fa-solid fa-book-open-reader',
             'can' => 'usuario',
         ],
     ],
