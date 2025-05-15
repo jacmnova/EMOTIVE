@@ -1,0 +1,57 @@
+.select {
+    height: 40px !important;
+    box-shadow: inset 0 0 0 transparent !important;
+}
+/* Estilização para ajustar a posição do ícone */
+.select {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    /* background: #fff url('data:image/svg+xml;utf8,<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>') no-repeat !important; */
+    background: transparent !important;
+    background-position: calc(100% - 8px) center !important;
+    background-size: 16px !important;
+    padding-right: 30px !important; /* ajuste conforme necessário */
+
+}
+
+
+/* Seleciona a entrada da seleção */
+.select2-container .select2-selection--single {
+    height: 40px !important;
+    line-height: 40px !important;
+}
+
+/* Ajusta a posição do ícone */
+.select2-container .select2-selection--single .select2-selection__arrow {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    right: 8px !important; /* Move a seta 8px para a esquerda */
+}
+
+/* Ajusta padding */
+.select2-container .select2-selection--single .select2-selection__rendered {
+    padding-right: 30px !important;
+}
+
+/* Personalização adicional do select2 */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #a08080 !important;
+    padding-left: 8px !important; /* Ajuste conforme necessário */
+}
+
+.select2-dropdown {
+    border-radius: 4px !important;
+    border: 1px solid #ccc !important;
+}
+
+/* Ajuste dos itens do dropdown */
+.select2-results__option {
+    padding: 8px 16px !important;
+}
+
+.select2-selection--single {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: transparent !important;
+}
