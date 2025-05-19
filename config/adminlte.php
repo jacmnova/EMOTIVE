@@ -63,7 +63,7 @@ return [
     |
     */
 
-    'logo' => 'CORE<b>NR1</b>',
+    'logo' => 'BORN<b>OUT</b>',
     'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
     'logo_img_class' => 'brand-image img-circle',
     'logo_img_xl' => null,
