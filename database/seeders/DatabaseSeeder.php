@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             UsuariosSeeder::class, // php artisan db:seed --class=UsuariosSeeder
             ClientesSeeder::class, // php artisan db:seed --class=ClientesSeeder
             CalculoSeeder::class, // php artisan db:seed --class=CalculoSeeder
+            VariavelPerguntaSeeder::class, // php artisan db:seed --class=VariavelPerguntaSeeder
         ]);
     }
 }
