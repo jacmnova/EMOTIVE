@@ -22,7 +22,8 @@
 
     <div class="container-fluid">
         <div class="row mb-2">
-            <div class="col-sm-6"></div>
+            <div class="col-sm-6">
+            </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#">Início</a></li>
@@ -51,6 +52,7 @@
                     <a href="#" class="btn btn-tool btn-sm">
                         <i class="fas fa-bars"></i>
                     </a>
+
                     <a href="#" class="btn btn-sm btn-tool">
                         <i class="fa-solid fa-circle-info"></i>
                     </a>
@@ -66,9 +68,9 @@
                         <thead>
                             <tr>
                                 <th></th>
-                                @if($formulario->score_ini !== null && $formulario->score_fim !== null)
-                                    @for($i = 0; $i <= ($formulario->score_fim - $formulario->score_ini); $i++)
-                                        <th></th>
+                                @if($formulario->score_ini && $formulario->score_fim)
+                                    @for($i = $formulario->score_ini; $i <= $formulario->score_fim; $i++)
+                                        <th> </th>
                                     @endfor
                                 @endif
                             </tr>
@@ -84,18 +86,13 @@
                                     <td>
                                         {{ $pergunta->numero_da_pergunta }} - {{ $pergunta->pergunta }}
                                     </td>
-
-                                    @if($formulario->score_ini !== null && $formulario->score_fim !== null)
-                                        @for($i = 0; $i <= ($formulario->score_fim - $formulario->score_ini); $i++)
-                                            @php
-                                                $valor = $formulario->score_ini + $i;
-                                                $label = $valor;
-                                            @endphp
-                                            <td style="text-align: center;">
+                                    @if($formulario->score_ini && $formulario->score_fim)
+                                        @for($i = $formulario->score_ini; $i <= $formulario->score_fim; $i++)
+                                            <td>
                                                 <div class="custom-control custom-radio">
-                                                    <label class="d-flex align-items-center justify-content-center" for="radio_{{ $pergunta->id }}_{{ $valor }}" style="font-size: 12px;">
-                                                        {{ $label }}
-                                                        <input class="custom-control-input" type="radio" id="radio_{{ $pergunta->id }}_{{ $valor }}" name="respostas[{{ $pergunta->id }}]" value="{{ $valor }}" @if($resposta && $resposta->valor_resposta == $valor) checked @endif>
+                                                    <label class="d-flex align-items-center" for="radio_{{ $pergunta->id }}_{{ $i }}" style="color: gray;font-size: 12px;">
+                                                        {{ $i }}
+                                                        <input class="custom-control-input" type="radio" id="radio_{{ $pergunta->id }}_{{ $i }}" name="respostas[{{ $pergunta->id }}]" value="{{ $i }}" @if($resposta && $resposta->valor_resposta == $i) checked @endif>
                                                         <span class="custom-control-label"></span>
                                                     </label>
                                                 </div>
@@ -112,7 +109,8 @@
                 <button type="submit" class="btn btn-dark" style="width: 150px;">Salvar Respostas</button>
             </div>
         </div>
-    </form>
+    </form>    
+
 
     <form id="finalizar-form" method="POST" action="{{ route('usuarioFormulario.finalizar') }}">
         @csrf
@@ -120,40 +118,57 @@
         <div class="card-footer text-right">
             <button id="finalizar-btn" class="btn btn-dark" style="width: 250px;" disabled>Finalizar Formulário</button>
         </div>
+        
     </form>
 
 @stop
 
 @section('css')
+    {{-- Add here extra stylesheets --}}
+    {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
+
 @stop
 
 @section('js')
+    <script> console.log("Hi, I'm using the Laravel-AdminLTE package!"); </script>
+
     <script>
-        document.getElementById('finalizar-btn').addEventListener('click', function () {
+        document.getElementById('finalizar-btn').addEventListener('click', function() {
+            console.log('Finalizar clicado');
             document.getElementById('finalizar-form').submit();
         });
+    </script>
 
-        document.addEventListener('DOMContentLoaded', function () {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
             const radios = document.querySelectorAll('input[type=radio]');
             const btnFinalizar = document.getElementById('finalizar-btn');
 
             function verificarRespostas() {
                 const totalPerguntas = new Set();
-                radios.forEach(radio => totalPerguntas.add(radio.name));
+
+                radios.forEach(radio => {
+                    totalPerguntas.add(radio.name);
+                });
+
                 const perguntasRespondidas = new Set();
+
                 radios.forEach(radio => {
                     if (radio.checked) {
                         perguntasRespondidas.add(radio.name);
                     }
                 });
 
-                btnFinalizar.disabled = perguntasRespondidas.size !== totalPerguntas.size || totalPerguntas.size === 0;
+                if (perguntasRespondidas.size === totalPerguntas.size && totalPerguntas.size > 0) {
+                    btnFinalizar.disabled = false;
+                } else {
+                    btnFinalizar.disabled = true;
+                }
             }
 
             radios.forEach(radio => {
                 radio.addEventListener('change', verificarRespostas);
             });
-
             verificarRespostas();
         });
     </script>
