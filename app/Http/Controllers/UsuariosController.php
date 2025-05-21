@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Cliente;
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\UsuarioFormulario;
 
 class UsuariosController extends Controller
 {
@@ -42,7 +43,10 @@ class UsuariosController extends Controller
         $usuario = User::find($id);
         $cliente = Cliente::find($usuario->cliente_id);
         $quantidadeFormularios = $usuario->getQuantidadeFormulariosAttribute();
-        return view('usuarios.show', compact('usuario', 'cliente', 'quantidadeFormularios'));
+        $quantidadePendente = $usuario->getQuantidadeFormulariosPendentesAttribute();
+        $quantidadeFinalizado = $usuario->getQuantidadeFormulariosFinalizadosAttribute();
+        $questionarios = UsuarioFormulario::with(['formulario'])->where('usuario_id',$usuario->id)->get();
+        return view('usuarios.show', compact('usuario', 'cliente', 'quantidadeFormularios','quantidadePendente','quantidadeFinalizado','questionarios'));
     }
 
     // Mostrar formulário de edição

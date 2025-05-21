@@ -67,13 +67,24 @@ Route::post('/questionarios/incluir', [ClienteController::class, 'incluir'])->na
 
 Route::resource('usuario_formulario', UsuarioFormularioController::class);
 
+
+
 Route::get('/meusquestionarios', [DadosController::class, 'questionariosUsuario'])->name('questionarios.usuario');
+
+
+
+
 Route::get('/meusquestionarios/editar/{id}', [DadosController::class, 'questionarioEditar'])->name('questionarios.editar');
 Route::post('/respostas/salvar', [DadosController::class, 'salvarRespostas'])->name('respostas.salvar');
 
 Route::post('/usuario-formulario/finalizar', [DadosController::class, 'finalizar'])->name('usuarioFormulario.finalizar');
 
-Route::get('/meurelatorio/show/{id}', [DadosController::class, 'relatorioShow'])->name('relatorio.show');
+
+// Route::get('/meurelatorio/show/{id}', [DadosController::class, 'relatorioShow'])->name('relatorio.show');
+Route::get('/meurelatorio/show', [DadosController::class, 'relatorioShow'])->name('relatorio.show');
+
+
+
 
 Route::get('/variaveis/formulario/{id}', [VariavelController::class, 'getPorFormulario']);
 

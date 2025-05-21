@@ -70,5 +70,19 @@ class User extends Authenticatable
         return UsuarioFormulario::where('usuario_id', $this->id)->count();
     }
 
+    public function getQuantidadeFormulariosPendentesAttribute()
+    {
+        return UsuarioFormulario::where('usuario_id', $this->id)
+            ->where('status', 'pendente')
+            ->count();
+    }
+
+    public function getQuantidadeFormulariosFinalizadosAttribute()
+    {
+        return UsuarioFormulario::where('usuario_id', $this->id)
+            ->where('status', 'completo')
+            ->count();
+    }
+
 
 }

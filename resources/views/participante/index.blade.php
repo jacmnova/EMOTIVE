@@ -69,7 +69,9 @@
                                 <td> <label class="badge badge-dark"> {{ $formulario->formulario->label }} </label> | {{ $formulario->formulario->nome }}</td>
                                 
                                 <td>{{ $formulario->formulario->perguntaCount() }}</td>
-                                <td>{{ $formulario->created_at }}</td>
+                                <td>
+                                    {{ $formulario->created_at->translatedFormat('d \d\e F \d\e Y \à\s H:i') }}
+                                </td>
                                 <td>
                                     @if($formulario->status == 'novo')
                                         <label class="badge badge-primary"> {{  strtoupper($formulario->status) }} </label>
@@ -86,10 +88,10 @@
                                             <i class="fa-regular fa-circle-play" style="color: #008ca5"></i>
                                         </a>
                                     @else
-                                        <a href="{{ route('relatorio.show', $formulario->formulario->id) }}"
-                                        class="btn btn-sm btn-tool" title="Relatório">
-                                            <i class="fa-regular fa-file-lines" style="color:rgb(46, 134, 11)"></i>
-                                        </a>
+                                        <a href="#"
+                                        class="btn btn-sm btn-tool" title="Formulário finalizado!">
+                                            <i class="fa-solid fa-check-double" style="color:rgb(46, 134, 11)"></i>
+                                        </a> Finalizado em: {{ $formulario->updated_at->translatedFormat('d \d\e F \d\e Y \à\s H:i') }}
                                     @endif
                                 </td>
                             </tr>

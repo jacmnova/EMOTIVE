@@ -36,42 +36,23 @@
 @section('content')
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title mr-5">
+        <h3 class="card-title">
             <i class="fa-solid fa-question" style="margin-right: 5px;"></i>
             Lista de Perguntas
         </h3>
         <div class="card-tools d-flex align-items-center">
-
-            <form method="GET" action="{{ route('perguntas.index') }}" class="d-flex align-items-center">
-                <select name="formulario_id"
-                        class="form-control form-control-sm"
-                        style="min-width: 380px; margin-right: 10px;"
-                        onchange="this.form.submit()">
-                    <option value="">-- Filtrar por Formulário --</option>
-                    @foreach($formularios as $formulario)
-                        <option value="{{ $formulario->id }}"
-                            {{ request('formulario_id') == $formulario->id ? 'selected' : '' }}>
-                            {{ $formulario->nome }}
-                        </option>
-                    @endforeach
-                </select>
-                @if(request('formulario_id'))
-                    <a href="{{ route('perguntas.index') }}" class="btn btn-default btn-sm btn-outline-dark" style="min-width: 250px; margin-right: 8px;">Limpar Filtro</a>
-                @endif
-            </form>
-
-
-            <button type="button"
-                    class="btn btn-default btn-sm"
-                    onclick="window.location.href='{{ route('perguntas.create') }}'">
-                <i class="fa-solid fa-plus" style="margin-right: 8px;"></i>
+            <button type="button" class="btn btn-block btn-default btn-sm"
+                    onclick="window.location.href='{{ route('perguntas.create') }}'"
+                    style="margin-right: 10px;">
+                <i class="fa-solid fa-plus" style="margin-right: 5px;"></i>
                 Incluir Pergunta
             </button>
 
+            <a href="#" class="btn btn-sm btn-tool d-sm-inline-block" title="Mais Informações">
+                <i class="fas fa-bars"></i>
+            </a>
         </div>
-
     </div>
-
 
     @if ($perguntas->count() > 0)
         <div class="card-body mr-1">
@@ -145,25 +126,25 @@
 @section('js')
 <script src="{{ asset('../js/utils.js') }}"></script>
 
-<script>
-    function confirmDeletar(id) {
-        Swal.fire({
-            title: 'Remover Pergunta!',
-            text: 'Esta ação vai remover a Pergunta. Você tem certeza?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#008ca5',
-            cancelButtonColor: '#5fc3b4',
-            confirmButtonText: 'Sim, Remover',
-            cancelButtonText: 'Cancelar',
-            iconHtml: '<i class="fa-solid fa-exclamation-circle text-danger" style="font-size: 1.5em;"></i>',
-            allowOutsideClick: false,
-            allowEscapeKey: false
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('removerForm-' + id).submit();
-            }
-        });
-    }
-</script>
+    <script>
+        function confirmDeletar(id) {
+            Swal.fire({
+                title: 'Remover Pergunta!',
+                text: 'Esta ação vai remover a Pergunta. Você tem certeza?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#008ca5',
+                cancelButtonColor: '#5fc3b4',
+                confirmButtonText: 'Sim, Remover',
+                cancelButtonText: 'Cancelar',
+                iconHtml: '<i class="fa-solid fa-exclamation-circle text-danger" style="font-size: 1.5em;"></i>',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('removerForm-' + id).submit();
+                }
+            });
+        }
+    </script>
 @stop

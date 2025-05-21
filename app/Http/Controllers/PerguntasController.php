@@ -9,12 +9,27 @@ use Illuminate\Http\Request;
 
 class PerguntasController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     $formularios = Formulario::all();
+    //     $perguntas = Pergunta::all();
+    //     return view('perguntas.index', compact('perguntas', 'formularios'));
+    // }
+
+    public function index(Request $request)
     {
-        $formularios = Formulario::all();
-        $perguntas = Pergunta::all();
+        $query = Pergunta::with('formulario');
+
+        if ($request->filled('formulario_id')) {
+            $query->where('formulario_id', $request->formulario_id);
+        }
+
+        $perguntas = $query->get();
+        $formularios = Formulario::orderBy('nome')->get();
+
         return view('perguntas.index', compact('perguntas', 'formularios'));
     }
+
 
     public function create()
     {

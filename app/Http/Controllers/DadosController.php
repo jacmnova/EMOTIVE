@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Cliente;
 use App\Models\Resposta;
+use App\Models\Variavel;
 use App\Models\Formulario;
 use Illuminate\Http\Request;
 use App\Models\ClienteFormulario;
@@ -138,6 +139,7 @@ class DadosController extends Controller
 
         if ($atualizarStatus) {
             $atualizarStatus->status = 'pendente';
+            $atualizarStatus->updated_at = now();
             $atualizarStatus->save();
         }
    
@@ -163,14 +165,50 @@ class DadosController extends Controller
         return redirect()->back()->with('error', 'Registro não encontrado.');
     }
 
-    public function relatorioShow($id)
+    public function relatorioShow(Request $request)
     {
-        $user = Auth::user();
-        $formulario = Formulario::with('perguntas')->find($id);
-        $perguntas = $formulario->perguntas;
-        $respostasUsuario = Resposta::where('user_id', $user->id)->whereIn('pergunta_id', $perguntas->pluck('id'))->get()->keyBy('pergunta_id');
-        return view('participante.relatorio', compact('user', 'formulario', 'respostasUsuario'));
-    }
+        $formularioId = $request->query('formulario_id');
+        $usuarioId = $request->query('usuario_id');
 
+        $user = User::find($usuarioId);
+
+        $formulario = Formulario::with('perguntas.variaveis')->findOrFail($formularioId);
+
+        $respostasUsuario = Resposta::where('user_id', $user->id)
+            ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
+            ->get()
+            ->keyBy('pergunta_id');
+
+        $variaveis = Variavel::with('perguntas')
+            ->where('formulario_id', $formulario->id)
+            ->get();
+
+        $pontuacoes = [];
+
+        foreach ($variaveis as $variavel) {
+            $pontuacao = 0;
+
+            foreach ($variavel->perguntas as $pergunta) {
+                $resposta = $respostasUsuario->get($pergunta->id);
+                if ($resposta) {
+                    $pontuacao += $resposta->valor_resposta ?? 0;
+                }
+            }
+
+            // $pontuacoes[$variavel->nome] = $pontuacao;
+            $pontuacoes[] = [
+                'nome' => $variavel->nome,
+                'tag' => strtoupper($variavel->tag),
+                'valor' => $pontuacao,
+            ];
+        }
+
+        return view('participante.relatorio', compact(
+            'formulario',
+            'respostasUsuario',
+            'pontuacoes',
+            'variaveis'
+        ));
+    }
 
 }

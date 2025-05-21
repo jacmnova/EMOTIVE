@@ -37,7 +37,7 @@
 @section('content')
 
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="card card-widget widget-user shadow">
 
                 <div class="widget-user-header bg-info">
@@ -61,15 +61,15 @@
 
                         <div class="col-sm-4 border-right">
                             <div class="description-block">
-                                <h5 class="description-header">4</h5>
+                                <h5 class="description-header">{{ $quantidadePendente }}</h5>
                                 <span class="description-text">Pendentes</span>
                             </div>
                         </div>
 
                         <div class="col-sm-4">
                             <div class="description-block">
-                                <h5 class="description-header">1</h5>
-                                <span class="description-text">Respondidos</span>
+                                <h5 class="description-header">{{ $quantidadeFinalizado }}</h5>
+                                <span class="description-text">Finalizados</span>
                             </div>
                         </div>
 
@@ -79,7 +79,7 @@
         </div>
 
         @if($cliente)
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <div class="card card-widget widget-user shadow">
                     <div class="widget-user-header bg-dark">
                         <h3 class="widget-user-username">{{ strtoupper($cliente->razao_social) }}</h3>
@@ -99,5 +99,7 @@
         @endif
 
     </div>
+
+    @include('usuarios.partials._formularios')
 
 @stop

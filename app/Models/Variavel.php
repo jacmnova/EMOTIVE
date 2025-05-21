@@ -34,4 +34,9 @@ class Variavel extends Model
     {
         return $this->belongsTo(Formulario::class, 'formulario_id');
     }
+
+    public function perguntas()
+    {
+        return $this->belongsToMany(Pergunta::class, 'pergunta_variavel');
+    }
 }

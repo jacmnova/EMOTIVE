@@ -21,13 +21,18 @@
 
 @section('content')
 
+
+    <!-- <div class="row">
+        @include('formularios.partials._variados')
+    </div> -->
+
     <div class="row">
         @include('formularios.partials._variaveis')
     </div>
+
     <div class="row">
         @include('formularios.partials._graficos')
     </div>
-
 
     <!-- <div class="row">
         @include('formularios.partials._faixas')
