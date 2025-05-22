@@ -19,6 +19,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::view('/termos', 'termos')->name('termos');
+Route::view('/tutorial', 'tutorial')->name('tutorial');
+
+
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -65,6 +69,9 @@ Route::put('/clientes/status/{id}', [ClienteController::class, 'status'])->name(
 Route::resource('clientes', ClienteController::class);
 
 Route::post('/questionarios/incluir', [ClienteController::class, 'incluir'])->name('questionarios.incluir');
+
+
+Route::post('/usuario_formulario_admin', [UsuarioFormularioController::class, 'storeAdmin'])->name('usuario_formulario_admin.store');
 
 Route::resource('usuario_formulario', UsuarioFormularioController::class);
 

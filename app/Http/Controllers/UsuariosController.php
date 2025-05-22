@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Cliente;
+use App\Models\Formulario;
 use Illuminate\Http\Request;
 use App\Models\UsuarioFormulario;
 
@@ -18,7 +19,8 @@ class UsuariosController extends Controller
 
     public function create()
     {
-        return view('usuarios.create');
+        $clientes = Cliente::all();
+        return view('usuarios.create', compact('clientes'));
     }
 
     public function store(Request $request)
@@ -54,7 +56,9 @@ class UsuariosController extends Controller
     {
         $usuario = User::findOrFail($id);
         $clientes = Cliente::all();
-        return view('usuarios.edit', compact('usuario','clientes'));
+        $formularios = Formulario::all();
+        $questionarios = UsuarioFormulario::with(['formulario'])->where('usuario_id',$usuario->id)->get();
+        return view('usuarios.edit', compact('usuario','clientes','formularios','questionarios'));
     }
 
     public function update(Request $request)

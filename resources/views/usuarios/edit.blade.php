@@ -53,27 +53,28 @@
 @stop
 
 @section('content')
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Editar Informações do Perfil</h3>
-            <div class="card-tools">
-                <a href="#" class="btn btn-sm btn-tool d-sm-inline-block" title="Filtro">
-                    <i class="fa-solid fa-filter"></i>
-                </a>
-        
-                <a href="#" class="btn btn-sm btn-tool d-sm-inline-block" title="Mais Informações">
-                    <i class="fas fa-bars"></i>
-                </a>
-            </div>
-        </div>
-        <form action="{{ route('usuarios.update', $usuario->id) }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
 
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Editar Informações do Perfil</h3>
+                    <div class="card-tools">
+                        <a href="#" class="btn btn-sm btn-tool d-sm-inline-block" title="Filtro">
+                            <i class="fa-solid fa-filter"></i>
+                        </a>
+                
+                        <a href="#" class="btn btn-sm btn-tool d-sm-inline-block" title="Mais Informações">
+                            <i class="fas fa-bars"></i>
+                        </a>
+                    </div>
+                </div>
 
+                <form action="{{ route('usuarios.update', $usuario->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="card-body">
                         <div class="card card-widget widget-user">
                             <div class="widget-user-header text-white" style="background: url('{{ asset('img/panel_user.png') }}') center center;">
                                 <h3 class="widget-user-username text-right">{{$usuario->name}}</h3>
@@ -143,11 +144,9 @@
                             </select>
                         </div>
             
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <p class="lead"><i class="fa-solid fa-house-lock"></i> Permissões</p>
-                        {{-- <div class="table-responsive"> --}}
+
+                        <div class="card card-widget widget-user border-0 p-4">
+                            <p class="lead"><i class="fa-solid fa-house-lock"></i> Permissões</p>
                             <table class="table">
                                 <tbody>
                                     <tr>
@@ -196,24 +195,21 @@
                                             </div>                                        
                                         </th>
                                     </tr>
-
                                 </tbody>
                             </table>
-                        {{-- </div> --}}
-
+                        </div>
                     </div>
 
-                </div>
-
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-default" style="width: 150px;">Salvar</button>
+                        <a href="{{ route('usuarios.index') }}" class="btn btn-default" style="width: 150px;">Cancelar</a>
+                    </div>
+                </form>
             </div>
-
-            <div class="card-footer">
-                <button type="submit" class="btn btn-default" style="width: 150px;">Salvar</button>
-                <a href="{{ route('usuarios.index') }}" class="btn btn-default" style="width: 150px;">Cancelar</a>
-            </div>
-
-        </form>
-
+        </div>
+        <div class="col-md-6">
+            @include('usuarios.partials._questionarios') 
+        </div>
     </div>
 
 @stop

@@ -20,31 +20,25 @@ class UsuarioFormularioController extends Controller
         return view('usuario_formulario.create');
     }
 
-    // public function store(Request $request)
-    // {
-    //     $validatedData = $request->validate([
-    //         'usuario_id' => 'nullable|integer',
-    //         'formulario_id' => 'nullable|integer',
-    //     ]);
+    public function storeAdmin(Request $request)
+    {
+        $validatedData = $request->validate([
+            'usuario_id' => 'nullable|integer',
+            'formulario_id' => 'nullable|integer',
+        ]);
     
-    //     $exists = UsuarioFormulario::where('usuario_id', $validatedData['usuario_id'])
-    //         ->where('formulario_id', $validatedData['formulario_id'])
-    //         ->exists();
+        $exists = UsuarioFormulario::where('usuario_id', $validatedData['usuario_id'])
+            ->where('formulario_id', $validatedData['formulario_id'])
+            ->exists();
     
-    //     if ($exists) {
-    //         return redirect()->back()->with('msgError', 'Este formulário já foi incluído para este usuário.');
-    //     }
+        if ($exists) {
+            return redirect()->back()->with('msgError', 'Este formulário já foi incluído para este usuário.');
+        }
 
-    //     $usuario = User::find($validatedData['usuario_id']);
-    //     $formulario = ClienteFormulario::where('formulario_id',$validatedData['formulario_id'])->where('cliente_id',$usuario->cliente_id);
-    //     if($formulario->quantidade > 0 ){
-    //         $formulario->quantidade = $formulario->quantidade - 1;
-    //         $formulario->save();
-    //         UsuarioFormulario::create($validatedData);
-    //     }
+        UsuarioFormulario::create($validatedData);
 
-    //     return redirect()->back()->with('msgSuccess', 'Formulário incluído com sucesso!');
-    // }
+        return redirect()->back()->with('msgSuccess', 'Formulário incluído com sucesso!');
+    }
 
     public function store(Request $request)
     {

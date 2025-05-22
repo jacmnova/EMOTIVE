@@ -63,7 +63,7 @@
                             </span>
                             <span>
                                 Politica e 
-                                <a href="https://fellipelli.com/termos" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#f53003] dark:text-[#FF4433] ml-1">
+                                <a href="{{ route('termos') }}" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#f53003] dark:text-[#FF4433] ml-1">
                                     <span>Termos de uso</span>
                                     <svg
                                         width="10"
@@ -90,7 +90,7 @@
                             </span>
                             <span>
                                 Assista aqui os 
-                                <a href="https://fellipelli.com.br/tutoriais" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#f53003] dark:text-[#FF4433] ml-1">
+                                <a href="{{ route('tutorial') }}" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#f53003] dark:text-[#FF4433] ml-1">
                                     <span>tutoriais do sistema.</span>
                                     <svg
                                         width="10"
