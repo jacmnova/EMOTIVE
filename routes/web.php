@@ -2,17 +2,18 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DadosController;
+use App\Http\Controllers\GestorController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\CalculosController;
 use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\VariavelController;
 use App\Http\Controllers\PerguntasController;
+use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\FormulariosController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\QuestionariosController;
 use App\Http\Controllers\UsuarioFormularioController;
-use App\Http\Controllers\GestorController;
-use App\Http\Controllers\CalculosController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -90,3 +91,6 @@ Route::get('/variaveis/formulario/{id}', [VariavelController::class, 'getPorForm
 
 Route::put('/calculos/status/{id}', [CalculosController::class, 'status'])->name('calculos.status');
 Route::resource('calculos', CalculosController::class);
+
+
+Route::get('/relatorio/pdf', [RelatorioController::class, 'gerarPDF'])->name('relatorio.pdf');

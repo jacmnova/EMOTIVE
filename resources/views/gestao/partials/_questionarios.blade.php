@@ -15,7 +15,7 @@
                         <option value="">-- Selecione --</option>
                         @foreach($formularios as $formulario)
                             <option value="{{ $formulario->formulario->id }}">
-                                {{ $formulario->formulario->label }} | {{ $formulario->formulario->nome }}
+                                {{ $formulario->formulario->label }} | {{ $formulario->formulario->nome }} | Qtde: {{$formulario->quantidade }}
                             </option>
                         @endforeach
                     </select>

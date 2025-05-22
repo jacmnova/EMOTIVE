@@ -40,6 +40,7 @@
 <div class="row">
     <div class="col-md-6">
 
+
         <div class="card">
             <div class="card-header border-0">
                 <h2 class="card-title"><label class="badge badge-dark"> {{ $formulario->label }} </label> | {{ $formulario->nome }}</h2>
@@ -56,7 +57,39 @@
                 </div>
             </div>
             <div class="card-body" style="box-shadow: none;">
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h4 class="card-title">Radar das Dimensões</h4>
+                        <canvas id="graficoRadar" width="400" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-right">
+                
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header border-0">
+                <h2 class="card-title"><label class="badge badge-dark"> {{ $formulario->label }} </label> | {{ $formulario->nome }} | Resultado de respostas ao questionario </h2>
+                <div class="card-tools">
+                    <a href="#" class="btn btn-tool btn-sm">
+                        <i class="fas fa-download"></i>
+                    </a>
+                    <a href="#" class="btn btn-tool btn-sm">
+                        <i class="fas fa-bars"></i>
+                    </a>
+                    <a href="#" class="btn btn-sm btn-tool">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body" style="box-shadow: none;">
                 <div class="card mb-2 pl-4 pr-4 border-0" style="box-shadow: none;">
+                    <div class="card mb-2 pl-4 pr-4 border-0 text-center" style="box-shadow: none;">
+                        <h1>{{ $user->name }}</h1>
+                        <h4>{{ $user->email }}</h4>
+                    </div>
                     <h5>Instruções</h5>
                     <p>{!! $formulario->instrucoes !!}</p>
                 </div>
@@ -95,8 +128,8 @@
                 </div>
             </div>
             <div class="card-footer text-right">
-                    teste
-                </div>
+
+            </div>
         </div>
     </div>
 
@@ -140,6 +173,9 @@
                     </tbody>
                 </table>
             </div>
+            <div class="card-footer text-right">
+                
+            </div>
         </div>
 
         <div class="card">
@@ -165,6 +201,9 @@
                     </div>
                 </div>
             </div>
+            <div class="card-footer text-right">
+                
+            </div>
         </div>
 
         <div class="card">
@@ -186,13 +225,13 @@
             <div class="card-body">
                 <h4 class="mb-3">Classificação por Variável</h4>
 
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered">
                     <thead class="thead-dark">
                         <tr>
-                            <th>Variável</th>
-                            <th>Tag</th>
-                            <th>Pontuação</th>
-                            <th>Classificação</th>
+                            <th style="width: 20%">Variável</th>
+                            <th style="width: 10%">Tag</th>
+                            <th style="width: 10%">Pontuação</th>
+                            <th style="width: 60%">Classificação</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -226,16 +265,23 @@
                                 <td>{{ $registro->nome }}</td>
                                 <td><strong>{{ mb_strtoupper($registro->tag, 'UTF-8') }}</strong></td>
                                 <td>{{ $pontuacao ?? '–' }}</td>
-                                <td><span class="badge badge-{{ $badge }}">{{ $classificacao }}</span></td>
+                                <td>{{ $classificacao }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
+            <div class="card-footer text-right">
+                
+            </div>
         </div>
 
-    </div>
 
+
+
+
+
+    </div>
 </div>
 
 
@@ -312,6 +358,50 @@
     });
 </script>
 
+<script>
+    // Radar usa os mesmos dados
+    const ctxRadar = document.getElementById('graficoRadar').getContext('2d');
+
+    new Chart(ctxRadar, {
+        type: 'radar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Pontuação',
+                data: data,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgba(54, 162, 235, 1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    enabled: true
+                },
+                title: {
+                    display: false
+                }
+            },
+            scales: {
+                r: {
+                    angleLines: {
+                        display: true
+                    },
+                    suggestedMin: 0,
+                    suggestedMax: Math.max(...data) + 5
+                }
+            }
+        }
+    });
+</script>
 
 
 @stop

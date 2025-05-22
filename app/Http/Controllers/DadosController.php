@@ -207,7 +207,8 @@ class DadosController extends Controller
             'formulario',
             'respostasUsuario',
             'pontuacoes',
-            'variaveis'
+            'variaveis',
+            'user'
         ));
     }
 

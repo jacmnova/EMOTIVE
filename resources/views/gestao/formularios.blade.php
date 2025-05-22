@@ -56,8 +56,9 @@
                 <table class="table datatable table-striped dtr-inline mr-1 ml-1">
                     <thead>
                         <tr>
-                            <th style="width: 20%">Nome</th>
-                            <th style="width: 40%">Descrição</th>
+                            <th style="width: 30%">Nome</th>
+                            <th style="width: 45%">Descrição</th>
+                            <th style="width: 5%">Quantidade</th>
                             <th style="width: 20%">Ações</th>
                         </tr>
                     </thead>
@@ -67,7 +68,7 @@
                             <tr>
                                 <td> <label class="badge badge-dark"> {{ $formulario->formulario->label }} </label> | {{ $formulario->formulario->nome }}</td>
                                 <td>{!! \Illuminate\Support\Str::limit($formulario->formulario->descricao, 70, '...') !!}</td>
-
+                                <td class="text-center" > <label class="badge badge-secondary"> {{ $formulario->quantidade }} </label> </td>
                                 <td>
                                     <a href="{{ route('formularios.show', $formulario->id) }}"
                                     class="btn btn-sm btn-tool" title="Ver Detalhes">

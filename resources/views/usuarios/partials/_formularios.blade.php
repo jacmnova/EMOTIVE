@@ -50,6 +50,10 @@
                                         <i class="fa-regular fa-rectangle-list" style="color: #008ca5"></i>
                                     </a>
                                 @endif
+
+                                <a href="{{ route('relatorio.pdf', ['user' => $usuario->id, 'formulario' => $formulario->formulario_id]) }}" class="btn btn-sm btn-tool" target="_blank">
+                                    <i class="fas fa-file-pdf" style="color: #008ca5"></i>
+                                </a>
                             </td>
                             <td>
                                 @if($formulario->status !== 'completo')

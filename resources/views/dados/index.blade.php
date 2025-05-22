@@ -96,7 +96,7 @@
             </div>
 
             <div class="col-md-6">
-                @if(Auth::user()->cliente_id !== null)
+                @if(Auth::user()->cliente_id !== null && Auth::user()->gestor === 1)
                     @include('dados.partials._gestor')
                 @else
                     @if(Auth::user()->gestor !== 1)
