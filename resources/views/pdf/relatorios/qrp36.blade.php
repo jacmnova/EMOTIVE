@@ -10,7 +10,7 @@
             color: #111;
             padding: 20px;
         }
-        h1, h2, h3 {
+        h1, h2, h3, h4 {
             text-align: center;
             margin-bottom: 10px;
         }
@@ -36,6 +36,15 @@
         }
         .section {
             margin-bottom: 30px;
+        }
+        .grafico {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .grafico img {
+            width: 100%;    /* Usa toda a largura disponível */
+            height: auto;   /* Mantém a proporção */
+            border: 1px solid #ccc;
         }
     </style>
 </head>
@@ -107,6 +116,16 @@
             @endforeach
         </tbody>
     </table>
+
+    <div class="grafico">
+        <h4>Gráfico de Barras</h4>
+        <img src="{{ public_path($imagemGrafico) }}" alt="Gráfico de Barras">
+    </div>
+
+    <div class="grafico">
+        <h4>Gráfico de Radar</h4>
+        <img src="{{ public_path($imagemRadar) }}" alt="Gráfico de Radar">
+    </div>
 </div>
 
 <div class="section">
@@ -153,7 +172,7 @@
 
 <div class="section">
     <h3>Análise Interpretativa por Dimensão</h3>
-
+    {{-- Conteúdo interpretativo a ser inserido aqui --}}
 </div>
 
 </body>

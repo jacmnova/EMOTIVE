@@ -311,33 +311,42 @@ return [
         ],
 
         // Sidebar items:
+        ['header' => 'SA MENU',
+            'can' => 'sa'
+        ],
+
+        [
+            'text' => 'Dashboard',
+            'url' => 'dashboard',
+            'icon' => 'fa-solid fa-users-gear',
+            'can' => 'sa',
+        ],
+
+
+        // Sidebar items:
         ['header' => 'ADMIN MENU',
             'can' => 'admin'
         ],
-
         [
             'text' => 'Usuários',
             'url' => 'usuarios',
             'icon' => 'fa-solid fa-users-gear',
             'can' => 'admin',
         ],
-
         [
             'text' => 'Clientes',
             'url' => 'clientes',
             'icon' => 'fa-solid fa-handshake',
             'can' => 'admin',
         ],
-
         [
             'text' => 'Formulários',
              'url' => 'formularios',
              'icon' => 'fa-solid fa-clipboard-list',
              'can' => 'admin',
         ],
-
         [
-            'text' => 'Variaveis',
+            'text' => 'Dimensões',
             'url' => 'variaveis',
             'icon' => 'fa-solid fa-code',
             'can' => 'admin',
@@ -355,6 +364,8 @@ return [
             'can' => 'admin',
         ],
 
+
+
         ['header' => 'GESTOR MENU',
             'can' => 'gestor'
         ],
@@ -370,6 +381,8 @@ return [
             'icon' => 'fa-solid fa-clipboard-check',
             'can' => 'gestor',
         ],
+
+
 
         ['header' => 'MENU',
             'can' => 'usuario'

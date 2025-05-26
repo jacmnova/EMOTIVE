@@ -18,7 +18,7 @@ class ClientesSeeder extends Seeder
 
         $clientes = [
             [
-                'usuario_id' => null, 
+                'usuario_id' => 1, 
                 'tipo' => 'cpf',
                 'cpf_cnpj' => '01148890904',
                 'nome_fantasia' => 'DESENVOLVIMENTO DE SISTEMAS',
@@ -30,7 +30,7 @@ class ClientesSeeder extends Seeder
                 'ativo' => 1
             ],
             [
-                'usuario_id' => null, 
+                'usuario_id' => 2, 
                 'tipo' => 'cnpj',
                 'cpf_cnpj' => '26789226000107',
                 'nome_fantasia' => 'HAGUEN SYSTEM DESENVOLVIMENTO',
@@ -42,7 +42,7 @@ class ClientesSeeder extends Seeder
                 'ativo' => 1
             ],
             [
-                'usuario_id' => null, 
+                'usuario_id' => 3, 
                 'tipo' => 'internacional',
                 'cpf_cnpj' => '123456',
                 'nome_fantasia' => 'GOOGLE.COM',

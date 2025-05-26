@@ -34,7 +34,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'sa' => 'boolean',
         'admin' => 'boolean',
-        'cliente' => 'integer',
+        'cliente_id' => 'integer',
         'gestor' => 'boolean',
         'usuario' => 'boolean',
         'ativo' => 'boolean',

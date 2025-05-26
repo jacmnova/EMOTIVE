@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Lista de Variáveis')
+@section('title', 'Lista de Dimensões')
 
 @section('content_header')
     @if(Session::has('msgSuccess'))
@@ -26,7 +26,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#">Início</a></li>
-                    <li class="breadcrumb-item active">Variáveis</li>
+                    <li class="breadcrumb-item active">Dimensões</li>
                 </ol>
             </div>
         </div>
@@ -38,14 +38,14 @@
     <div class="card-header">
         <h3 class="card-title">
             <i class="fa-solid fa-spell-check" style="margin-right: 5px;"></i>
-            Lista de Variáveis
+            Lista de Dimensões
         </h3>
         <div class="card-tools d-flex align-items-center">
             <button type="button" class="btn btn-block btn-default btn-sm"
                     onclick="window.location.href='{{ route('variaveis.create') }}'"
                     style="margin-right: 10px;">
                 <i class="fa-solid fa-plus" style="margin-right: 5px;"></i>
-                Adicionar Variável
+                Adicionar Dimensão
             </button>
 
             <a href="#" class="btn btn-sm btn-tool d-sm-inline-block" title="Mais Informações">
@@ -60,7 +60,7 @@
                 <thead>
                     <tr>
                         <th style="width: 20%">Formulário</th>
-                        <th style="width: 20%">Variavel</th>
+                        <th style="width: 20%">Dimensão</th>
                         <th style="width: 40%">Descrição</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
@@ -103,9 +103,9 @@
     @else
         <div class="row" style="margin: 20px;">
             <div class="callout callout-warning">
-                <h5><i class="fa-solid fa-circle-info"></i> Nenhuma variável foi encontrada.</h5>
-                <p>Cadastre uma nova variável usando o botão
-                   <strong>"Adicionar Variável"</strong> no canto superior direito.</p>
+                <h5><i class="fa-solid fa-circle-info"></i> Nenhuma Dimensão foi encontrada.</h5>
+                <p>Cadastre uma nova Dimensão usando o botão
+                   <strong>"Adicionar Dimensão"</strong> no canto superior direito.</p>
             </div>
         </div>
     @endif
@@ -119,7 +119,7 @@
         function confirmarRemocao(id) {
             Swal.fire({
                 title: 'Remover Variável!',
-                text: 'Esta ação vai remover a variável. Você tem certeza?',
+                text: 'Esta ação vai remover a dimensão. Você tem certeza?',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#008ca5',
