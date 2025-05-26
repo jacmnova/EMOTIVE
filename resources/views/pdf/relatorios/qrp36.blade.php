@@ -119,12 +119,15 @@
 
     <div class="grafico">
         <h4>Gráfico de Barras</h4>
-        <img src="{{ public_path($imagemGrafico) }}" alt="Gráfico de Barras">
+        <!-- <img src="{{ public_path($imagemGrafico) }}" alt="Gráfico de Barras"> -->
+        <img src="{{ asset($imagemGrafico) }}" alt="Gráfico de Barras" style="width: 100%; height: auto;">
+
     </div>
 
     <div class="grafico">
         <h4>Gráfico de Radar</h4>
-        <img src="{{ public_path($imagemRadar) }}" alt="Gráfico de Radar">
+        <!-- <img src="{{ public_path($imagemRadar) }}" alt="Gráfico de Radar"> -->
+        <img src="{{ asset($imagemRadar) }}" alt="Gráfico de Radar" style="width: 100%; height: auto;">
     </div>
 </div>
 
