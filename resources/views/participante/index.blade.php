@@ -83,9 +83,8 @@
                                 </td>
                                 <td>
                                     @if($formulario->status !== 'completo')
-                                        <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}"
-                                        class="btn btn-sm btn-tool" title="Iniciar">
-                                            <i class="fa-regular fa-circle-play" style="color: #008ca5"></i>
+                                        <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm btn-secondary" title="Iniciar">
+                                            <i class="fa-regular fa-circle-play mr-1"></i> Responder Questionario 
                                         </a>
                                     @else
                                         <a href="#"

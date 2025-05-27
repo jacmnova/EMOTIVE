@@ -14,6 +14,7 @@ use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\QuestionariosController;
 use App\Http\Controllers\UsuarioFormularioController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -101,3 +102,6 @@ Route::resource('calculos', CalculosController::class);
 
 
 Route::get('/relatorio/pdf', [RelatorioController::class, 'gerarPDF'])->name('relatorio.pdf');
+
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
