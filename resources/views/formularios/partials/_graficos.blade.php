@@ -37,7 +37,7 @@
                     label: 'Pontuação',
                     data: [{{ $categorias->baixa }}, {{ $categorias->media }}, {{ $categorias->alta }},{{ $categorias->max }}],
                     backgroundColor: ['#17a2b8', '#ffc107', '#dc3545','#6c757d'],
-                    borderColor: ['#0069d9', '#e0a800', '#218838', '#091d33'],
+                    borderColor: ['#17a2b8', '#ffc107', '#dc3545', '#6c757d'],
                     borderWidth: 1
                 }]
             },
