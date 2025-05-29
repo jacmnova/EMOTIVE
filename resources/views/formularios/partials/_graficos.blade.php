@@ -36,7 +36,7 @@
                 datasets: [{
                     label: 'Pontuação',
                     data: [{{ $categorias->baixa }}, {{ $categorias->media }}, {{ $categorias->alta }},{{ $categorias->max }}],
-                    backgroundColor: ['#007bff', '#ffc107', '#28a745','#091d33'],
+                    backgroundColor: ['#17a2b8', '#ffc107', '#dc3545','#6c757d'],
                     borderColor: ['#0069d9', '#e0a800', '#218838', '#091d33'],
                     borderWidth: 1
                 }]
