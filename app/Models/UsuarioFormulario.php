@@ -16,6 +16,7 @@ class UsuarioFormulario extends Model
         'formulario_id',
         'status',
         'data_limite',
+        'video_assistido',
         'deleted_by',
         'created_at',
         'updated_at'
@@ -24,9 +25,10 @@ class UsuarioFormulario extends Model
     protected $casts = [
         'status' => 'string',
         'data_limite' => 'date',
+        'video_assistido' => 'boolean',
         'deleted_by' => 'integer',
         'created_at' => 'datetime',
-        'updated_at' =>'datetime'
+        'updated_at' => 'datetime'
     ];
 
     public function usuario()
@@ -38,4 +40,10 @@ class UsuarioFormulario extends Model
     {
         return $this->belongsTo(Formulario::class, 'formulario_id');
     }
+
+    public function midia()
+    {
+        return $this->hasOne(Midia::class, 'formulario_id', 'formulario_id');
+    }
+
 }

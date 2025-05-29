@@ -121,4 +121,15 @@ class UsuarioFormularioController extends Controller
 
         return redirect()->route('usuario_formulario.index')->with('success', 'Registro excluído com sucesso!');
     }
+
+    public function marcarAssistido(Request $request, $id)
+    {
+        $registro = UsuarioFormulario::findOrFail($id);
+        $registro->video_assistido = true;
+        $registro->save();
+
+        return response()->json(['success' => true]);
+    }
+
+
 }

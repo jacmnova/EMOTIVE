@@ -98,7 +98,8 @@ class DadosController extends Controller
     public function questionariosUsuario()
     {
         $user = Auth::user();
-        $questionarios = UsuarioFormulario::with(['formulario'])->where('usuario_id',$user->id)->get();
+        $questionarios = UsuarioFormulario::with(['formulario', 'midia'])->where('usuario_id', $user->id)->get();
+
         return view('participante.index', compact('user', 'questionarios'));
     }
 
@@ -115,12 +116,12 @@ class DadosController extends Controller
     {
         $userId = Auth::user()->id;
         $respostas = $request->input('respostas', []);
-    
+
         foreach ($respostas as $perguntaId => $valorResposta) {
             $resposta = Resposta::where('user_id', $userId)
                                 ->where('pergunta_id', $perguntaId)
                                 ->first();
-    
+
             if ($resposta) {
                 $resposta->valor_resposta = (int) $valorResposta;
                 $resposta->save();
@@ -140,11 +141,20 @@ class DadosController extends Controller
         if ($atualizarStatus) {
             $atualizarStatus->status = 'pendente';
             $atualizarStatus->updated_at = now();
+
+            // Se for finalização, já marca como completo
+            if ($request->has('finalizar')) {
+                $atualizarStatus->status = 'completo';
+            }
+
             $atualizarStatus->save();
         }
-   
-        return redirect()->back()->with('success', 'Respostas salvas com sucesso!');
+
+        return redirect()->route('questionarios.usuario')
+            ->with('msgSuccess', $request->has('finalizar') ? 'Formulário finalizado com sucesso!' : 'Respostas salvas com sucesso!');
     }
+
+
 
     public function finalizar(Request $request)
     {
@@ -159,11 +169,12 @@ class DadosController extends Controller
             $record->status = 'completo';
             $record->save();
 
-            return redirect()->back()->with('success', 'Formulário finalizado com sucesso!');
+            return redirect()->route('formulario.index')->with('msgSuccess', 'Formulário finalizado com sucesso!');
         }
 
-        return redirect()->back()->with('error', 'Registro não encontrado.');
+        return redirect()->back()->with('msgError', 'Registro não encontrado.');
     }
+
 
     public function relatorioShow(Request $request)
     {

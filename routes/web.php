@@ -1,12 +1,15 @@
 <?php
 
+use App\Models\Midia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DadosController;
+use App\Http\Controllers\MidiaController;
 use App\Http\Controllers\GestorController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\CalculosController;
 use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\VariavelController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerguntasController;
 use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\FormulariosController;
@@ -14,7 +17,6 @@ use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\QuestionariosController;
 use App\Http\Controllers\UsuarioFormularioController;
-use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -78,7 +80,7 @@ Route::resource('usuario_formulario', UsuarioFormularioController::class);
 
 
 
-Route::get('/meusquestionarios', [DadosController::class, 'questionariosUsuario'])->name('questionarios.usuario');
+Route::get('/meus-questionarios', [DadosController::class, 'questionariosUsuario'])->name('questionarios.usuario');
 
 
 
@@ -105,3 +107,9 @@ Route::get('/relatorio/pdf', [RelatorioController::class, 'gerarPDF'])->name('re
 
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+Route::resource('midias', MidiaController::class);
+
+
+Route::post('/usuario-formulario/{id}/assistido', [UsuarioFormularioController::class, 'marcarAssistido']);
+

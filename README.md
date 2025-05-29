@@ -65,3 +65,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 adicionei uma biblioteca para PDF
 
 composer require barryvdh/laravel-dompdf
+
+
+sudo apt-get install libheif1 libheif-dev
+sudo apt-get install imagemagick

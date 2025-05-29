@@ -50,11 +50,9 @@
     </div>
 
     <div id="visualizacaoCards" style="display: none;">
-        {{-- Aqui vai o conteúdo de visualização em cards (já implementado) --}}
         @include('usuarios.partials._visualizacao_cards', ['perfis' => $perfis])
     </div>
     <div id="visualizacaoTabela">
-        {{-- Aqui vai o conteúdo de visualização em tabela --}}
         @include('usuarios.partials._visualizacao_tabela', ['perfis' => $perfis])
     </div>
 

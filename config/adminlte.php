@@ -358,6 +358,12 @@ return [
             'can' => 'admin',
         ],
         [
+            'text' => 'Mídia',
+            'url' => 'midias',
+            'icon' => 'fa-solid fa-photo-film',
+            'can' => 'admin',
+        ],
+        [
             'text' => 'Cálculos',
             'url' => 'calculos',
             'icon' => 'fa-solid fa-square-root-variable',
@@ -394,8 +400,8 @@ return [
             'can' => 'usuario',
         ],
         [
-            'text' => 'Questionario',
-            'url' => 'meusquestionarios',
+            'text' => 'Questionários',
+            'url' => 'meus-questionarios',
             'icon' => 'fa-solid fa-book-open-reader',
             'can' => 'usuario',
         ],

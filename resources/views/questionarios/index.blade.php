@@ -27,7 +27,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#">Início</a></li>
-                    <li class="breadcrumb-item active">Questionarios</li>
+                    <li class="breadcrumb-item active">Questionários</li>
                 </ol>
             </div>
         </div>
@@ -73,8 +73,8 @@
         @else
             <div class="row" style="margin: 20px;">
                 <div class="callout callout-warning">
-                    <h5><i class="fa-solid fa-circle-info"></i> Nenhum Formulário foi encontrado.</h5>
-                    <p>Cadastre um novo formulário usando o botão <strong>"Adicionar Formulário"</strong> no canto superior direito.</p>
+                    <h5><i class="fa-solid fa-circle-info"></i> Nenhum Questionário foi encontrado.</h5>
+                    <p>Entre em Contato com seu <strong>"Gestor/Administrador"</strong> e peça a liberação.</p>
                 </div>
             </div>
         @endif

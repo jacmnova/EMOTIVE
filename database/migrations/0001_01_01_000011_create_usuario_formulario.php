@@ -15,6 +15,7 @@ return new class extends Migration
             $table->timestamps();
             $table->enum('status', ['novo', 'pendente', 'completo'])->default('novo');
             $table->date('data_limite')->nullable();
+            $table->boolean('video_assistido')->default(false);
             $table->softDeletes();
             $table->unsignedBigInteger('deleted_by')->nullable();
         });

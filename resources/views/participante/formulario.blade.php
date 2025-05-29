@@ -114,14 +114,6 @@
         </div>
     </form>
 
-    <form id="finalizar-form" method="POST" action="{{ route('usuarioFormulario.finalizar') }}">
-        @csrf
-        <input type="hidden" name="f_formulario_id" value="{{ $formulario->id }}">
-        <div class="card-footer text-right">
-            <button id="finalizar-btn" class="btn btn-dark" style="width: 250px;" disabled>Finalizar Formulário</button>
-        </div>
-    </form>
-
 @stop
 
 @section('css')
@@ -129,16 +121,14 @@
 @stop
 
 @section('js')
-    <script>
-        document.getElementById('finalizar-btn').addEventListener('click', function () {
-            document.getElementById('finalizar-form').submit();
-        });
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
             const radios = document.querySelectorAll('input[type=radio]');
-            const btnFinalizar = document.getElementById('finalizar-btn');
+            const btnSalvar = document.querySelector('form[action="{{ route('respostas.salvar') }}"] button[type=submit]');
 
-            function verificarRespostas() {
+            function todasRespostasMarcadas() {
                 const totalPerguntas = new Set();
                 radios.forEach(radio => totalPerguntas.add(radio.name));
                 const perguntasRespondidas = new Set();
@@ -147,15 +137,39 @@
                         perguntasRespondidas.add(radio.name);
                     }
                 });
-
-                btnFinalizar.disabled = perguntasRespondidas.size !== totalPerguntas.size || totalPerguntas.size === 0;
+                return perguntasRespondidas.size === totalPerguntas.size && totalPerguntas.size > 0;
             }
 
-            radios.forEach(radio => {
-                radio.addEventListener('change', verificarRespostas);
-            });
+            btnSalvar.addEventListener('click', function (e) {
+                e.preventDefault();
 
-            verificarRespostas();
+                if (todasRespostasMarcadas()) {
+                    Swal.fire({
+                        title: 'Deseja salvar e finalizar o questionário?',
+                        text: "Após finalizar, você não poderá alterar as respostas.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sim, salvar e finalizar!',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Cria um input hidden para avisar que é finalização
+                            const form = btnSalvar.closest('form');
+                            const inputFinalizar = document.createElement('input');
+                            inputFinalizar.type = 'hidden';
+                            inputFinalizar.name = 'finalizar';
+                            inputFinalizar.value = '1';
+                            form.appendChild(inputFinalizar);
+                            form.submit();
+                        }
+                    });
+                } else {
+                    // Se não estiverem todas respondidas, apenas salva normalmente
+                    btnSalvar.closest('form').submit();
+                }
+            });
         });
     </script>
 @stop
