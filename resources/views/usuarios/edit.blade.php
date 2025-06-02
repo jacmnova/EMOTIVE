@@ -210,6 +210,7 @@
         <div class="col-md-6">
             @include('usuarios.partials._questionarios') 
         </div>
+
     </div>
 
 @stop

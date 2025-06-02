@@ -46,9 +46,10 @@
                 <table class="table datatable table-striped dtr-inline">
                     <thead>
                         <tr>
-                            <th style="width: 25%">Nome</th>
+                            <th style="width: 20%">Nome</th>
                             <th style="width: 5%">Questões</th>
                             <th style="width: 10%">Habilitado em</th>
+                            <th style="width: 10%">Etapa Atual</th>
                             <th style="width: 5%">Status</th>
                             <th style="width: 25%">Ações</th>
                         </tr>
@@ -62,6 +63,15 @@
                                 <td>{{ $formulario->formulario->perguntaCount() }}</td>
                                 <td>
                                     {{ optional($formulario->created_at)->translatedFormat('d \d\e F \d\e Y \à\s H:i') }}
+                                </td>
+                                <td>
+                                    @if ($formulario->etapa_atual_numero)
+                                        <span class="badge badge-info">
+                                            {{ $formulario->etapa_atual_nome }}
+                                        </span>
+                                    @else
+                                        <span class="badge badge-secondary">Sem Etapa</span>
+                                    @endif
                                 </td>
                                 <td>
                                     @if($formulario->status == 'novo')

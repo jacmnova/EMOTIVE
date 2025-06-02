@@ -12,13 +12,21 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
          $this->call([
-            FormularioSeeder::class,  // php artisan db:seed --class=FormularioSeeder
-            VariaveisSeeder::class, // php artisan db:seed --class=VariaveisSeeder
-            PerguntasSeeder::class, // php artisan db:seed --class=PerguntasSeeder
+            // FormularioSeeder::class,  // php artisan db:seed --class=FormularioSeeder
+            // VariaveisSeeder::class, // php artisan db:seed --class=VariaveisSeeder
+            // PerguntasSeeder::class, // php artisan db:seed --class=PerguntasSeeder
+            // VariavelPerguntaSeeder::class, // php artisan db:seed --class=VariavelPerguntaSeeder
+            
             UsuariosSeeder::class, // php artisan db:seed --class=UsuariosSeeder
             ClientesSeeder::class, // php artisan db:seed --class=ClientesSeeder
             CalculoSeeder::class, // php artisan db:seed --class=CalculoSeeder
-            VariavelPerguntaSeeder::class, // php artisan db:seed --class=VariavelPerguntaSeeder
+
+
+            FormBurnOutSeeder::class, // php artisan db:seed --class=FormBurnOutSeeder
+            VarBurnOutSeeder::class, // php artisan db:seed --class=VarBurnOutSeeder
+            PerguntasBurnOutSeeder::class, // php artisan db:seed --class=PerguntasBurnOutSeeder
+            VarPerguntaBurnOutSeeder::class, // php artisan db:seed --class=VarPerguntaBurnOutSeeder
+            EtapaSeeder::class, // php artisan db:seed --class=EtapaSeeder
         ]);
     }
 }

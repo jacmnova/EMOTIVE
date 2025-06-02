@@ -69,3 +69,8 @@ composer require barryvdh/laravel-dompdf
 
 sudo apt-get install libheif1 libheif-dev
 sudo apt-get install imagemagick
+
+
+composer require openai-php/laravel
+
+php artisan vendor:publish --tag="openai-config"

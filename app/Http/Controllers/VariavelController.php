@@ -22,7 +22,7 @@ class VariavelController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'formulario_id' => 'required|exists:formularios,id',
             'nome' => 'required|string|max:255',
             'descricao' => 'required|string',
@@ -30,12 +30,18 @@ class VariavelController extends Controller
             'B' => 'required|integer',
             'M' => 'required|integer',
             'A' => 'required|integer',
-            'baixa' => 'nullable|string',
-            'moderada' => 'nullable|string',
-            'alta' => 'nullable|string',
+            'baixa' => 'required|string',
+            'moderada' => 'required|string',
+            'alta' => 'required|string',
+            'r_baixa' => 'required|string',
+            'r_moderada' => 'required|string',
+            'r_alta' => 'required|string',
+            'd_baixa' => 'nullable|string',
+            'd_moderada' => 'nullable|string',
+            'd_alta' => 'nullable|string',
         ]);
 
-        Variavel::create($request->all());
+        Variavel::create($validatedData);
 
         return redirect()->route('variaveis.index')->with('msgSuccess', 'Variável criada com sucesso!');
     }
@@ -55,21 +61,26 @@ class VariavelController extends Controller
     public function update(Request $request, Variavel $variavel)
     {
         $validatedData = $request->validate([
+            'formulario_id' => 'required|exists:formularios,id',
             'nome' => 'required|string|max:255',
             'descricao' => 'required|string',
-            'B' => 'required|numeric',
-            'M' => 'required|numeric',
-            'A' => 'required|numeric',
+            'tag' => 'required|string|max:255|unique:variaveis,tag,' . $variavel->id,
+            'B' => 'required|integer',
+            'M' => 'required|integer',
+            'A' => 'required|integer',
             'baixa' => 'required|string',
             'moderada' => 'required|string',
             'alta' => 'required|string',
+            'r_baixa' => 'required|string',
+            'r_moderada' => 'required|string',
+            'r_alta' => 'required|string',
+            'd_baixa' => 'nullable|string',
+            'd_moderada' => 'nullable|string',
+            'd_alta' => 'nullable|string',
         ]);
-    
-        // Opcional: use somente os campos validados
-        $updateFields = $request->only(['nome', 'descricao', 'B', 'M', 'A', 'baixa', 'moderada', 'alta']);
-    
+
         try {
-            $variavel->update($updateFields);
+            $variavel->update($validatedData);
             return redirect()->route('variaveis.index')->with('msgSuccess', 'Variável atualizada com sucesso!');
         } catch (\Exception $e) {
             return back()->with('msgError', 'Erro ao atualizar Variável. Tente novamente.');
@@ -89,5 +100,4 @@ class VariavelController extends Controller
 
         return response()->json($variaveis);
     }
-
 }

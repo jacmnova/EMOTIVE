@@ -98,25 +98,84 @@ class DadosController extends Controller
     public function questionariosUsuario()
     {
         $user = Auth::user();
-        $questionarios = UsuarioFormulario::with(['formulario', 'midia'])->where('usuario_id', $user->id)->get();
+        $questionarios = UsuarioFormulario::with(['formulario.perguntas', 'formulario.etapas', 'midia'])
+            ->where('usuario_id', $user->id)
+            ->get();
+
+        foreach ($questionarios as $formulario) {
+            $perguntas = $formulario->formulario->perguntas;
+            $etapas = $formulario->formulario->etapas;
+
+            $respostasUsuario = \App\Models\Resposta::where('user_id', $user->id)
+                ->whereIn('pergunta_id', $perguntas->pluck('id'))
+                ->get()
+                ->keyBy('pergunta_id');
+
+            $etapaAtual = null;
+            foreach ($etapas as $etapa) {
+                $perguntasEtapa = $perguntas->whereBetween('id', [$etapa->de, $etapa->ate]);
+                $todasRespondidas = $perguntasEtapa->every(function ($pergunta) use ($respostasUsuario) {
+                    return isset($respostasUsuario[$pergunta->id]);
+                });
+                if (!$todasRespondidas) {
+                    $etapaAtual = $etapa;
+                    break;
+                }
+            }
+
+            if (!$etapaAtual) {
+                $etapaAtual = $etapas->last();
+            }
+
+            $formulario->etapa_atual_numero = $etapaAtual ? $etapaAtual->etapa : null;
+            $formulario->etapa_atual_nome = $etapaAtual ? 'Etapa ' . $etapaAtual->etapa : 'Sem Etapa';
+        }
 
         return view('participante.index', compact('user', 'questionarios'));
     }
 
+
     public function questionarioEditar($id)
     {
         $user = Auth::user();
-        $formulario = Formulario::with('perguntas')->find($id);
+        $formulario = Formulario::with(['perguntas', 'etapas'])->find($id);
+
         $perguntas = $formulario->perguntas;
-        $respostasUsuario = Resposta::where('user_id', $user->id)->whereIn('pergunta_id', $perguntas->pluck('id'))->get()->keyBy('pergunta_id');
-        return view('participante.formulario', compact('user', 'formulario','respostasUsuario'));
+
+        $respostasUsuario = Resposta::where('user_id', $user->id)
+            ->whereIn('pergunta_id', $perguntas->pluck('id'))
+            ->get()
+            ->keyBy('pergunta_id');
+
+        // Fluxo para encontrar a primeira etapa não respondida
+        $etapaAtual = null;
+        foreach ($formulario->etapas as $etapa) {
+            $perguntasEtapa = $perguntas->whereBetween('id', [$etapa->de, $etapa->ate]);
+            $todasRespondidas = $perguntasEtapa->every(function ($pergunta) use ($respostasUsuario) {
+                return isset($respostasUsuario[$pergunta->id]);
+            });
+            if (!$todasRespondidas) {
+                $etapaAtual = $etapa;
+                break;
+            }
+        }
+
+        // Se todas as etapas foram respondidas, mostra a última
+        if (!$etapaAtual) {
+            $etapaAtual = $formulario->etapas->last();
+        }
+
+        return view('participante.formulario', compact('user', 'formulario', 'respostasUsuario', 'etapaAtual'));
     }
+
 
     public function salvarRespostas(Request $request)
     {
         $userId = Auth::user()->id;
+        $formularioId = $request->input('formulario_id');
         $respostas = $request->input('respostas', []);
 
+        // Salvar ou atualizar respostas
         foreach ($respostas as $perguntaId => $valorResposta) {
             $resposta = Resposta::where('user_id', $userId)
                                 ->where('pergunta_id', $perguntaId)
@@ -134,47 +193,36 @@ class DadosController extends Controller
             }
         }
 
-        $atualizarStatus = UsuarioFormulario::where('usuario_id', $userId)
-            ->where('formulario_id', $request->input('formulario_id'))
+        // Atualizar status do formulário
+        $usuarioFormulario = UsuarioFormulario::where('usuario_id', $userId)
+            ->where('formulario_id', $formularioId)
             ->first();
 
-        if ($atualizarStatus) {
-            $atualizarStatus->status = 'pendente';
-            $atualizarStatus->updated_at = now();
+        if ($usuarioFormulario) {
+            $usuarioFormulario->status = 'pendente';
+            $usuarioFormulario->updated_at = now();
 
-            // Se for finalização, já marca como completo
-            if ($request->has('finalizar')) {
-                $atualizarStatus->status = 'completo';
+            // Checar se todas as perguntas foram respondidas
+            $formulario = \App\Models\Formulario::with('perguntas')->find($formularioId);
+            $totalPerguntas = $formulario->perguntas->count();
+
+            $respostasUsuario = \App\Models\Resposta::where('user_id', $userId)
+                ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
+                ->count();
+
+            if ($respostasUsuario >= $totalPerguntas && $totalPerguntas > 0) {
+                $usuarioFormulario->status = 'completo';
             }
 
-            $atualizarStatus->save();
+            $usuarioFormulario->save();
         }
 
-        return redirect()->route('questionarios.usuario')
-            ->with('msgSuccess', $request->has('finalizar') ? 'Formulário finalizado com sucesso!' : 'Respostas salvas com sucesso!');
+        $mensagem = ($usuarioFormulario->status === 'completo') 
+            ? 'Formulário finalizado automaticamente com sucesso!'
+            : 'Respostas salvas com sucesso!';
+
+        return redirect()->route('questionarios.usuario')->with('msgSuccess', $mensagem);
     }
-
-
-
-    public function finalizar(Request $request)
-    {
-        $usuarioId = Auth::user()->id;
-        $formularioId = $request->input('f_formulario_id');
-
-        $record = UsuarioFormulario::where('usuario_id', $usuarioId)
-                    ->where('formulario_id', $formularioId)
-                    ->first();
-
-        if ($record) {
-            $record->status = 'completo';
-            $record->save();
-
-            return redirect()->route('formulario.index')->with('msgSuccess', 'Formulário finalizado com sucesso!');
-        }
-
-        return redirect()->back()->with('msgError', 'Registro não encontrado.');
-    }
-
 
     public function relatorioShow(Request $request)
     {

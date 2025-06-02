@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Formulario;
+use App\Models\FormularioEtapa;
 use App\Models\TipoCalculo;
 use App\Models\Variavel;
 use Illuminate\Http\Request;
@@ -50,6 +51,8 @@ class FormulariosController extends Controller
     public function edit(Formulario $formulario)
     {
         $calculos = TipoCalculo::all();
+        // $etapas = FormularioEtapa::find($formulario->id);
+        $formulario->load('etapas'); 
         return view('formularios.edit', compact('formulario','calculos'));
     }
 

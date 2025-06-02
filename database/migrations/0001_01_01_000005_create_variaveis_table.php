@@ -20,6 +20,15 @@ return new class extends Migration
             $table->text('baixa');
             $table->text('moderada');
             $table->text('alta');
+
+            $table->text('r_baixa');
+            $table->text('r_moderada');
+            $table->text('r_alta');
+
+            $table->text('d_baixa')->nullable();
+            $table->text('d_moderada')->nullable();
+            $table->text('d_alta')->nullable();
+
             $table->timestamps();
         });
     }

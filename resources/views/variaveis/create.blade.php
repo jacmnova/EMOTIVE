@@ -33,14 +33,12 @@
             <div class="card-body">
 
                 <div class="row">
-
                     <div class="form-group col-md-4">
                         <label for="formulario_id">Formulário:</label>
                         <select name="formulario_id" id="formulario_id" class="form-control" required>
                             <option value="">-- Selecione --</option>
                             @foreach($formularios as $formulario)
-                                <option value="{{ $formulario->id }}"
-                                    {{ old('nome', $variavel->formulario_id ?? '') == $formulario->id ? 'selected' : '' }}>
+                                <option value="{{ $formulario->id }}">
                                     {{ $formulario->nome }}
                                 </option>
                             @endforeach
@@ -56,7 +54,6 @@
                         <label for="tag">Tag:</label>
                         <input type="text" name="tag" id="tag" class="form-control" value="{{ old('tag') }}" required>
                     </div>
-
                 </div>
 
                 <div class="row">
@@ -67,46 +64,83 @@
                 </div>
 
                 <div class="row">
-
                     <div class="form-group col-md-4">
                         <label for="B">Baixa de 0 até:</label>
                         <input type="text" name="B" id="B" class="form-control" value="{{ old('B') }}" required>
                     </div>
-
                     <div class="form-group col-md-4">
                         <label for="M">Moderada até:</label>
                         <input type="text" name="M" id="M" class="form-control" value="{{ old('M') }}" required>
                     </div>
-
                     <div class="form-group col-md-4">
                         <label for="A">Alta a partir de:</label>
                         <input type="text" name="A" id="A" class="form-control" value="{{ old('A') }}" required>
                     </div>
-
                 </div>
 
                 <div class="row">
                     <div class="form-group col-md-12">
-                        <label for="baixa">Baixa:</label>
-                        <textarea name="baixa" id="baixa" class="form-control" rows="5" required>{{ old('baixa') }}</textarea>
+                        <label for="baixa">Texto Faixa Baixa:</label>
+                        <textarea name="baixa" id="baixa" class="form-control" rows="4" required>{{ old('baixa') }}</textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label for="moderada">Texto Faixa Moderada:</label>
+                        <textarea name="moderada" id="moderada" class="form-control" rows="4" required>{{ old('moderada') }}</textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label for="alta">Texto Faixa Alta:</label>
+                        <textarea name="alta" id="alta" class="form-control" rows="4" required>{{ old('alta') }}</textarea>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="form-group col-md-12">
-                        <label for="moderada">Moderada:</label>
-                        <textarea name="moderada" id="moderada" class="form-control" rows="5" required>{{ old('moderada') }}</textarea>
-                    </div>
-                </div>
+                <hr>
 
                 <div class="row">
                     <div class="form-group col-md-12">
-                        <label for="alta">Alta:</label>
-                        <textarea name="alta" id="alta" class="form-control" rows="5" required>{{ old('alta') }}</textarea>
+                        <label for="r_baixa">Recomendação Faixa Baixa:</label>
+                        <textarea name="r_baixa" id="r_baixa" class="form-control" rows="4" required>{{ old('r_baixa') }}</textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label for="r_moderada">Recomendação Faixa Moderada:</label>
+                        <textarea name="r_moderada" id="r_moderada" class="form-control" rows="4" required>{{ old('r_moderada') }}</textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label for="r_alta">Recomendação Faixa Alta:</label>
+                        <textarea name="r_alta" id="r_alta" class="form-control" rows="4" required>{{ old('r_alta') }}</textarea>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label for="d_baixa">Detalhamento Faixa Baixa (opcional):</label>
+                        <textarea name="d_baixa" id="d_baixa" class="form-control" rows="4">{{ old('d_baixa') }}</textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label for="d_moderada">Detalhamento Faixa Moderada (opcional):</label>
+                        <textarea name="d_moderada" id="d_moderada" class="form-control" rows="4">{{ old('d_moderada') }}</textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label for="d_alta">Detalhamento Faixa Alta (opcional):</label>
+                        <textarea name="d_alta" id="d_alta" class="form-control" rows="4">{{ old('d_alta') }}</textarea>
                     </div>
                 </div>
 
             </div>
+
             <div class="card-footer">
                 <button type="submit" class="btn btn-default" style="width: 150px;">Salvar</button>
                 <a href="{{ route('variaveis.index') }}" class="btn btn-default" style="width: 150px;">Cancelar</a>

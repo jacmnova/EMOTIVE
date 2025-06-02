@@ -107,4 +107,8 @@ class Formulario extends Model
         return $this->hasMany(Pergunta::class, 'formulario_id', 'id');
     }
 
+    public function etapas()
+    {
+        return $this->hasMany(FormularioEtapa::class, 'formulario_id');
+    }
 }

@@ -322,6 +322,14 @@ return [
             'can' => 'sa',
         ],
 
+        [
+            'text' => 'ChatGPT',
+            'url' => 'chat',
+            'icon' => 'fa-solid fa-users-gear',
+            'can' => 'sa',
+        ],
+
+
 
         // Sidebar items:
         ['header' => 'ADMIN MENU',

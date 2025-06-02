@@ -2,6 +2,7 @@
 
 use App\Models\Midia;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DadosController;
 use App\Http\Controllers\MidiaController;
 use App\Http\Controllers\GestorController;
@@ -16,6 +17,8 @@ use App\Http\Controllers\FormulariosController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\QuestionariosController;
+
+use App\Http\Controllers\FormularioEtapaController;
 use App\Http\Controllers\UsuarioFormularioController;
 
 Route::get('/', function () {
@@ -112,4 +115,12 @@ Route::resource('midias', MidiaController::class);
 
 
 Route::post('/usuario-formulario/{id}/assistido', [UsuarioFormularioController::class, 'marcarAssistido']);
+
+
+Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+Route::post('/chat', [ChatController::class, 'store'])->name('chat.ask');
+
+
+Route::post('/etapas/adicionar', [FormularioEtapaController::class, 'adicionar'])->name('etapas.adicionar');
+Route::delete('/etapas/{id}/remover', [FormularioEtapaController::class, 'remover'])->name('etapas.remover');
 

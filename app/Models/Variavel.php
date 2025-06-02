@@ -21,6 +21,15 @@ class Variavel extends Model
         'baixa',
         'moderada',
         'alta',
+
+        'r_baixa',
+        'r_moderada',
+        'r_alta',
+
+        'd_baixa',
+        'd_moderada',
+        'd_alta',
+        
         'formulario_id',
     ];
 
