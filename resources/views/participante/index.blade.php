@@ -46,12 +46,12 @@
                 <table class="table datatable table-striped dtr-inline">
                     <thead>
                         <tr>
-                            <th style="width: 20%">Nome</th>
+                            <th style="width: 40%">Nome</th>
                             <th style="width: 5%">Questões</th>
-                            <th style="width: 10%">Habilitado em</th>
-                            <th style="width: 10%">Etapa Atual</th>
+                            <th style="width: 15%">Habilitado em</th>
+                            <th style="width: 5%">Etapa</th>
                             <th style="width: 5%">Status</th>
-                            <th style="width: 25%">Ações</th>
+                            <th style="width: 30%">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
