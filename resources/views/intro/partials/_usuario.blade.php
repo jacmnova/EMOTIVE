@@ -15,7 +15,15 @@
     </div>
 
     <div class="card-body">
-        Usuário
+        <p>
+            Como <strong>Usuário</strong>, você está prestes a participar de um importante momento de reflexão pessoal.
+            O formulário <strong>NR1 — Burnout</strong> foi criado para ajudá-lo a identificar como você está emocional e profissionalmente diante das exigências do trabalho.
+            Ele não é apenas uma ferramenta de medição, mas um convite ao autoconhecimento.
+        </p>
+        <p>
+            Responda com sinceridade, sabendo que suas respostas podem ajudar não apenas você, mas também a organização, a construir um ambiente mais saudável, humano e sustentável.
+            Este é um espaço seguro, e cada resposta conta para melhorar sua qualidade de vida no trabalho.
+        </p>
     </div>
     
     <div class="card-footer text-right">
