@@ -21,6 +21,8 @@ use App\Http\Controllers\QuestionariosController;
 use App\Http\Controllers\FormularioEtapaController;
 use App\Http\Controllers\UsuarioFormularioController;
 
+use App\Http\Controllers\AnaliseController;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -124,3 +126,5 @@ Route::post('/chat', [ChatController::class, 'store'])->name('chat.ask');
 Route::post('/etapas/adicionar', [FormularioEtapaController::class, 'adicionar'])->name('etapas.adicionar');
 Route::delete('/etapas/{id}/remover', [FormularioEtapaController::class, 'remover'])->name('etapas.remover');
 
+
+Route::post('/relatorio/analise/{usuarioId}', [AnaliseController::class, 'gerarAnalise'])->name('relatorio.analise');

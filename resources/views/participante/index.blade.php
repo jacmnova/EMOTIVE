@@ -101,9 +101,18 @@
                                         @endif
 
                                         @if($formulario->video_assistido == true)
-                                            <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}" class="btn btn-sm btn-tool" title="Relatório">
+
+
+                                            <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}"
+                                            id="btnGerarRelatorio"
+                                            class="btn btn-sm btn-tool"
+                                            title="Relatório">
                                                 <i class="fa-regular fa-rectangle-list" style="color: #008ca5"></i>
                                             </a>
+
+
+
+
                                             <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}" class="btn btn-sm btn-tool" target="_blank">
                                                 <i class="fas fa-file-pdf" style="color: #008ca5"></i>
                                             </a>
@@ -153,6 +162,30 @@
 @section('js')
 <script src="{{ asset('../js/utils.js') }}"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.getElementById('btnGerarRelatorio').addEventListener('click', function(event) {
+        event.preventDefault(); // impede redirecionamento imediato
+
+        const url = this.href;
+
+        Swal.fire({
+            title: 'Gerando análise...',
+            text: 'Por favor, aguarde enquanto processamos seu relatório.',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Agora redireciona manualmente (deixa o Swal aparecer)
+        window.location.href = url;
+    });
+</script>
+
 
 <script>
     let player;

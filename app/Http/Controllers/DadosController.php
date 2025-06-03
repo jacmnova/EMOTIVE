@@ -229,37 +229,84 @@ class DadosController extends Controller
         $formularioId = $request->query('formulario_id');
         $usuarioId = $request->query('usuario_id');
 
-        $user = User::find($usuarioId);
+        $user = \App\Models\User::find($usuarioId);
+        $formulario = \App\Models\Formulario::with('perguntas.variaveis')->findOrFail($formularioId);
 
-        $formulario = Formulario::with('perguntas.variaveis')->findOrFail($formularioId);
-
-        $respostasUsuario = Resposta::where('user_id', $user->id)
+        $respostasUsuario = \App\Models\Resposta::where('user_id', $user->id)
             ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
             ->get()
             ->keyBy('pergunta_id');
 
-        $variaveis = Variavel::with('perguntas')
+        $variaveis = \App\Models\Variavel::with('perguntas')
             ->where('formulario_id', $formulario->id)
             ->get();
 
         $pontuacoes = [];
-
         foreach ($variaveis as $variavel) {
             $pontuacao = 0;
-
             foreach ($variavel->perguntas as $pergunta) {
                 $resposta = $respostasUsuario->get($pergunta->id);
                 if ($resposta) {
                     $pontuacao += $resposta->valor_resposta ?? 0;
                 }
             }
-
-            // $pontuacoes[$variavel->nome] = $pontuacao;
             $pontuacoes[] = [
-                'nome' => $variavel->nome,
                 'tag' => strtoupper($variavel->tag),
                 'valor' => $pontuacao,
             ];
+        }
+
+        // 🔍 Verifica se já existe análise salva
+        $analise = \App\Models\Analise::where('user_id', $usuarioId)
+            ->where('formulario_id', $formularioId)
+            ->first();
+
+        if (!$analise) {
+            // Não existe → gera com API e salva
+            $prompt = "Você é um assistente especializado em saúde emocional, bem-estar no trabalho e aconselhamento positivo.  
+    Escreva um texto motivacional (500 palavras), diretamente para a pessoa que respondeu este questionário, explicando seus resultados, destacando pontos fortes, apontando vulnerabilidades e oferecendo orientações práticas de autocuidado e crescimento.\n\n";
+
+            foreach ($variaveis as $variavel) {
+                $ponto = collect($pontuacoes)->firstWhere('tag', strtoupper($variavel->tag))['valor'] ?? null;
+                if ($ponto !== null) {
+                    if ($ponto <= $variavel->B) {
+                        $faixa = 'Baixa';
+                    } elseif ($ponto <= $variavel->M) {
+                        $faixa = 'Moderada';
+                    } else {
+                        $faixa = 'Alta';
+                    }
+                    $prompt .= "{$variavel->nome} ({$variavel->tag}): {$ponto} pontos, Faixa {$faixa}.\n";
+                }
+            }
+
+            $response = \Http::withHeaders([
+                'Authorization' => 'Bearer ' . env('OPENAI_API_KEY'),
+            ])->post('https://api.openai.com/v1/chat/completions', [
+                'model' => 'gpt-4o',
+                'messages' => [
+                    ['role' => 'system', 'content' => 'Você é um assistente especializado em saúde emocional e aconselhamento motivacional.'],
+                    ['role' => 'user', 'content' => $prompt],
+                ],
+                'temperature' => 0.7,
+                'max_tokens' => 1500,
+            ]);
+
+            if ($response->successful()) {
+                $analiseTexto = $response->json()['choices'][0]['message']['content'];
+
+                // 💾 Salva no banco
+                $analise = \App\Models\Analise::create([
+                    'user_id' => $usuarioId,
+                    'formulario_id' => $formularioId,
+                    'texto' => $analiseTexto,
+                ]);
+            } else {
+                $analiseTexto = 'Erro ao gerar análise: ' . $response->body();
+            }
+        } else {
+            // Já existe no banco
+            $analiseTexto = $analise->texto;
         }
 
         return view('participante.relatorio', compact(
@@ -267,8 +314,11 @@ class DadosController extends Controller
             'respostasUsuario',
             'pontuacoes',
             'variaveis',
-            'user'
+            'user',
+            'analiseTexto' // passa para a view
         ));
     }
+
+
 
 }

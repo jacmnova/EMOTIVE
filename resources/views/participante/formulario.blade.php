@@ -46,12 +46,12 @@
             </div>
 
             <div class="card-body">
-                <div class="card mb-2 pl-4 pr-4 border-0">
+                <div class="card m-2 p-4">
                     <h5>Instruções</h5>
                     <p>{!! $formulario->instrucoes !!}</p>
                 </div>
 
-                <div class="card mb-2 p-2">
+                <div class="card m-2 p-4">
                     <table class="table table-striped">
                         <tbody>
                             @php

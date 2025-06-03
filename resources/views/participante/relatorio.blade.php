@@ -40,7 +40,8 @@
 <div class="row">
     <div class="col-md-6">
         @include('participante.partials._radar')
-        @include('participante.partials._gabarito')
+        <!-- @include('participante.partials._gabarito') -->
+        @include('participante.partials._recomenda')
     </div>
 
     <div class="col-md-6">
@@ -48,6 +49,18 @@
         @include('participante.partials._barras')
     </div>
 </div>
+
+
+@if(isset($analiseTexto))
+    <div class="card mt-4">
+        <div class="card-header">
+            <h3>Análise Geral</h3>
+        </div>
+        <div class="card-body">
+            <pre style="white-space: pre-wrap;">{{ $analiseTexto }}</pre>
+        </div>
+    </div>
+@endif
 
 
 @stop
