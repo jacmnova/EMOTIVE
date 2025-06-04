@@ -325,12 +325,18 @@ return [
         ],
 
         [
+            'text' => 'Template',
+            'url' => 'template',
+            'icon' => 'fa-solid fa-eye',
+            'can' => 'sa',
+        ],
+
+        [
             'text' => 'ChatGPT',
             'url' => 'chat',
             'icon' => 'fa-solid fa-users-gear',
             'can' => 'sa',
         ],
-
 
 
         // Sidebar items:
@@ -571,4 +577,5 @@ return [
     */
 
     'livewire' => false,
+    
 ];

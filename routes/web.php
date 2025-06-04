@@ -23,15 +23,24 @@ use App\Http\Controllers\UsuarioFormularioController;
 
 use App\Http\Controllers\AnaliseController;
 
+
 Route::get('/', function () {
     return view('welcome');
 });
+
 
 Route::view('/termos', 'termos')->name('termos');
 Route::view('/tutorial', 'tutorial')->name('tutorial');
 
 
 Auth::routes();
+
+
+Route::get('/template', function () {
+    return view('template.index');
+})->name('template.index');
+
+
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

@@ -3,8 +3,13 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Models\SystemSetting;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,5 +42,12 @@ class AppServiceProvider extends ServiceProvider
             return $user->usuario == 1;
         });
 
+        // Ativa ou desativa a right_sidebar baseado no tipo de usuário
+        if (Auth::check() && Auth::user()->sa) {
+            Config::set('adminlte.right_sidebar', true);
+        } else {
+            Config::set('adminlte.right_sidebar', false);
+        }
     }
+
 }
