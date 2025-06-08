@@ -34,9 +34,12 @@
 
 @section('content')
 
-    <form action="{{ route('respostas.salvar') }}" method="POST">
+    <form id="formulario-perguntas">
         @csrf
         <input name="formulario_id" value="{{ $formulario->id }}" hidden>
+        <input name="etapa_atual" value="{{ $etapaAtual->numero ?? $etapaAtual->id }}" hidden>
+        <input name="etapa_de" value="{{ $etapaAtual->de }}" hidden>
+        <input name="etapa_ate" value="{{ $etapaAtual->ate }}" hidden>
 
         <div class="card">
             <div class="card-header border-0">
@@ -97,5 +100,64 @@
 
         </div>
     </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById('formulario-perguntas').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let form = e.target;
+            let formData = new FormData(form);
+
+            fetch("{{ route('respostas.salvar') }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'etapa_concluida') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: `Parabéns! Você respondeu todas as perguntas da Etapa ${data.etapa}.`,
+                        text: `Você concluiu ${data.percentual}% do questionário.`,
+                        confirmButtonText: 'Continuar'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else if (data.status === 'formulario_concluido') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Formulário concluído!',
+                        text: 'Você respondeu 100% das perguntas.',
+                        confirmButtonText: 'Ir para o início'
+                    }).then(() => {
+                        window.location.href = "{{ route('questionarios.usuario') }}";
+                    });
+                } else if (data.status === 'etapa_incompleta') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: `Você respondeu ${data.percentual}% do formulário.`,
+                        confirmButtonText: 'Continuar'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Respostas salvas com sucesso.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro ao salvar respostas.'
+                });
+            });
+        });
+    </script>
 
 @stop

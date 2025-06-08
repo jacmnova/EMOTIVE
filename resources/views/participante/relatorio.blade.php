@@ -40,27 +40,20 @@
 <div class="row">
     <div class="col-md-6">
         @include('participante.partials._radar')
-        <!-- @include('participante.partials._gabarito') -->
         @include('participante.partials._recomenda')
+
+        @if(Auth::user()->admin === true)
+            @include('participante.partials._gabarito')
+        @endif
     </div>
 
     <div class="col-md-6">
         @include('participante.partials._dimensoes')
         @include('participante.partials._barras')
+        @include('participante.partials._analise')
+        @include('participante.partials._graficos-dimensionais')
     </div>
 </div>
-
-
-@if(isset($analiseTexto))
-    <div class="card mt-4">
-        <div class="card-header">
-            <h3>Análise Geral</h3>
-        </div>
-        <div class="card-body">
-            <pre style="white-space: pre-wrap;">{{ $analiseTexto }}</pre>
-        </div>
-    </div>
-@endif
 
 
 @stop
@@ -73,30 +66,32 @@
 
 @section('js')
     <script src="{{ asset('../js/utils.js') }}"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // Dados vindos do backend (agora um array de objetos)
     const pontuacoes = @json($pontuacoes);
-
-    // Extrai nomes + tags para os labels
     const labels = pontuacoes.map(p => `${p.tag}`);
     const data = pontuacoes.map(p => p.valor);
 
-    // Função para gerar cores aleatórias
-    function corAleatoria(opacidade = 1) {
-        const r = Math.floor(Math.random() * 200);
-        const g = Math.floor(Math.random() * 200);
-        const b = Math.floor(Math.random() * 200);
-        return `rgba(${r}, ${g}, ${b}, ${opacidade})`;
+    function gerarCores(qtd, opacidade = 1) {
+        const cores = [
+            'rgba(255, 99, 132, OP)',
+            'rgba(54, 162, 235, OP)',
+            'rgba(255, 206, 86, OP)',
+            'rgba(75, 192, 192, OP)',
+            'rgba(153, 102, 255, OP)',
+            'rgba(255, 159, 64, OP)',
+            'rgba(199, 199, 199, OP)',
+            'rgba(83, 102, 255, OP)',
+            'rgba(66, 135, 245, OP)',
+            'rgba(245, 66, 212, OP)'
+        ];
+        return Array.from({ length: qtd }, (_, i) => cores[i % cores.length].replace('OP', opacidade));
     }
 
-    // Gera cores aleatórias para cada barra
-    const backgroundColors = data.map(() => corAleatoria(0.6));
-    const borderColors = backgroundColors.map(cor => cor.replace('0.6', '1'));
+    const backgroundColors = gerarCores(data.length, 0.6);
+    const borderColors = gerarCores(data.length, 1);
 
-    // Monta o gráfico
     const ctx = document.getElementById('graficoVariaveis').getContext('2d');
 
     new Chart(ctx, {
@@ -137,49 +132,88 @@
 </script>
 
 <script>
-    // Radar usa os mesmos dados
+
+    const labelsRadar = pontuacoes.map(p => p.tag);
+    const dataRadar = pontuacoes.map(p => p.valor);
+
+    function gerarCoresRadar(qtd, opacidade = 1) {
+        const cores = [
+            'rgba(255, 99, 132, OP)',
+            'rgba(54, 162, 235, OP)',
+            'rgba(255, 206, 86, OP)',
+            'rgba(75, 192, 192, OP)',
+            'rgba(153, 102, 255, OP)',
+            'rgba(255, 159, 64, OP)',
+            'rgba(199, 199, 199, OP)',
+            'rgba(83, 102, 255, OP)',
+            'rgba(66, 135, 245, OP)',
+            'rgba(245, 66, 212, OP)'
+        ];
+        return Array.from({ length: qtd }, (_, i) => cores[i % cores.length].replace('OP', opacidade));
+    }
+
+    const coresFundo = gerarCoresRadar(dataRadar.length, 0.2);
+    const coresBorda = gerarCoresRadar(dataRadar.length, 1);
+
+    // Dataset geral (linha cinza clara, fundo transparente)
+    const datasetPrincipal = {
+        label: 'Pontuação Geral',
+        data: dataRadar,
+        backgroundColor: 'rgba(192, 192, 192, 0)', // silver transparente
+        borderColor: 'rgba(192, 192, 192, 1)',     // silver
+        borderWidth: 2,
+        pointBackgroundColor: 'rgba(192, 192, 192, 1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(192, 192, 192, 1)',
+        order: 2 // menor prioridade → desenha por baixo
+    };
+
+    // Datasets coloridos (um para cada dimensão, com nome completo)
+    const datasetsColoridos = pontuacoes.map((ponto, i) => {
+        const data = Array(pontuacoes.length).fill(0);
+        data[i] = ponto.valor;
+
+        return {
+            label: ponto.nome,
+            data: data,
+            backgroundColor: coresFundo[i],
+            borderColor: coresBorda[i],
+            pointBackgroundColor: coresBorda[i],
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: coresBorda[i],
+            borderWidth: 1,
+            fill: true,
+            order: 1 // prioridade visual acima da linha cinza
+        };
+    });
+
     const ctxRadar = document.getElementById('graficoRadar').getContext('2d');
 
     new Chart(ctxRadar, {
         type: 'radar',
         data: {
-            labels: labels,
-            datasets: [{
-                label: 'Pontuação',
-                data: data,
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                pointBackgroundColor: 'rgba(54, 162, 235, 1)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgba(54, 162, 235, 1)'
-            }]
+            labels: labelsRadar,
+            datasets: [datasetPrincipal, ...datasetsColoridos]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: {
-                    position: 'top',
-                },
-                tooltip: {
-                    enabled: true
-                },
-                title: {
-                    display: false
-                }
+                legend: { position: 'right' },
+                tooltip: { enabled: true }
             },
             scales: {
                 r: {
-                    angleLines: {
-                        display: true
-                    },
+                    angleLines: { display: true },
                     suggestedMin: 0,
-                    suggestedMax: Math.max(...data) + 5
+                    suggestedMax: Math.max(...dataRadar) + 5
                 }
             }
         }
     });
 </script>
+
 
 
 @stop

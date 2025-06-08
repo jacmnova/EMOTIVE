@@ -137,3 +137,7 @@ Route::delete('/etapas/{id}/remover', [FormularioEtapaController::class, 'remove
 
 
 Route::post('/relatorio/analise/{usuarioId}', [AnaliseController::class, 'gerarAnalise'])->name('relatorio.analise');
+
+Route::post('/relatorio/regenerar', [RelatorioController::class, 'regenerarAnalise'])
+    ->name('relatorio.regenerar')
+    ->middleware('auth');

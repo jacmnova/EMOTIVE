@@ -4,97 +4,200 @@
     <meta charset="UTF-8">
     <title>{{ $formulario->label }} | {{ $formulario->nome }}</title>
     <style>
+        @page {
+            margin: 0;
+        }
+
+        @page :not(:first) {
+            margin: 100px 80px;
+        }
+
         body {
             font-family: DejaVu Sans, sans-serif;
             font-size: 12px;
             color: #111;
+        }
+
+        .conteudo {
             padding: 20px;
         }
+
+        .page-break {
+            page-break-after: always;
+        }
+
+        .capa-imagem {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        .capa-imagem img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
         h1, h2, h3, h4 {
             text-align: center;
             margin-bottom: 10px;
         }
+
         .titulo {
             font-size: 16px;
             font-weight: bold;
             margin-top: 20px;
             margin-bottom: 10px;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
             font-size: 11px;
         }
+
         th, td {
             border: 1px solid #333;
             padding: 6px;
             text-align: left;
         }
+
         th {
             background-color: #f2f2f2;
         }
+
         .section {
             margin-bottom: 30px;
         }
+
         .grafico {
             text-align: center;
-            margin: 20px 0;
+            margin: 30px 0;
+            padding: 10px;
+            border: 1px dashed #ccc;
+            border-radius: 6px;
+            background-color: #f9f9f9;
         }
+
+        .grafico h4 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
         .grafico img {
-            width: 100%;    /* Usa toda a largura disponível */
-            height: auto;   /* Mantém a proporção */
-            border: 1px solid #ccc;
+            max-width: 90%;
+            height: auto;
+            margin: 0 auto;
+            display: block;
         }
     </style>
 </head>
 <body>
 
+{{-- Primeira página: capa sem margem/padding --}}
+<div class="capa-imagem">
+    <img src="{{ public_path('img/capa-fundo.png') }}" alt="Capa">
+</div>
+
+<div class="page-break"></div>
+
+{{-- Conteúdo com margens e paddings padrão --}}
+<div class="conteudo">
+
 <h1>{{ $formulario->label }}</h1>
 <h2>{{ $formulario->nome }}</h2>
-
 <p><strong>Descrição:</strong> {!! $formulario->descricao !!}</p>
-<p><strong>Nome:</strong> {{ $user->name }}</p>
-<p><strong>E-mail:</strong> {{ $user->email }}</p>
-<p><strong>Data:</strong> {{ $hoje }}</p>
 
 <hr>
 
 <div class="section">
-    <h3>Instruções</h3>
-    <p>{!! $formulario->instrucoes !!}</p>
+    <h2>Sumário do Relatório</h2>
+
+    <p><strong>Formulário:</strong> {{ $formulario->label }} — {{ $formulario->nome }}</p>
+    <p><strong>Participante:</strong> {{ $user->name }} ({{ $user->email }})</p>
+    <p><strong>Data:</strong> {{ $hoje }}</p>
+
+    <p><strong>Respostas registradas:</strong> {{ $respostasUsuario->count() }} de {{ $formulario->perguntas->count() }}</p>
+
+    <p><strong>Dimensões avaliadas:</strong> {{ $variaveis->pluck('nome')->join(', ') }}.</p>
+
+    <p><strong>Conteúdo do Relatório:</strong></p>
+    <ul>
+        <li>Pontuação por Dimensão</li>
+        <li>Gráficos Visuais</li>
+        <li>Classificação por Variável</li>
+        <li>Análise Interpretativa</li>
+        <li>Recomendações Personalizadas</li>
+        <li>Resumo por Faixa de Pontuação</li>
+    </ul>
 </div>
 
+<hr>
+
 <div class="section">
-    <h3>Respostas ao Questionário</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Pergunta</th>
-                <th>Variável</th>
-                <th>Resposta</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($formulario->perguntas as $pergunta)
-                @php
-                    $resposta = $respostasUsuario->get($pergunta->id);
-                @endphp
-                <tr>
-                    <td>{{ $pergunta->numero_da_pergunta }} - {{ $pergunta->pergunta }}</td>
-                    <td>
-                        @if($pergunta->variaveis->isNotEmpty())
-                            {{ $pergunta->variaveis->pluck('nome')->join(', ') }}
-                        @else
-                            Nenhuma
-                        @endif
-                    </td>
-                    <td>{{ $resposta->valor_resposta ?? 'Sem resposta' }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <h3>Resumo por Faixa de Pontuação</h3>
+
+    @php
+        $grupoAlta = [];
+        $grupoModerada = [];
+        $grupoBaixa = [];
+
+        foreach ($variaveis as $registro) {
+            foreach ($pontuacoes as $pontos) {
+                if (mb_strtoupper($registro->tag, 'UTF-8') === $pontos['tag']) {
+                    $pontuacao = $pontos['pontuacao'];
+                    if ($pontuacao <= $registro->B) {
+                        $grupoBaixa[] = $registro->nome . ' (' . $registro->tag . ')';
+                    } elseif ($pontuacao <= $registro->M) {
+                        $grupoModerada[] = $registro->nome . ' (' . $registro->tag . ')';
+                    } else {
+                        $grupoAlta[] = $registro->nome . ' (' . $registro->tag . ')';
+                    }
+                    break;
+                }
+            }
+        }
+    @endphp
+
+    @if(count($grupoAlta))
+        <div style="background-color:#fdecea; border-left: 4px solid #d93025; padding: 10px; margin-bottom: 10px;">
+            <strong>Faixa Alta</strong>
+            <ul>
+                @foreach($grupoAlta as $dim)
+                    <li>{{ $dim }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @if(count($grupoModerada))
+        <div style="background-color:#fff9e5; border-left: 4px solid #f4b400; padding: 10px; margin-bottom: 10px;">
+            <strong>Faixa Moderada</strong>
+            <ul>
+                @foreach($grupoModerada as $dim)
+                    <li>{{ $dim }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @if(count($grupoBaixa))
+        <div style="background-color:#e8f1fa; border-left: 4px solid #1a73e8; padding: 10px; margin-bottom: 10px;">
+            <strong>Faixa Baixa</strong>
+            <ul>
+                @foreach($grupoBaixa as $dim)
+                    <li>{{ $dim }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 </div>
+
+
+<hr>
 
 <div class="section">
     <h3>Pontuação por Dimensão</h3>
@@ -118,65 +221,73 @@
     </table>
 
     <div class="grafico">
-        <h4>Gráfico de Barras</h4>
+        <h4>Visualização Gráfica — Barras</h4>
         <img src="{{ public_path($imagemGrafico) }}" alt="Gráfico de Barras">
-        <!-- <img src="{{ asset($imagemGrafico) }}" alt="Gráfico de Barras" style="width: 100%; height: auto;"> -->
-
     </div>
 
     <div class="grafico">
-        <h4>Gráfico de Radar</h4>
+        <h4>Visualização Gráfica — Radar</h4>
         <img src="{{ public_path($imagemRadar) }}" alt="Gráfico de Radar">
-        <!-- <img src="{{ asset($imagemRadar) }}" alt="Gráfico de Radar" style="width: 100%; height: auto;"> -->
     </div>
 </div>
 
 <div class="section">
-    <h3>Classificação por Variável</h3>
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 20%">Variável</th>
-                <th style="width: 10%">Tag</th>
-                <th style="width: 10%">Pontuação</th>
-                <th style="width: 60%">Classificação</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($variaveis as $registro)
-                @php
-                    $pontuacao = null;
-                    $classificacao = 'Sem dados';
+    <h3>Recomendações Personalizadas</h3>
+    @foreach ($variaveis as $registro)
+        @php
+            $pontuacao = null;
+            $faixa = null;
+            $recomendacao = 'Sem recomendação disponível.';
 
-                    foreach($pontuacoes as $pontos) {
-                        if (mb_strtoupper($registro->tag, 'UTF-8') === $pontos['tag']) {
-                            $pontuacao = $pontos['pontuacao'];
-                            if ($pontuacao <= $registro->B) {
-                                $classificacao = $registro->baixa;
-                            } elseif ($pontuacao <= $registro->M) {
-                                $classificacao = $registro->moderada;
-                            } else {
-                                $classificacao = $registro->alta;
-                            }
-                            break;
-                        }
+            foreach ($pontuacoes as $pontos) {
+                if (mb_strtoupper($registro->tag, 'UTF-8') === $pontos['tag']) {
+                    $pontuacao = $pontos['pontuacao'];
+
+                    if ($pontuacao <= $registro->B) {
+                        $faixa = 'Baixa';
+                        $recomendacao = $registro->r_baixa;
+                    } elseif ($pontuacao <= $registro->M) {
+                        $faixa = 'Moderada';
+                        $recomendacao = $registro->r_moderada;
+                    } else {
+                        $faixa = 'Alta';
+                        $recomendacao = $registro->r_alta;
                     }
-                @endphp
-                <tr>
-                    <td>{{ $registro->nome }}</td>
-                    <td>{{ mb_strtoupper($registro->tag, 'UTF-8') }}</td>
-                    <td>{{ $pontuacao ?? '–' }}</td>
-                    <td>{{ $classificacao }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+                    break;
+                }
+            }
+        @endphp
+
+        <div style="margin-bottom: 20px;">
+            <strong>{{ $registro->nome }} ({{ mb_strtoupper($registro->tag, 'UTF-8') }})</strong><br>
+            <em>Faixa: {{ $faixa ?? '–' }}</em>
+            <p style="margin-top: 5px;">{!! nl2br(e($recomendacao)) !!}</p>
+        </div>
+    @endforeach
 </div>
 
 <div class="section">
     <h3>Análise Interpretativa por Dimensão</h3>
-    {{-- Conteúdo interpretativo a ser inserido aqui --}}
+    <p style="white-space: pre-wrap;">
+        {{ $analiseTexto }}
+    </p>
 </div>
+
+@if (isset($pdf))
+    <script type="text/php">
+        if (isset($pdf)) {
+            $font = $fontMetrics->get_font("DejaVu Sans", "normal");
+            $size = 9;
+            $text = "Página {PAGE_NUM} de {PAGE_COUNT} — {{ $user->name }} — {{ $hoje }}";
+            $width = $fontMetrics->get_text_width($text, $font, $size);
+            $x = (595.28 - $width) / 2;
+            $y = 820;
+            $pdf->text($x, $y, $text, $font, $size);
+        }
+    </script>
+@endif
+
+</div> {{-- fim .conteudo --}}
 
 </body>
 </html>
