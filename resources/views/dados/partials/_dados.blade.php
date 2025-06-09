@@ -34,6 +34,7 @@
             </div>
 
             <div class="card-body">
+
                 <form id="formCropUpload" method="POST" action="{{ route('upload.image.usuario') }}">
                     @csrf
                     <input type="hidden" name="id" value="{{ auth()->user()->id }}">
@@ -41,7 +42,8 @@
 
                     <div class="form-group">
                         <label for="imagemInput">Nova Imagem de Perfil:</label>
-                        <input type="file" id="imagemInput" class="form-control" accept="image/*">
+                        <input type="file" id="imagemInput" class="form-control" accept="image/jpeg,image/png,image/jpg">
+
                     </div>
 
                     <div class="mt-3 mb-3 text-center">
@@ -50,6 +52,8 @@
 
                     <button type="button" id="recortarBtn" class="btn btn-warning" style="display:none;">Recortar e Enviar</button>
                 </form>
+
+
             </div>
             
         </div>
@@ -104,6 +108,15 @@ let cropper;
 document.getElementById('imagemInput').addEventListener('change', function (e) {
     const file = e.target.files[0];
     if (!file) return;
+
+    const tipo = file.type.toLowerCase();
+
+    // Bloqueia imagens HEIC
+    if (tipo === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
+        alert('Formato HEIC não é suportado. Por favor, envie uma imagem JPG ou PNG.');
+        e.target.value = ''; // limpa o input
+        return;
+    }
 
     const reader = new FileReader();
     reader.onload = function (event) {

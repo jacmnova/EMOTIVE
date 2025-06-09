@@ -6,7 +6,6 @@ use App\Models\Cliente;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Imagick;
 
 class ImageUploadController extends Controller
 {
@@ -17,18 +16,19 @@ class ImageUploadController extends Controller
         ]);
 
         $user = User::findOrFail($request->id);
-
         $data = $request->input('imagem_base64');
 
-        if (preg_match('/^data:image\/(\w+);base64,/', $data, $matches)) {
-            $tipo = strtolower($matches[1]);
-
-            if (!in_array($tipo, ['jpg', 'jpeg', 'png'])) {
-                return back()->withErrors(['imagem_base64' => 'Formato de imagem inválido.']);
-            }
-
+        if (preg_match('/^data:image\/(\w+);base64,/', $data)) {
             $data = substr($data, strpos($data, ',') + 1);
             $data = base64_decode($data);
+
+            // 🛡️ Verificação do tipo real da imagem
+            $infoImagem = getimagesizefromstring($data);
+            $tipoReal = $infoImagem['mime'] ?? null;
+
+            if (!in_array($tipoReal, ['image/jpeg', 'image/png'])) {
+                return back()->withErrors(['imagem_base64' => 'Imagem inválida ou em formato não suportado. Envie apenas JPG ou PNG.']);
+            }
 
             $nomeFinal = uniqid('avatar_') . '.jpg';
             $pasta = 'avatars';
@@ -60,21 +60,24 @@ class ImageUploadController extends Controller
         $cliente = Cliente::findOrFail($request->id);
         $data = $request->input('imagem_base64');
 
-        if (preg_match('/^data:image\/(\w+);base64,/', $data, $matches)) {
-            $tipo = strtolower($matches[1]);
-
-            if (!in_array($tipo, ['jpg', 'jpeg', 'png'])) {
-                return back()->withErrors(['imagem_base64' => 'Formato de imagem inválido.']);
-            }
-
+        if (preg_match('/^data:image\/(\w+);base64,/', $data)) {
             $data = substr($data, strpos($data, ',') + 1);
             $data = base64_decode($data);
+
+            // 🛡️ Verificação do tipo real da imagem
+            $infoImagem = getimagesizefromstring($data);
+            $tipoReal = $infoImagem['mime'] ?? null;
+
+            if (!in_array($tipoReal, ['image/jpeg', 'image/png'])) {
+                return back()->withErrors(['imagem_base64' => 'Imagem inválida ou em formato não suportado. Envie apenas JPG ou PNG.']);
+            }
 
             $nomeFinal = uniqid('logo_') . '.jpg';
             $pasta = 'avatars';
 
             Storage::disk('public')->put("{$pasta}/{$nomeFinal}", $data);
 
+            // Apaga o anterior, se necessário
             if ($cliente->logo_url && strpos($cliente->logo_url, 'vendor/adminlte/dist/img/client.png') === false) {
                 if (Storage::disk('public')->exists($cliente->logo_url)) {
                     Storage::disk('public')->delete($cliente->logo_url);
@@ -89,5 +92,4 @@ class ImageUploadController extends Controller
 
         return back()->withErrors(['imagem_base64' => 'Imagem inválida.']);
     }
-
 }

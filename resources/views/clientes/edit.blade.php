@@ -264,7 +264,7 @@
 
                         <div class="form-group">
                             <label for="imagem_cliente_input">Nova Imagem do Cliente:</label>
-                            <input type="file" id="imagem_cliente_input" class="form-control" accept="image/*">
+                            <input type="file" id="imagem_cliente_input" class="form-control" accept="image/jpeg,image/png,image/jpg">
                         </div>
 
                         <div class="mt-3 mb-3 text-center">
@@ -278,6 +278,7 @@
             </div>
         </div>       
     </div>
+    
 </div>
 
 @stop
@@ -296,6 +297,15 @@
     document.getElementById('imagem_cliente_input').addEventListener('change', function (e) {
         const file = e.target.files[0];
         if (!file) return;
+
+        const tipo = file.type.toLowerCase();
+
+        // Bloqueia HEIC
+        if (tipo === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
+            alert('Formato HEIC não é suportado. Por favor, envie uma imagem JPG ou PNG.');
+            e.target.value = ''; // limpa o input
+            return;
+        }
 
         const reader = new FileReader();
         reader.onload = function (event) {
@@ -334,6 +344,7 @@
         }, 'image/jpeg');
     });
 </script>
+
 
 
 @stop
