@@ -1,34 +1,3 @@
-<!-- <div class="card">
-    <div class="card-header">
-        <h3 class="card-title">
-            <i class="fa-solid fa-file-alt" style="margin-right: 5px;"></i>
-            Perguntas por Variavel
-        </h3>
-    </div>
-
-    <div class="card-body mr-1">
-        <table class="table datatable table-striped dtr-inline mr-1 ml-1">
-            <thead>
-                <tr>
-                    <th style="width: 60%">Variável</th>
-                    <th style="width: 10%">Perguntas</th>
-                    <th style="width: 10%">Score</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($formulario->perguntasPorVariavel() as $formularios)
-                    <tr>
-                        <td>{{ $formularios->nome }}</td>
-                        <td>{{ $formularios->total_perguntas }}</td>
-                        <td>{{ $formularios->total_perguntas * $formulario->score_fim }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-</div> -->
-
-
 <div class="row">
     @foreach($variaveis as $var)
 
@@ -54,7 +23,6 @@
             $id = 'grafico_faixa_' . $tag;
         @endphp
 
-
         <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header">
@@ -62,12 +30,7 @@
                 </div>
                 <div class="card-body">
                     <canvas id="{{ $id }}" height="250"></canvas>
-                    <div class="mt-3 text-center">
-                        <!-- <span class="mr-3"><i class="fas fa-square text-info"></i> Baixa</span>
-                        <span class="mr-3"><i class="fas fa-square text-warning"></i> Moderada</span>
-                        <span class="mr-3"><i class="fas fa-square text-danger"></i> Alta</span>
-                        <span><i class="fas fa-square text-dark"></i> Pontuação</span> -->
-                    </div>
+                    <div class="mt-3 text-center"></div>
                 </div>
             </div>
         </div>
@@ -117,14 +80,14 @@
                                         type: 'line',
                                         yMin: {{ $resposta }},
                                         yMax: {{ $resposta }},
-                                        borderColor: '#343a40',
+                                        borderColor: 'red',
                                         borderWidth: 2,
-                                        borderDash: [5, 5],
+                                        borderDash: [6, 6],
                                         label: {
                                             content: 'Pontuação',
                                             enabled: true,
                                             position: 'start',
-                                            backgroundColor: '#343a40',
+                                            backgroundColor: 'red',
                                             color: '#fff',
                                             font: {
                                                 size: 10,
