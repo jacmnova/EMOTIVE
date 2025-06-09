@@ -1,3 +1,12 @@
+
+
+<!-- Cropper.js CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+<!-- Cropper.js JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+
+
 <div class="card card-secondary card-outline">
     <div class="card-body box-profile">
 
@@ -25,20 +34,24 @@
             </div>
 
             <div class="card-body">
-                <form action="{{ route('upload.image.usuario') }}" method="post" enctype="multipart/form-data">
+                <form id="formCropUpload" method="POST" action="{{ route('upload.image.usuario') }}">
                     @csrf
-                    <input type="hidden" name="id" value="{{ auth()->user()->id }}"> <!-- Adicione esta linha -->
+                    <input type="hidden" name="id" value="{{ auth()->user()->id }}">
+                    <input type="hidden" name="imagem_base64" id="imagem_base64">
+
                     <div class="form-group">
-                        <label for="avatar">Nova Imagem de Perfil:</label>
-                        <div class="input-group mb-3">
-                            <input type="file" name="image" id="image" class="form-control rounded-0" required>
-                            <span class="input-group-append">
-                                <button type="submit" class="btn btn-info btn-flat">Enviar!</button>
-                            </span>
-                        </div>
+                        <label for="imagemInput">Nova Imagem de Perfil:</label>
+                        <input type="file" id="imagemInput" class="form-control" accept="image/*">
                     </div>
+
+                    <div class="mt-3 mb-3 text-center">
+                        <img id="imagemPreview" style="max-width: 300px; display:none;" class="img-fluid rounded">
+                    </div>
+
+                    <button type="button" id="recortarBtn" class="btn btn-warning" style="display:none;">Recortar e Enviar</button>
                 </form>
             </div>
+            
         </div>
 
     </div>
@@ -83,3 +96,49 @@
     <div class="card-footer">
     </div>
 </div>
+
+
+<script>
+let cropper;
+
+document.getElementById('imagemInput').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        const img = document.getElementById('imagemPreview');
+        img.src = event.target.result;
+        img.style.display = 'block';
+
+        if (cropper) {
+            cropper.destroy();
+        }
+
+        cropper = new Cropper(img, {
+            aspectRatio: 1,
+            viewMode: 1,
+            dragMode: 'move',
+            autoCropArea: 1,
+        });
+
+        document.getElementById('recortarBtn').style.display = 'inline-block';
+    };
+
+    reader.readAsDataURL(file);
+});
+
+document.getElementById('recortarBtn').addEventListener('click', function () {
+    if (!cropper) return;
+
+    const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
+    canvas.toBlob(function (blob) {
+        const reader = new FileReader();
+        reader.onloadend = function () {
+            document.getElementById('imagem_base64').value = reader.result;
+            document.getElementById('formCropUpload').submit();
+        };
+        reader.readAsDataURL(blob);
+    }, 'image/jpeg');
+});
+</script>

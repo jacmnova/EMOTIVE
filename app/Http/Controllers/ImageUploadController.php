@@ -13,89 +13,81 @@ class ImageUploadController extends Controller
     public function UploadImagemUsuario(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpg,jpeg,png,heic|max:2048',
+            'imagem_base64' => 'required|string',
         ]);
 
         $user = User::findOrFail($request->id);
 
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
+        $data = $request->input('imagem_base64');
 
-            // Nome base para a imagem convertida
-            $nomeFinal = uniqid('avatar_') . '.jpg';
+        if (preg_match('/^data:image\/(\w+);base64,/', $data, $matches)) {
+            $tipo = strtolower($matches[1]);
 
-            // Pasta onde vai salvar no storage (público)
-            $pasta = 'avatars';
-
-            // Se for .heic, converte para .jpg
-            if ($file->getClientOriginalExtension() === 'heic') {
-                $caminhoTemporario = $file->getRealPath();
-                $imagem = new Imagick();
-                $imagem->readImage($caminhoTemporario);
-                $imagem->setImageFormat('jpeg');
-                $caminhoFinal = storage_path('app/public/' . $pasta . '/' . $nomeFinal);
-                $imagem->writeImage($caminhoFinal);
-                $imagem->clear();
-                $imagem->destroy();
-            } else {
-                // Se for jpg, jpeg ou png, só move pro storage direto
-                $caminhoFinal = $file->storeAs($pasta, $nomeFinal, 'public');
-                $caminhoFinal = storage_path('app/public/' . $caminhoFinal);
+            if (!in_array($tipo, ['jpg', 'jpeg', 'png'])) {
+                return back()->withErrors(['imagem_base64' => 'Formato de imagem inválido.']);
             }
 
-            // Apaga avatar antigo se não for o padrão
-            if ($user->avatar && $user->avatar !== null && strpos($user->avatar, 'vendor/adminlte/dist/img/user.png') === false) {
+            $data = substr($data, strpos($data, ',') + 1);
+            $data = base64_decode($data);
+
+            $nomeFinal = uniqid('avatar_') . '.jpg';
+            $pasta = 'avatars';
+
+            Storage::disk('public')->put("{$pasta}/{$nomeFinal}", $data);
+
+            // Apaga o anterior, se necessário
+            if ($user->avatar && strpos($user->avatar, 'vendor/adminlte/dist/img/user.png') === false) {
                 if (Storage::disk('public')->exists($user->avatar)) {
                     Storage::disk('public')->delete($user->avatar);
                 }
             }
 
-            // Salva caminho relativo no banco
-            $user->avatar = $pasta . '/' . $nomeFinal;
+            $user->avatar = "{$pasta}/{$nomeFinal}";
             $user->save();
+
+            return back()->with('msgSuccess', 'Perfil <strong>' . $user->email . '</strong> atualizado com sucesso!');
         }
 
-        return redirect()->back()->with('msgSuccess', 'Perfil <strong>' . $user->email . '</strong> atualizado com sucesso!');
+        return back()->withErrors(['imagem_base64' => 'Imagem inválida.']);
     }
 
     public function UploadImagemCliente(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpg,jpeg,png,heic|max:2048',
+            'imagem_base64' => 'required|string',
         ]);
 
         $cliente = Cliente::findOrFail($request->id);
+        $data = $request->input('imagem_base64');
 
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
+        if (preg_match('/^data:image\/(\w+);base64,/', $data, $matches)) {
+            $tipo = strtolower($matches[1]);
+
+            if (!in_array($tipo, ['jpg', 'jpeg', 'png'])) {
+                return back()->withErrors(['imagem_base64' => 'Formato de imagem inválido.']);
+            }
+
+            $data = substr($data, strpos($data, ',') + 1);
+            $data = base64_decode($data);
 
             $nomeFinal = uniqid('logo_') . '.jpg';
             $pasta = 'avatars';
 
-            if ($file->getClientOriginalExtension() === 'heic') {
-                $caminhoTemporario = $file->getRealPath();
-                $imagem = new Imagick();
-                $imagem->readImage($caminhoTemporario);
-                $imagem->setImageFormat('jpeg');
-                $caminhoFinal = storage_path('app/public/' . $pasta . '/' . $nomeFinal);
-                $imagem->writeImage($caminhoFinal);
-                $imagem->clear();
-                $imagem->destroy();
-            } else {
-                $caminhoFinal = $file->storeAs($pasta, $nomeFinal, 'public');
-                $caminhoFinal = storage_path('app/public/' . $caminhoFinal);
-            }
+            Storage::disk('public')->put("{$pasta}/{$nomeFinal}", $data);
 
-            if ($cliente->logo_url && $cliente->logo_url !== null && strpos($cliente->logo_url, 'vendor/adminlte/dist/img/client.png') === false) {
+            if ($cliente->logo_url && strpos($cliente->logo_url, 'vendor/adminlte/dist/img/client.png') === false) {
                 if (Storage::disk('public')->exists($cliente->logo_url)) {
                     Storage::disk('public')->delete($cliente->logo_url);
                 }
             }
 
-            $cliente->logo_url = $pasta . '/' . $nomeFinal;
+            $cliente->logo_url = "{$pasta}/{$nomeFinal}";
             $cliente->save();
+
+            return back()->with('msgSuccess', 'Perfil <strong>' . $cliente->nome . '</strong> atualizado com sucesso!');
         }
 
-        return redirect()->back()->with('msgSuccess', 'Perfil <strong>' . $cliente->nome . '</strong> atualizado com sucesso!');
+        return back()->withErrors(['imagem_base64' => 'Imagem inválida.']);
     }
+
 }

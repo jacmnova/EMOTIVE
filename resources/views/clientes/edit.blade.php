@@ -128,7 +128,6 @@
                             </select>
                         </div>
 
-
                         <div class="form-group col-md-4">
                             <label for="ativo">Ativo:</label>
                             <select name="ativo" id="ativo" class="form-control" required>
@@ -137,7 +136,6 @@
                             </select>
                         </div>                        
                     </div>
-
 
                 </div>
 
@@ -247,7 +245,6 @@
                 @endif
             </div>
 
-
             <div class="card collapsed-card bg-light" style="margin-left: 20px;margin-right: 20px;">
                 
                 <div class="card-header">
@@ -260,18 +257,21 @@
                 </div>
 
                 <div class="card-body">
-                    <form action="{{ route('upload.image.cliente') }}" method="post" enctype="multipart/form-data">
+                    <form id="formCropCliente" method="POST" action="{{ route('upload.image.cliente') }}">
                         @csrf
                         <input type="hidden" name="id" value="{{ $clientes->id }}">
+                        <input type="hidden" name="imagem_base64" id="imagem_base64_cliente">
+
                         <div class="form-group">
-                            <label for="avatar">Nova Imagem do Cliente:</label>
-                            <div class="input-group mb-3">
-                                <input type="file" name="image" id="image" class="form-control rounded-0" required>
-                                <span class="input-group-append">
-                                    <button type="submit" class="btn btn-info btn-flat">Enviar!</button>
-                                </span>
-                            </div>
+                            <label for="imagem_cliente_input">Nova Imagem do Cliente:</label>
+                            <input type="file" id="imagem_cliente_input" class="form-control" accept="image/*">
                         </div>
+
+                        <div class="mt-3 mb-3 text-center">
+                            <img id="imagem_cliente_preview" style="max-width: 300px; display:none;" class="img-fluid rounded">
+                        </div>
+
+                        <button type="button" id="btn_crop_cliente" class="btn btn-warning" style="display:none;">Recortar e Enviar</button>
                     </form>
                 </div>
 
@@ -284,7 +284,56 @@
 
 @section('js')
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
 {{-- Script Global --}}
 <script src="{{ asset('js/utils.js') }}"></script>
+
+<script>
+    let cropperCliente;
+
+    document.getElementById('imagem_cliente_input').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const img = document.getElementById('imagem_cliente_preview');
+            img.src = event.target.result;
+            img.style.display = 'block';
+
+            if (cropperCliente) {
+                cropperCliente.destroy();
+            }
+
+            cropperCliente = new Cropper(img, {
+                aspectRatio: 1,
+                viewMode: 1,
+                dragMode: 'move',
+                autoCropArea: 1,
+            });
+
+            document.getElementById('btn_crop_cliente').style.display = 'inline-block';
+        };
+
+        reader.readAsDataURL(file);
+    });
+
+    document.getElementById('btn_crop_cliente').addEventListener('click', function () {
+        if (!cropperCliente) return;
+
+        const canvas = cropperCliente.getCroppedCanvas({ width: 300, height: 300 });
+        canvas.toBlob(function (blob) {
+            const reader = new FileReader();
+            reader.onloadend = function () {
+                document.getElementById('imagem_base64_cliente').value = reader.result;
+                document.getElementById('formCropCliente').submit();
+            };
+            reader.readAsDataURL(blob);
+        }, 'image/jpeg');
+    });
+</script>
+
 
 @stop
