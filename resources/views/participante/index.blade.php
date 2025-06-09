@@ -33,97 +33,81 @@
 @stop
 
 @section('content')
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
-                <i class="fa-solid fa-file-alt" style="margin-right: 5px;"></i>
-                Lista de Questionários
-            </h3>
-        </div>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fa-solid fa-file-alt" style="margin-right: 5px;"></i>
+            Lista de Questionários
+        </h3>
+    </div>
 
-        @if ($questionarios->count() > 0)
-            <div class="card-body">
+    @if ($questionarios->count() > 0)
+        {{-- Tabela (Desktop e Tablet) --}}
+        <div class="card-body d-none d-md-block">
+            <div class="table-responsive">
                 <table class="table datatable table-striped dtr-inline">
                     <thead>
                         <tr>
-                            <th style="width: 40%">Nome</th>
-                            <th style="width: 5%">Questões</th>
-                            <th style="width: 15%">Habilitado em</th>
-                            <th style="width: 5%">Etapa</th>
-                            <th style="width: 5%">Status</th>
-                            <th style="width: 30%">Ações</th>
+                            <th>Nome</th>
+                            <th>Questões</th>
+                            <th>Habilitado em</th>
+                            <th>Etapa</th>
+                            <th>Status</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($questionarios as $formulario)
                             <tr>
                                 <td>
-                                    <label class="badge badge-dark">{{ $formulario->formulario->label }}</label> | {{ $formulario->formulario->nome }}
+                                    <label class="badge badge-dark">{{ $formulario->formulario->label }}</label> |
+                                    {{ $formulario->formulario->nome }}
                                 </td>
                                 <td>{{ $formulario->formulario->perguntaCount() }}</td>
-                                <td>
-                                    {{ optional($formulario->created_at)->translatedFormat('d \d\e F \d\e Y \à\s H:i') }}
-                                </td>
+                                <td>{{ optional($formulario->created_at)->format('d/m/Y H:i') }}</td>
                                 <td>
                                     @if ($formulario->etapa_atual_numero)
-                                        <span class="badge badge-info">
-                                            {{ $formulario->etapa_atual_nome }}
-                                        </span>
+                                        <span class="badge badge-info">{{ $formulario->etapa_atual_nome }}</span>
                                     @else
                                         <span class="badge badge-secondary">Sem Etapa</span>
                                     @endif
                                 </td>
                                 <td>
-                                    @if($formulario->status == 'novo')
-                                        <label class="badge badge-primary">{{ strtoupper($formulario->status) }}</label>
-                                    @elseif($formulario->status == 'pendente')
-                                        <label class="badge badge-warning">{{ strtoupper($formulario->status) }}</label>
-                                    @else
-                                        <label class="badge badge-success">{{ strtoupper($formulario->status) }}</label>
-                                    @endif
+                                    @php
+                                        $statusClass = [
+                                            'novo' => 'primary',
+                                            'pendente' => 'warning',
+                                            'completo' => 'success'
+                                        ][$formulario->status];
+                                    @endphp
+                                    <span class="badge badge-{{ $statusClass }}">{{ strtoupper($formulario->status) }}</span>
                                 </td>
                                 <td>
                                     @if($formulario->status !== 'completo')
-                                        <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm btn-secondary" title="Iniciar">
-                                            <i class="fa-regular fa-circle-play mr-1"></i> Responder Questionário
+                                        <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm text-secondary">
+                                            <i class="fa-regular fa-circle-play mr-1"></i> Responder
                                         </a>
                                     @else
                                         @if($formulario->midia && $formulario->midia->tipo == 'url')
-                                            <button class="btn btn-sm btn-tool" title="Assistir Vídeo"
-                                                onclick="abrirMidiaModal('url', '{{ $formulario->midia->url }}', {{ $formulario->id }})">
-                                                <i class="fa-solid fa-link text-primary"></i>
+                                            <button class="btn btn-sm text-primary" onclick="abrirMidiaModal('url', '{{ $formulario->midia->url }}', {{ $formulario->id }})">
+                                                <i class="fa-solid fa-link"></i>
                                             </button>
                                         @elseif($formulario->midia && $formulario->midia->tipo == 'video' && $formulario->midia->arquivo)
-                                            <button class="btn btn-sm btn-tool" title="Abrir Vídeo"
-                                                onclick="abrirMidiaModal('video', '{{ asset('storage/' . $formulario->midia->arquivo) }}', {{ $formulario->id }})">
-                                                <i class="fa-solid fa-video text-success"></i>
+                                            <button class="btn btn-sm text-success" title="Assista Vídeo" onclick="abrirMidiaModal('video', '{{ asset('storage/' . $formulario->midia->arquivo) }}', {{ $formulario->id }})">
+                                                <i class="fa-solid fa-video"></i>
                                             </button>
                                         @endif
 
-                                        @if($formulario->video_assistido == true)
-
-
-                                            <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}"
-                                            id="btnGerarRelatorio"
-                                            class="btn btn-sm btn-tool"
-                                            title="Relatório">
-                                                <i class="fa-regular fa-rectangle-list" style="color: #008ca5"></i>
+                                        @if($formulario->video_assistido)
+                                            <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}"  title="Visualizar Relatório" class="btn btn-sm text-info">
+                                                <i class="fa-regular fa-rectangle-list"></i>
                                             </a>
-
-
-
-
-                                            <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}" class="btn btn-sm btn-tool" target="_blank">
-                                                <i class="fas fa-file-pdf" style="color: #008ca5"></i>
+                                            <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}"  title="Imprimir Relatório" target="_blank" class="btn btn-sm text-danger">
+                                                <i class="fas fa-file-pdf"></i>
                                             </a>
                                         @else
-                                            <i class="fa-solid fa-spinner" title="Pendente"></i>
+                                            <span class="text-muted"><i class="fa-solid fa-spinner"></i> Pendente</span>
                                         @endif
-
-                                        <a href="#" class="btn btn-sm btn-tool" title="Formulário finalizado!">
-                                            <i class="fa-solid fa-check-double text-success"></i>
-                                        </a>
-                                        Finalizado em: {{ optional($formulario->updated_at)->translatedFormat('d \d\e F \d\e Y \à\s H:i') }}
                                     @endif
                                 </td>
                             </tr>
@@ -131,22 +115,96 @@
                     </tbody>
                 </table>
             </div>
-        @else
-            <div class="row m-3">
-                <div class="callout callout-warning">
-                    <h5><i class="fa-solid fa-circle-info"></i> Nenhum Questionário foi encontrado.</h5>
-                    <p>Entre em contato com seu gestor para habilitar um novo questionário.</p>
-                </div>
+        </div>
+
+        {{-- Cards (Mobile) --}}
+        <div class="card-body d-block d-md-none">
+            <div class="row">
+                @foreach ($questionarios as $formulario)
+                    <div class="col-12 mb-3">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="mb-2">
+                                    <i class="fa-solid fa-file-alt text-primary mr-1"></i>
+                                    {{ $formulario->formulario->nome }}
+                                </h5>
+                                <span class="badge badge-dark mb-3">{{ $formulario->formulario->label }}</span>
+
+                                <p class="mb-1"><i class="fa-solid fa-circle-question mr-1 text-muted"></i> <strong>Questões:</strong> {{ $formulario->formulario->perguntaCount() }}</p>
+                                <p class="mb-1"><i class="fa-solid fa-calendar-plus mr-1 text-muted"></i> <strong>Habilitado:</strong> {{ optional($formulario->created_at)->format('d/m/Y H:i') }}</p>
+                                <p class="mb-1"><i class="fa-solid fa-layer-group mr-1 text-muted"></i> <strong>Etapa:</strong>
+                                    @if ($formulario->etapa_atual_numero)
+                                        <span class="badge badge-info">{{ $formulario->etapa_atual_nome }}</span>
+                                    @else
+                                        <span class="badge badge-secondary">Sem Etapa</span>
+                                    @endif
+                                </p>
+                                <p class="mb-1"><i class="fa-solid fa-flag-checkered mr-1 text-muted"></i> <strong>Status:</strong>
+                                    @php
+                                        $statusClass = [
+                                            'novo' => 'primary',
+                                            'pendente' => 'warning',
+                                            'completo' => 'success'
+                                        ][$formulario->status];
+                                    @endphp
+                                    <span class="badge badge-{{ $statusClass }}">{{ strtoupper($formulario->status) }}</span>
+                                </p>
+                            </div>
+                            <div class="card-footer bg-light border-top">
+                                <div class="d-flex flex-wrap justify-content-start gap-2">
+                                    @if($formulario->status !== 'completo')
+                                        <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm text-secondary">
+                                            <i class="fa-regular fa-circle-play mr-1"></i> Responder
+                                        </a>
+                                    @else
+                                        @if($formulario->midia && $formulario->midia->tipo == 'url')
+                                            <button class="btn btn-sm text-primary" onclick="abrirMidiaModal('url', '{{ $formulario->midia->url }}', {{ $formulario->id }})">
+                                                <i class="fa-solid fa-link"></i>
+                                            </button>
+                                        @elseif($formulario->midia && $formulario->midia->tipo == 'video' && $formulario->midia->arquivo)
+                                            <button class="btn btn-sm text-success" title="Assista Vídeo" onclick="abrirMidiaModal('video', '{{ asset('storage/' . $formulario->midia->arquivo) }}', {{ $formulario->id }})">
+                                                <i class="fa-solid fa-video"></i>
+                                            </button>
+                                        @endif
+
+                                        @if($formulario->video_assistido)
+                                            <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}" title="Visualizar Relatório" class="btn btn-sm text-info">
+                                                <i class="fa-regular fa-rectangle-list"></i>
+                                            </a>
+                                            <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}" target="_blank" title="Imprimir Relatório" class="btn btn-sm text-danger">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </a>
+                                        @else
+                                        <a href="#" class="btn btn-sm text-danger" title="Assista Vídeo">
+                                            <i class="fa-solid fa-spinner"></i>
+                                        </a>
+                                        @endif
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
-        @endif
-    </div>
+        </div>
+    @else
+        <div class="row m-3">
+            <div class="callout callout-warning w-100">
+                <h5><i class="fa-solid fa-circle-info"></i> Nenhum Questionário foi encontrado.</h5>
+                <p>Entre em contato com seu gestor para habilitar um novo questionário.</p>
+            </div>
+        </div>
+    @endif
+</div>
+
 
     <!-- Modal para exibir mídia -->
     <div class="modal fade" id="midiaModal" tabindex="-1" role="dialog" aria-labelledby="midiaModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-primary">
-                    <h5 class="modal-title" id="midiaModalLabel">Visualizar Mídia</h5>
+                    <h5 class="modal-title" id="midiaModalLabel"><label class="badge badge-dark">{{ $formulario->formulario->label }}</label> |
+                                    {{ $formulario->formulario->nome }} </h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Fechar">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -157,7 +215,11 @@
             </div>
         </div>
     </div>
+
 @stop
+
+
+
 
 @section('js')
 <script src="{{ asset('../js/utils.js') }}"></script>
