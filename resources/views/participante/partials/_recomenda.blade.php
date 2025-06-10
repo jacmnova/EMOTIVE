@@ -3,11 +3,6 @@
         <h2 class="card-title">
             <label class="badge badge-dark"> Recomendações Personalizadas </label> | Por Dimensão
         </h2>
-        <div class="card-tools">
-            <a href="#" class="btn btn-tool btn-sm"><i class="fas fa-download"></i></a>
-            <a href="#" class="btn btn-tool btn-sm"><i class="fas fa-bars"></i></a>
-            <a href="#" class="btn btn-sm btn-tool"><i class="fa-solid fa-circle-info"></i></a>
-        </div>
     </div>
 
     <div class="card-body">
@@ -21,13 +16,13 @@
         @foreach($pontuacoes as $ponto)
             <div class="mb-4 p-3 border rounded">
                 <h4>
-                    <label class="badge badge-{{ $ponto['badge'] }}">{{ $ponto['tag'] }}</label>
-                    {{ $ponto['nome'] }}
+                    <label class="badge badge-secondary">{{ $ponto['tag'] }}</label>
+                    {{ $ponto['nome'] }}  <label class="badge badge-{{ $ponto['badge'] }}">{{ $ponto['faixa'] }}</label>
                 </h4>
                 <p>
-                    Sua pontuação foi de {{ $ponto['valor'] }} pontos, Sua faixa está {{ $ponto['faixa'] }}.
+                    Sua pontuação foi de <strong>{{ $ponto['valor'] }}</strong> pontos. <br>Sua faixa está <strong>{{ $ponto['faixa'] }}</strong>.
                 </p>
-                <p>{{ $ponto['recomendacao'] }}</p>
+                <p style="text-align: justify;">{{ $ponto['recomendacao'] }}</p>
             </div>
         @endforeach
     </div>

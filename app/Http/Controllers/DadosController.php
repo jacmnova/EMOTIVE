@@ -345,8 +345,7 @@ class DadosController extends Controller
     //         'analiseData'
     //     ));
     // }
-
-    public function relatorioShow(Request $request)
+public function relatorioShow(Request $request)
 {
     $validated = $request->validate([
         'formulario_id' => ['required', 'integer', 'exists:formularios,id'],
@@ -438,6 +437,11 @@ class DadosController extends Controller
 
     $analiseData = $analise?->created_at;
 
+    // === FORMATAÇÃO DE MARCAÇÕES BÁSICAS DO TEXTO GERADO ===
+    $analiseHtml = nl2br(e($analiseTexto));
+    $analiseHtml = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $analiseHtml);
+    $analiseHtml = preg_replace('/###\s?(.*)/', '<h4>$1</h4>', $analiseHtml);
+
     return view('participante.relatorio', compact(
         'formulario',
         'respostasUsuario',
@@ -445,9 +449,11 @@ class DadosController extends Controller
         'variaveis',
         'user',
         'analiseTexto',
+        'analiseHtml',
         'analiseData'
     ));
 }
+
 
 
     private function gerarPrompt($user, $variaveis, $pontuacoes): string

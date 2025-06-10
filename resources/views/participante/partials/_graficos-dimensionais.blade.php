@@ -7,6 +7,7 @@
             foreach($pontuacoes as $pontos) {
                 if($pontos['tag'] === $tag) {
                     $resposta = $pontos['valor'];
+                    $fx = $pontos['faixa'];
                     break;
                 }
             }
@@ -26,7 +27,7 @@
         <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header">
-                    <strong>{{ $tag }} - {{ $var->nome }}</strong>
+                    <strong>{{ $tag }} - {{ $var->nome }}</strong> | @if($fx == 'Baixa') <label class="badge badge-info">FAIXA BAIXA com {{$pontos['valor']}} Pontos</label> @elseif($fx == 'Moderada') <label class="badge badge-warning">FAIXA M0DERADA  com {{$pontos['valor']}} Pontos</label> @else <label class="badge badge-danger">FAIXA ALTA com {{$pontos['valor']}} Pontos @endif
                 </div>
                 <div class="card-body">
                     <canvas id="{{ $id }}" height="250"></canvas>

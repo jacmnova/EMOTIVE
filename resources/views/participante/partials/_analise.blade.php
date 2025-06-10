@@ -1,22 +1,20 @@
-@if(isset($analiseTexto))
+@if(isset($analiseHtml))
     <div class="card">
         <div class="card-header border-0">
             <h2 class="card-title">
                 <label class="badge badge-dark"> Análise Geral </label> | Saúde Emocional
+
                 @if(isset($analiseData))
-                    <small class="text-muted" style="margin-left: 10px;color: silver;">
+                    <small class="text-muted ml-2" style="color: silver;">
                         Gerado em {{ \Carbon\Carbon::parse($analiseData)->format('d/m/Y \à\s H:i') }}
                     </small>
                 @endif
             </h2>
-            <div class="card-tools">
-                <a href="#" class="btn btn-tool btn-sm"><i class="fas fa-download"></i></a>
-                <a href="#" class="btn btn-tool btn-sm"><i class="fas fa-bars"></i></a>
-                <a href="#" class="btn btn-sm btn-tool"><i class="fa-solid fa-circle-info"></i></a>
 
+            <div class="card-tools d-flex">
 
                 @if(Auth::user()->admin)
-                    <form method="POST" action="{{ route('relatorio.regenerar') }}" class="d-inline">
+                    <form method="POST" action="{{ route('relatorio.regenerar') }}" class="d-inline ml-1">
                         @csrf
                         <input type="hidden" name="formulario_id" value="{{ $formulario->id }}">
                         <input type="hidden" name="usuario_id" value="{{ $user->id }}">
@@ -25,7 +23,6 @@
                         </button>
                     </form>
                 @endif
-
             </div>
         </div>
 
@@ -36,10 +33,8 @@
                     {{ $analiseTexto }}
                 </div>
             @else
-                <div class="mb-4 p-3 border rounded">
-                    <p style="white-space: pre-wrap; font-size: 16px;">
-                        {{ $analiseTexto }}
-                    </p>
+                <div class="mb-4 p-3 border rounded" style="font-size: 16px;">
+                    {!! $analiseHtml !!}
                 </div>
             @endif
         </div>
