@@ -4,36 +4,24 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\NovoUsuarioCadastrado;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Register Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
-
     use RegistersUsers;
 
     /**
-     * Where to redirect users after registration.
+     * Para onde redirecionar após o registro.
      *
      * @var string
      */
     protected $redirectTo = '/home';
 
     /**
-     * Create a new controller instance.
-     *
-     * @return void
+     * Construtor do controller.
      */
     public function __construct()
     {
@@ -41,7 +29,7 @@ class RegisterController extends Controller
     }
 
     /**
-     * Get a validator for an incoming registration request.
+     * Validação dos dados de registro.
      *
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
@@ -49,24 +37,29 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
     }
 
     /**
-     * Create a new user instance after a valid registration.
+     * Criação do usuário e envio da notificação.
      *
      * @param  array  $data
      * @return \App\Models\User
      */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
+        $usuario = User::create([
+            'name'     => $data['name'],
+            'email'    => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+
+        // Notificar o admin (ajuste o ID se necessário)
+        User::find(1)?->notify(new NovoUsuarioCadastrado($usuario));
+
+        return $usuario;
     }
 }

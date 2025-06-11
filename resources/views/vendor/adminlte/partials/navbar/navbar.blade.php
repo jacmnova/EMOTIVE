@@ -24,6 +24,45 @@
         {{-- Configured right links --}}
         @each('adminlte::partials.navbar.menu-item', $adminlte->menu('navbar-right'), 'item')
 
+        {{-- Notificações (sino) --}}
+        @if(Auth::check())
+            @php
+                $notificacoes = Auth::user()->unreadNotifications()->take(5)->get();
+            @endphp
+
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-toggle="dropdown" href="#">
+                    <i class="far fa-bell"></i>
+                    @if($notificacoes->count())
+                        <span class="badge badge-warning navbar-badge">{{ $notificacoes->count() }}</span>
+                    @endif
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <span class="dropdown-header">{{ $notificacoes->count() }} Notificações</span>
+                    <div class="dropdown-divider"></div>
+
+                    @forelse($notificacoes as $notif)
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-user-plus mr-2"></i>
+                            {{ $notif->data['titulo'] }}
+                            <br>
+                            <small>{{ $notif->data['mensagem'] }}</small>
+                            <span class="float-right text-muted text-sm">
+                                {{ \Carbon\Carbon::parse($notif->created_at)->diffForHumans() }}
+                            </span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                    @empty
+                        <span class="dropdown-item text-center">Sem notificações novas</span>
+                    @endforelse
+
+                    <a href="{{ route('notificacoes.marcarLidas') }}" class="dropdown-item dropdown-footer">
+                        Marcar todas como lidas
+                    </a>
+                </div>
+            </li>
+        @endif
+
         {{-- User menu link --}}
         @if(Auth::user())
             @if(config('adminlte.usermenu_enabled'))

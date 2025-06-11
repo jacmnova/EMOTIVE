@@ -24,6 +24,11 @@ use App\Http\Controllers\UsuarioFormularioController;
 use App\Http\Controllers\AnaliseController;
 
 
+use Illuminate\Support\Facades\Notification;
+use App\Models\User;
+use App\Notifications\NovoUsuarioCadastrado;
+
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -141,3 +146,23 @@ Route::post('/relatorio/analise/{usuarioId}', [AnaliseController::class, 'gerarA
 Route::post('/relatorio/regenerar', [RelatorioController::class, 'regenerarAnalise'])
     ->name('relatorio.regenerar')
     ->middleware('auth');
+
+
+Route::get('/notificacoes/marcar-todas', function () {
+    auth()->user()->unreadNotifications->markAsRead();
+    return back();
+})->name('notificacoes.marcarLidas');
+
+
+
+Route::get('/teste-email', function () {
+    $admin = User::find(1);
+    $falso = new \App\Models\User([
+        'name' => 'Teste',
+        'email' => 'wheelkorner@gmail.com'
+    ]);
+
+    $admin->notify(new NovoUsuarioCadastrado($falso));
+
+    return 'Notificação enviada';
+});
