@@ -159,8 +159,8 @@
                     <table class="table datatable table-striped dtr-inline mr-1 ml-1">
                         <thead>
                             <tr>
-                                <th style="width: 10%">Número</th>
-                                <th style="width: 60%">Pergunta</th>
+                                <th style="width: 5%">Número</th>
+                                <th style="width: 65%">Pergunta</th>
                                 <th style="width: 30%">Variavel</th>
                             </tr>
                         </thead>

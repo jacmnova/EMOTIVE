@@ -64,7 +64,7 @@ class Formulario extends Model
             ->leftJoin('variaveis as v', 'v.id', '=', 'pv.variavel_id')
             ->select('p.numero_da_pergunta', 'p.pergunta', 'v.nome', 'v.tag')
             ->where('p.formulario_id', $this->id)
-            ->orderBy('p.numero_da_pergunta')
+            ->orderBy('p.id')
             ->get();
     }
 

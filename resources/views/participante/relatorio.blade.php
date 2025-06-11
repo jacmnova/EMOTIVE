@@ -38,21 +38,18 @@
 @section('content')
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-12">
         @include('participante.partials._radar')
+        @include('participante.partials._dimensoes')
+        @include('participante.partials._barras')
         @include('participante.partials._recomenda')
+        @include('participante.partials._graficos-dimensionais')
+        @include('participante.partials._analise')
+    </div>
 
         @if(Auth::user()->admin === true)
             @include('participante.partials._gabarito')
         @endif
-    </div>
-
-    <div class="col-md-6">
-        @include('participante.partials._dimensoes')
-        @include('participante.partials._barras')
-        @include('participante.partials._analise')
-        @include('participante.partials._graficos-dimensionais')
-    </div>
 </div>
 
 
