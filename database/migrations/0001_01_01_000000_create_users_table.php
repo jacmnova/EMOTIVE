@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('verification_token', 64)->nullable();
+
             $table->string('password');
             $table->string('avatar')->default('../vendor/adminlte/dist/img/user.png')->nullable();
 
@@ -32,6 +35,7 @@ return new class extends Migration
             $table->unsignedBigInteger('deleted_by')->nullable();
             $table->rememberToken();
             $table->timestamps();
+
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

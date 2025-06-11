@@ -22,6 +22,7 @@ use App\Http\Controllers\FormularioEtapaController;
 use App\Http\Controllers\UsuarioFormularioController;
 
 use App\Http\Controllers\AnaliseController;
+use App\Http\Controllers\Auth\EmailVerificacaoController;
 
 
 use Illuminate\Support\Facades\Notification;
@@ -155,14 +156,17 @@ Route::get('/notificacoes/marcar-todas', function () {
 
 
 
-Route::get('/teste-email', function () {
-    $admin = User::find(1);
-    $falso = new \App\Models\User([
-        'name' => 'Teste',
-        'email' => 'wheelkorner@gmail.com'
-    ]);
+// Route::get('/teste-email', function () {
+//     $admin = User::find(1);
+//     $falso = new \App\Models\User([
+//         'name' => 'Teste',
+//         'email' => 'wheelkorner@gmail.com'
+//     ]);
 
-    $admin->notify(new NovoUsuarioCadastrado($falso));
+//     $admin->notify(new NovoUsuarioCadastrado($falso));
 
-    return 'Notificação enviada';
-});
+//     return 'Notificação enviada';
+// });
+
+Route::get('/verificar-email/{token}', [EmailVerificacaoController::class, 'verificar'])
+    ->name('verificar.email');

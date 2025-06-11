@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\NovoUsuarioCadastrado;
+use App\Notifications\VerificarEmail;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
@@ -44,7 +46,7 @@ class RegisterController extends Controller
     }
 
     /**
-     * Criação do usuário e envio da notificação.
+     * Criação do usuário, envio de token de verificação e notificação ao admin.
      *
      * @param  array  $data
      * @return \App\Models\User
@@ -52,12 +54,16 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         $usuario = User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
+            'name'                => $data['name'],
+            'email'               => $data['email'],
+            'password'            => Hash::make($data['password']),
+            'verification_token'  => Str::random(64),
         ]);
 
-        // Notificar o admin (ajuste o ID se necessário)
+        // Envia e-mail de verificação ao próprio usuário
+        $usuario->notify(new VerificarEmail($usuario->verification_token));
+
+        // Notifica o admin
         User::find(1)?->notify(new NovoUsuarioCadastrado($usuario));
 
         return $usuario;
