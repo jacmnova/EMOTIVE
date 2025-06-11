@@ -47,23 +47,27 @@
                                     </button>
                                 </form>
                                 @if($perfil['id'] !== Auth::user()->id)
-                                    <form action="{{ route('usuarios.status', $perfil['id']) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('PUT')
-                                        <button type="button" class="btn btn-sm btn-tool d-sm-inline-block" onclick="confirmStatus({{ $perfil['id'] }})" title="@if($perfil['ativo']) Inativar @else Ativar @endif">
-                                            @if($perfil['ativo'])
-                                                <i class="fa-solid fa-toggle-on" style="color: #233750;"></i>
-                                            @else
-                                                <i class="fa-solid fa-toggle-off" style="color: #5fc3b4;"></i>
-                                            @endif
-                                        </button>
-                                    </form>
-                                    <form action="{{ route('impersonate.start', ['id' => $perfil['id']]) }}" method="POST" class="d-inline" id="startForm_{{ $perfil['id'] }}">
-                                        @csrf
-                                        <a class="btn btn-sm btn-tool d-sm-inline-block" href="#" onclick="document.getElementById('startForm_{{ $perfil['id'] }}').submit()" title="Impersonar">
-                                            <i class="fa-solid fa-user-gear" style="color: red;"></i>
-                                        </a>
-                                    </form>
+                                    @if($perfil['sa'] !== true)
+                                        <form action="{{ route('usuarios.status', $perfil['id']) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="button" class="btn btn-sm btn-tool d-sm-inline-block" onclick="confirmStatus({{ $perfil['id'] }})" title="@if($perfil['ativo']) Inativar @else Ativar @endif">
+                                                @if($perfil['ativo'])
+                                                    <i class="fa-solid fa-toggle-on" style="color: #233750;"></i>
+                                                @else
+                                                    <i class="fa-solid fa-toggle-off" style="color: #5fc3b4;"></i>
+                                                @endif
+                                            </button>
+                                        </form>
+                                    
+                                        <form action="{{ route('impersonate.start', ['id' => $perfil['id']]) }}" method="POST" class="d-inline" id="startForm_{{ $perfil['id'] }}">
+                                            @csrf
+                                            <a class="btn btn-sm btn-tool d-sm-inline-block" href="#" onclick="document.getElementById('startForm_{{ $perfil['id'] }}').submit()" title="Impersonar">
+                                                <i class="fa-solid fa-user-gear" style="color: red;"></i>
+                                            </a>
+                                        </form>
+                                    @endif
+
                                 @endif
                             </td>
                         </tr>
