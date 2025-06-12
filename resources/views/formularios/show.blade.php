@@ -41,112 +41,117 @@
     <!-- <div class="row">
         @include('formularios.partials._teste')
     </div> -->
-    
 
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fa-solid fa-eye" style="margin-right: 5px;"></i>
-                        Detalhes do Formulário
-                    </h3>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fa-solid fa-eye" style="margin-right: 5px;"></i>
+                    Detalhes do Formulário
+                </h3>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label><strong>Nome:</strong></label>
+                        <p>{{ $formulario->nome }}</p>
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label><strong>Tag:</strong></label>
+                        <p>{{ $formulario->label }}</p>
+                    </div>
                 </div>
 
-                <div class="card-body">
-                    <div class="row">
-                        <div class="form-group col-md-6">
-                            <label><strong>Nome:</strong></label>
-                            <p>{{ $formulario->nome }}</p>
-                        </div>
-
-                        <div class="form-group col-md-6">
-                            <label><strong>Tag:</strong></label>
-                            <p>{{ $formulario->label }}</p>
-                        </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label><strong>Descrição:</strong></label>
+                        <p>{!! $formulario->descricao !!}</p>
                     </div>
-
-                    <div class="row">
-                        <div class="form-group col-md-12">
-                            <label><strong>Descrição:</strong></label>
-                            <p>{!! $formulario->descricao !!}</p>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="form-group col-md-4">
-                            <label><strong>Calculo:</strong></label>
-                            <p>{{ $formulario->tipoCalculo->nome ?? '---' }}</p>
-                        </div>
-
-                        <div class="form-group col-md-4">
-                            <label><strong>Score inicial:</strong></label>
-                            <p>{{ $formulario->score_ini }}</p>
-                        </div>
-
-                        <div class="form-group col-md-4">
-                            <label><strong>Score final:</strong></label>
-                            <p>{{ $formulario->score_fim }}</p>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="form-group col-md-4">
-                            <label><strong>Quantidade de Variaveis:</strong></label>
-                            <p>{{$formulario->variaveisCount()}}</p>
-                        </div>
-
-                        <div class="form-group col-md-4">
-                            <label><strong>Quantidade de Perguntas:</strong></label>
-                            <p>{{$formulario->perguntaCount()}}</p>
-                        </div>
-                    </div>
-
                 </div>
 
-                <div class="card-footer">
-                    <a href="{{ route('formularios.index') }}" class="btn btn-default" style="width: 150px;">Voltar</a>
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        <label><strong>Calculo:</strong></label>
+                        <p>{{ $formulario->tipoCalculo->nome ?? '---' }}</p>
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        <label><strong>Score inicial:</strong></label>
+                        <p>{{ $formulario->score_ini }}</p>
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        <label><strong>Score final:</strong></label>
+                        <p>{{ $formulario->score_fim }}</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        <label><strong>Quantidade de Variaveis:</strong></label>
+                        <p>{{$formulario->variaveisCount()}}</p>
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        <label><strong>Quantidade de Perguntas:</strong></label>
+                        <p>{{$formulario->perguntaCount()}}</p>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-4">
-
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fa-solid fa-file-alt" style="margin-right: 5px;"></i>
-                        Perguntas por Variavel
-                    </h3>
-                </div>
-
-                <div class="card-body mr-1">
-                    <table class="table datatable table-striped dtr-inline mr-1 ml-1">
-                        <thead>
-                            <tr>
-                                <th style="width: 60%">Variável</th>
-                                <th style="width: 40%">Perguntas</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($formulario->perguntasPorVariavel() as $formularios)
-                                <tr>
-                                    <td>{{ $formularios->nome }}</td>
-                                    <td>{{ $formularios->total_perguntas }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-
     </div>
 
-    <div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fa-solid fa-eye" style="margin-right: 5px;"></i>
+                    Instruções {{ $formulario->label }}
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <p>{!! $formulario->instrucoes !!}</p>
+                </div>
+            </div>
+            <div class="card-footer">
+            </div>
+        </div>
+    </div>
 
-        <div class="col-md-8">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fa-solid fa-file-alt" style="margin-right: 5px;"></i>
+                    Perguntas por Variavel
+                </h3>
+            </div>
+            <div class="card-body mr-1">
+                <table class="table datatable table-striped dtr-inline mr-1 ml-1">
+                    <thead>
+                        <tr>
+                            <th style="width: 60%">Variável</th>
+                            <th style="width: 40%">Perguntas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($formulario->perguntasPorVariavel() as $formularios)
+                            <tr>
+                                <td>{{ $formularios->nome }}</td>
+                                <td>{{ $formularios->total_perguntas }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @if(Auth::user()->sa === true)
+        <div class="col-12">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">
@@ -177,30 +182,9 @@
                 </div>
             </div>
         </div>
-
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fa-solid fa-eye" style="margin-right: 5px;"></i>
-                        Instruções {{ $formulario->label }}
-                    </h3>
-                </div>
-
-                <div class="card-body">
-                    <div class="form-group">
-                        <p>{!! $formulario->instrucoes !!}</p>
-                    </div>
-                </div>
+    @endif
 
 
-                <div class="card-footer">
-
-                </div>
-            </div>
-        </div>
-
-    </div>
 
 
 @stop

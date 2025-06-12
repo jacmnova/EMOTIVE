@@ -3,9 +3,7 @@
     $valores = $formulario->perguntasPorVariavel()->pluck('total_perguntas');
 @endphp
 
-
-
-    <div class="col-md-4">
+    <div class="col-12">
         <div class="card">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
@@ -19,7 +17,7 @@
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-12">
         <div class="card">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">

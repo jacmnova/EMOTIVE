@@ -37,17 +37,6 @@
 <div class="card">
     <div class="card-header">
         <h3 class="card-title"> <i class="fa-solid fa-sitemap mr-2"></i>Importação de Usuários em Lote</h3>
-        <div class="card-tools">
-
-            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                <i class="fas fa-minus"></i>
-            </button>
-
-            <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
-                <i class="fas fa-times"></i>
-            </button>
-
-        </div>
     </div>
         <form action="{{ route('gestor.importar') }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -65,9 +54,9 @@
                     <p>O cabeçalho da primeira linha <strong>deve estar presente</strong>, como no exemplo:</p>
 
                     <pre class="bg-light p-2 border rounded text-left">
-                        email,nome
-                        joao.silva@empresa.com,João da Silva
-                        maria.souza@empresa.com,Maria Souza
+email,nome
+joao.silva@empresa.com,João da Silva
+maria.souza@empresa.com,Maria Souza
                     </pre>
 
                     <p>Todos os usuários importados receberão uma senha padrão e um e-mail de boas-vindas com instruções de acesso.</p>

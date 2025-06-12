@@ -23,7 +23,7 @@
 @section('content')
 
 {{-- FORMULÁRIO DESKTOP/TABLET --}}
-<div class="d-none d-md-block">
+<div class="d-none d-md-block mt-2">
     <form id="formulario-perguntas">
         @csrf
         <input name="formulario_id" value="{{ $formulario->id }}" hidden>
@@ -85,7 +85,7 @@
 </div>
 
 {{-- FORMULÁRIO MOBILE --}}
-<div class="d-block d-md-none">
+<div class="d-block d-md-none mt-2">
     <form id="formulario-perguntas-mobile">
         @csrf
         <input type="hidden" name="formulario_id" value="{{ $formulario->id }}">
@@ -186,7 +186,9 @@
                     if (data.status === 'formulario_concluido') {
                         window.location.href = "{{ route('questionarios.usuario') }}";
                     } else {
-                        location.reload();
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('scroll', 'top');
+                        window.location.href = url.toString();
                     }
                 });
             })
@@ -200,4 +202,15 @@
     enviarFormulario('formulario-perguntas-mobile');
 </script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('scroll') === 'top') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Remove o parâmetro da URL sem recarregar
+            history.replaceState(null, '', window.location.pathname);
+        }
+    });
+</script>
 @stop

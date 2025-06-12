@@ -250,210 +250,119 @@ class DadosController extends Controller
         }
     }
 
-    // public function relatorioShow(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'formulario_id' => ['required', 'integer', 'exists:formularios,id'],
-    //         'usuario_id' => ['required', 'integer', 'exists:users,id'],
-    //     ]);
+    public function relatorioShow(Request $request)
+    {
+        $validated = $request->validate([
+            'formulario_id' => ['required', 'integer', 'exists:formularios,id'],
+            'usuario_id' => ['required', 'integer', 'exists:users,id'],
+        ]);
 
-    //     $formularioId = $validated['formulario_id'];
-    //     $usuarioId = $validated['usuario_id'];
+        $formularioId = $validated['formulario_id'];
+        $usuarioId = $validated['usuario_id'];
 
-    //     $user = User::find($usuarioId);
-    //     $formulario = Formulario::with('perguntas.variaveis')->findOrFail($formularioId);
+        $user = User::find($usuarioId);
+        $formulario = Formulario::with('perguntas.variaveis')->findOrFail($formularioId);
 
-    //     $respostasUsuario = Resposta::where('user_id', $user->id)
-    //         ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
-    //         ->get()
-    //         ->keyBy('pergunta_id');
+        $respostasUsuario = Resposta::where('user_id', $user->id)
+            ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
+            ->get()
+            ->keyBy('pergunta_id');
 
-    //     $variaveis = Variavel::with('perguntas')
-    //         ->where('formulario_id', $formulario->id)
-    //         ->get();
+        $variaveis = Variavel::with('perguntas')
+            ->where('formulario_id', $formulario->id)
+            ->get();
 
-    //     $pontuacoes = [];
-    //     foreach ($variaveis as $variavel) {
-    //         $pontuacao = 0;
-    //         foreach ($variavel->perguntas as $pergunta) {
-    //             $resposta = $respostasUsuario->get($pergunta->id);
-    //             if ($resposta) {
-    //                 $pontuacao += $resposta->valor_resposta ?? 0;
-    //             }
-    //         }
-
-    //         $faixa = $this->classificarPontuacao($pontuacao, $variavel);
-    //         switch ($faixa) {
-    //             case 'Baixa':
-    //                 $recomendacao = $variavel->r_baixa;
-    //                 $badge = 'info';
-    //                 break;
-    //             case 'Moderada':
-    //                 $recomendacao = $variavel->r_moderada;
-    //                 $badge = 'warning';
-    //                 break;
-    //             case 'Alta':
-    //                 $recomendacao = $variavel->r_alta;
-    //                 $badge = 'danger';
-    //                 break;
-    //             default:
-    //                 $recomendacao = 'Sem dados.';
-    //                 $badge = 'secondary';
-    //                 break;
-    //         }
-
-    //         $pontuacoes[] = [
-    //             'tag' => strtoupper($variavel->tag),
-    //             'nome' => $variavel->nome,
-    //             'valor' => $pontuacao,
-    //             'faixa' => $faixa,
-    //             'recomendacao' => $recomendacao,
-    //             'badge' => $badge,
-    //         ];
-    //     }
-
-    //     $analise = Analise::where('user_id', $usuarioId)
-    //         ->where('formulario_id', $formularioId)
-    //         ->first();
-
-    //     if (!$analise) {
-    //         $prompt = $this->gerarPrompt($user, $variaveis, $pontuacoes);
-    //         $analiseTexto = $this->gerarAnaliseViaOpenAI($prompt);
-
-    //         if ($analiseTexto) {
-    //             $analise = Analise::create([
-    //                 'user_id' => $usuarioId,
-    //                 'formulario_id' => $formularioId,
-    //                 'texto' => $analiseTexto,
-    //             ]);
-    //         } else {
-    //             $analiseTexto = 'Erro ao gerar análise. Por favor, tente novamente mais tarde.';
-    //         }
-    //     } else {
-    //         $analiseTexto = $analise->texto;
-    //     }
-
-    //     $analiseData = $analise?->created_at;
-
-    //     return view('participante.relatorio', compact(
-    //         'formulario',
-    //         'respostasUsuario',
-    //         'pontuacoes',
-    //         'variaveis',
-    //         'user',
-    //         'analiseTexto',
-    //         'analiseData'
-    //     ));
-    // }
-public function relatorioShow(Request $request)
-{
-    $validated = $request->validate([
-        'formulario_id' => ['required', 'integer', 'exists:formularios,id'],
-        'usuario_id' => ['required', 'integer', 'exists:users,id'],
-    ]);
-
-    $formularioId = $validated['formulario_id'];
-    $usuarioId = $validated['usuario_id'];
-
-    $user = User::find($usuarioId);
-    $formulario = Formulario::with('perguntas.variaveis')->findOrFail($formularioId);
-
-    $respostasUsuario = Resposta::where('user_id', $user->id)
-        ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
-        ->get()
-        ->keyBy('pergunta_id');
-
-    $variaveis = Variavel::with('perguntas')
-        ->where('formulario_id', $formulario->id)
-        ->get();
-
-    $pontuacoes = [];
-    foreach ($variaveis as $variavel) {
-        $pontuacao = 0;
-        foreach ($variavel->perguntas as $pergunta) {
-            $resposta = $respostasUsuario->get($pergunta->id);
-            if ($resposta) {
-                $pontuacao += $resposta->valor_resposta ?? 0;
+        $pontuacoes = [];
+        foreach ($variaveis as $variavel) {
+            $pontuacao = 0;
+            foreach ($variavel->perguntas as $pergunta) {
+                $resposta = $respostasUsuario->get($pergunta->id);
+                if ($resposta) {
+                    $pontuacao += $resposta->valor_resposta ?? 0;
+                }
             }
+
+            $faixa = $this->classificarPontuacao($pontuacao, $variavel);
+            switch ($faixa) {
+                case 'Baixa':
+                    $recomendacao = $variavel->r_baixa;
+                    $badge = 'info';
+                    break;
+                case 'Moderada':
+                    $recomendacao = $variavel->r_moderada;
+                    $badge = 'warning';
+                    break;
+                case 'Alta':
+                    $recomendacao = $variavel->r_alta;
+                    $badge = 'danger';
+                    break;
+                default:
+                    $recomendacao = 'Sem dados.';
+                    $badge = 'secondary';
+                    break;
+            }
+
+            $b = $variavel->B ?? 0;
+            $m = $variavel->M ?? 0;
+            $a = $variavel->A ?? ($m + ($m - $b));
+
+            $pontuacoes[] = [
+                'tag' => strtoupper($variavel->tag),
+                'nome' => $variavel->nome,
+                'valor' => $pontuacao,
+                'faixa' => $faixa,
+                'recomendacao' => $recomendacao,
+                'badge' => $badge,
+                'b' => $b,
+                'm' => $m,
+                'a' => $a,
+            ];
         }
 
-        $faixa = $this->classificarPontuacao($pontuacao, $variavel);
-        switch ($faixa) {
-            case 'Baixa':
-                $recomendacao = $variavel->r_baixa;
-                $badge = 'info';
-                break;
-            case 'Moderada':
-                $recomendacao = $variavel->r_moderada;
-                $badge = 'warning';
-                break;
-            case 'Alta':
-                $recomendacao = $variavel->r_alta;
-                $badge = 'danger';
-                break;
-            default:
-                $recomendacao = 'Sem dados.';
-                $badge = 'secondary';
-                break;
-        }
+        $analise = Analise::where('user_id', $usuarioId)
+            ->where('formulario_id', $formularioId)
+            ->first();
 
-        $b = $variavel->B ?? 0;
-        $m = $variavel->M ?? 0;
-        $a = $variavel->A ?? ($m + ($m - $b)); // se A não existir, calcula baseado na média
+        if (!$analise) {
+            $prompt = $this->gerarPrompt($user, $variaveis, $pontuacoes);
 
-        $pontuacoes[] = [
-            'tag' => strtoupper($variavel->tag),
-            'nome' => $variavel->nome,
-            'valor' => $pontuacao,
-            'faixa' => $faixa,
-            'recomendacao' => $recomendacao,
-            'badge' => $badge,
-            'b' => $b,
-            'm' => $m,
-            'a' => $a,
-        ];
-    }
+            try {
+                $analiseTexto = $this->gerarAnaliseViaOpenAI($prompt);
+            } catch (\Throwable $e) {
+                $analiseTexto = null;
+            }
 
-    $analise = Analise::where('user_id', $usuarioId)
-        ->where('formulario_id', $formularioId)
-        ->first();
-
-    if (!$analise) {
-        $prompt = $this->gerarPrompt($user, $variaveis, $pontuacoes);
-        $analiseTexto = $this->gerarAnaliseViaOpenAI($prompt);
-
-        if ($analiseTexto) {
-            $analise = Analise::create([
-                'user_id' => $usuarioId,
-                'formulario_id' => $formularioId,
-                'texto' => $analiseTexto,
-            ]);
+            if ($analiseTexto) {
+                $analise = Analise::create([
+                    'user_id' => $usuarioId,
+                    'formulario_id' => $formularioId,
+                    'texto' => $analiseTexto,
+                ]);
+            } else {
+                $analiseTexto = 'A análise está em processamento. Em breve ela será disponibilizada neste relatório.';
+            }
         } else {
-            $analiseTexto = 'Erro ao gerar análise. Por favor, tente novamente mais tarde.';
+            $analiseTexto = $analise->texto;
         }
-    } else {
-        $analiseTexto = $analise->texto;
+
+        $analiseData = $analise?->created_at;
+
+        // === FORMATAÇÃO DE MARCAÇÕES BÁSICAS DO TEXTO GERADO ===
+        $analiseHtml = nl2br(e($analiseTexto));
+        $analiseHtml = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $analiseHtml);
+        $analiseHtml = preg_replace('/###\s?(.*)/', '<h4>$1</h4>', $analiseHtml);
+
+        return view('participante.relatorio', compact(
+            'formulario',
+            'respostasUsuario',
+            'pontuacoes',
+            'variaveis',
+            'user',
+            'analiseTexto',
+            'analiseHtml',
+            'analiseData'
+        ));
     }
-
-    $analiseData = $analise?->created_at;
-
-    // === FORMATAÇÃO DE MARCAÇÕES BÁSICAS DO TEXTO GERADO ===
-    $analiseHtml = nl2br(e($analiseTexto));
-    $analiseHtml = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $analiseHtml);
-    $analiseHtml = preg_replace('/###\s?(.*)/', '<h4>$1</h4>', $analiseHtml);
-
-    return view('participante.relatorio', compact(
-        'formulario',
-        'respostasUsuario',
-        'pontuacoes',
-        'variaveis',
-        'user',
-        'analiseTexto',
-        'analiseHtml',
-        'analiseData'
-    ));
-}
-
 
 
     private function gerarPrompt($user, $variaveis, $pontuacoes): string

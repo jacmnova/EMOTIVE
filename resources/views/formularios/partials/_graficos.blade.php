@@ -1,6 +1,6 @@
 
 @foreach($variaveis as $index => $categorias)
-    <div class="col-md-2">
+    <div class="col-12">
         <div class="card mb-3">
         <div class="card-header border-0">
             <div class="d-flex justify-content-between align-items-center">

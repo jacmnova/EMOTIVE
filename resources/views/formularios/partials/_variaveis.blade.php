@@ -1,5 +1,5 @@
-<div class="col-md-3">
-    <div class="card mb-3">
+
+    <div class="card col-12">
         <div class="card-header border-0">
             <div class="d-flex justify-content-between align-items-center">
             <h3 class="card-title">Variaveis do Formulário</h3>
@@ -7,12 +7,11 @@
             </div>
         </div>
         <div class="card-body">
-            <canvas id="radarCharty" style="height: 600px; width: 600px;"></canvas>
+            <canvas id="radarCharty"></canvas>
         </div>
     </div>
-</div>
-<div class="col-md-3">
-    <div class="card">
+
+    <div class="card col-12">
         <div class="card-header">
             <h3 class="card-title">
                 <i class="fa-solid fa-file-alt" style="margin-right: 5px;"></i>
@@ -41,7 +40,7 @@
             </table>
         </div>
     </div>
-</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

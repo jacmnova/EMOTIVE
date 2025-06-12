@@ -198,27 +198,32 @@
 </div>
 
 
-    <!-- Modal para exibir mídia -->
-    <div class="modal fade" id="midiaModal" tabindex="-1" role="dialog" aria-labelledby="midiaModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-primary">
+<!-- Modal para exibir mídia -->
+<div class="modal fade" id="midiaModal" tabindex="-1" role="dialog" aria-labelledby="midiaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-fullscreen-sm-down" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary flex-wrap">
+                <h5 class="modal-title w-100 mb-2" id="midiaModalLabel">
+                    <label class="badge badge-dark">
+                        {{ optional($formulario->formulario ?? null)->label }}
+                    </label> |
+                    {{ optional($formulario->formulario ?? null)->nome }}
+                </h5>
+                <p class="text-white small w-100 mb-0">
+                    Você precisa assistir o vídeo na sua totalidade para a liberação do relatório!
+                </p>
+                <button type="button" class="close text-white position-absolute" style="top: 10px; right: 15px;" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
 
-                    <h5 class="modal-title" id="midiaModalLabel">
-                        <label class="badge badge-dark">{{ optional($formulario->formulario ?? null)->label }}</label> |
-                        {{ optional($formulario->formulario ?? null)->nome }}
-                    </h5>
-
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Fechar">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body text-center" id="midiaModalBody">
-                    <!-- Conteúdo dinâmico -->
-                </div>
+            <div class="modal-body text-center p-2 p-md-4" id="midiaModalBody">
+                <!-- Conteúdo dinâmico (vídeo ou imagem) -->
             </div>
         </div>
     </div>
+</div>
+
 
 @stop
 

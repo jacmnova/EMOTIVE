@@ -2,16 +2,7 @@
     <div class="card-body">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
             <div class="dataTables_length mb-1" id="DataTables_Table_0_length">
-                <!-- <span class="d-flex align-items-center mb-0">
-                    Mostrar
-                    <select name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="custom-select custom-select-sm form-control form-control-sm ml-2 mr-1" style="width: 60px;">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100" selected>100</option>
-                    </select>
-                    registros por página
-                </span> -->
+
             </div>
             <div class="dataTables_filter" id="DataTables_Table_0_filter">
                 <span class="d-flex align-items-center mb-0">
@@ -70,24 +61,26 @@
                                 </button>
                             </form>
                             @if($perfil['id'] !== Auth::user()->id)
-                                <form action="{{ route('usuarios.status', $perfil['id']) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('PUT')
-                                    <input type="hidden" name="status_id" id="statusIdInput">
-                                    <button type="button" class="btn btn-tool d-flex align-items-center" title="@if($perfil['ativo']) Inativar @else Ativar @endif" onclick="confirmStatus({{ $perfil['id'] }})">
-                                        @if($perfil['ativo'])
-                                            <i class="fa-solid fa-toggle-on text-primary"></i>
-                                        @else
-                                            <i class="fa-solid fa-toggle-off text-muted"></i>
-                                        @endif
-                                    </button>
-                                </form>
-                                <form action="{{ route('impersonate.start', ['id' => $perfil['id']]) }}" method="POST" class="d-inline" id="startForm_{{ $perfil['id'] }}">
-                                    @csrf
-                                    <a class="btn btn-tool d-flex align-items-center" href="#" title="Impersonate" onclick="document.getElementById('startForm_{{ $perfil['id'] }}').submit()">
-                                        <i class="fa-solid fa-user-gear text-danger"></i>
-                                    </a>
-                                </form>
+                                @if($perfil['sa'] !== true)
+                                    <form action="{{ route('usuarios.status', $perfil['id']) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="status_id" id="statusIdInput">
+                                        <button type="button" class="btn btn-tool d-flex align-items-center" title="@if($perfil['ativo']) Inativar @else Ativar @endif" onclick="confirmStatus({{ $perfil['id'] }})">
+                                            @if($perfil['ativo'])
+                                                <i class="fa-solid fa-toggle-on text-primary"></i>
+                                            @else
+                                                <i class="fa-solid fa-toggle-off text-muted"></i>
+                                            @endif
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('impersonate.start', ['id' => $perfil['id']]) }}" method="POST" class="d-inline" id="startForm_{{ $perfil['id'] }}">
+                                        @csrf
+                                        <a class="btn btn-tool d-flex align-items-center" href="#" title="Impersonate" onclick="document.getElementById('startForm_{{ $perfil['id'] }}').submit()">
+                                            <i class="fa-solid fa-user-gear text-danger"></i>
+                                        </a>
+                                    </form>
+                                @endif    
                             @endif
                         </div>
                     </div>
