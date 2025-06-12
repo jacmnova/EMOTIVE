@@ -19,6 +19,27 @@
 
 @section('content')
 
+    @if(Auth::check() && is_null(Auth::user()->email_verified_at))
+        <div class="card bg-danger text-white">
+            <div class="card-header">
+                <h3 class="card-title">Confirmação de E-mail Necessária</h3>
+            </div>
+            <div class="card-body">
+                <p>Olá, {{ Auth::user()->name }}!</p>
+                <p>Detectamos que seu e-mail ainda não foi confirmado. Para acessar todas as funcionalidades do sistema, confirme seu endereço de e-mail.</p>
+                <p>Verifique sua caixa de entrada ou a pasta de spam. Caso não tenha recebido o e-mail, clique no botão abaixo para reenviar.</p>
+
+                <form action="{{ route('verificar.email.reativar') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-light">
+                        Reenviar E-mail de Verificação
+                    </button>
+                </form>
+            </div>
+        </div>
+    @endif
+
+
     @include('layouts.partials.whatsapp')
 
     @if(Auth::user()->admin === true)

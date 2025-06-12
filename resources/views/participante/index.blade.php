@@ -203,8 +203,12 @@
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-primary">
-                    <h5 class="modal-title" id="midiaModalLabel"><label class="badge badge-dark">{{ $formulario->formulario->label }}</label> |
-                                    {{ $formulario->formulario->nome }} </h5>
+
+                    <h5 class="modal-title" id="midiaModalLabel">
+                        <label class="badge badge-dark">{{ optional($formulario->formulario ?? null)->label }}</label> |
+                        {{ optional($formulario->formulario ?? null)->nome }}
+                    </h5>
+
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Fechar">
                         <span aria-hidden="true">&times;</span>
                     </button>

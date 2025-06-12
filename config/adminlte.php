@@ -319,7 +319,7 @@ return [
 
         [
             'text' => 'Dashboard',
-            'url' => 'dashboard',
+            'url' => 'dashboard-admin',
             'icon' => 'fa-solid fa-users-gear',
             'can' => 'sa',
         ],

@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Midia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DadosController;
@@ -22,12 +21,10 @@ use App\Http\Controllers\FormularioEtapaController;
 use App\Http\Controllers\UsuarioFormularioController;
 
 use App\Http\Controllers\AnaliseController;
-use App\Http\Controllers\Auth\EmailVerificacaoController;
 
-
-use Illuminate\Support\Facades\Notification;
 use App\Models\User;
-use App\Notifications\NovoUsuarioCadastrado;
+
+use Illuminate\Support\Facades\Auth;
 
 
 Route::get('/', function () {
@@ -111,10 +108,7 @@ Route::post('/respostas/salvar', [DadosController::class, 'salvarRespostas'])->n
 Route::post('/usuario-formulario/finalizar', [DadosController::class, 'finalizar'])->name('usuarioFormulario.finalizar');
 
 
-// Route::get('/meurelatorio/show/{id}', [DadosController::class, 'relatorioShow'])->name('relatorio.show');
 Route::get('/meurelatorio/show', [DadosController::class, 'relatorioShow'])->name('relatorio.show');
-
-
 
 
 Route::get('/variaveis/formulario/{id}', [VariavelController::class, 'getPorFormulario']);
@@ -126,7 +120,7 @@ Route::resource('calculos', CalculosController::class);
 Route::get('/relatorio/pdf', [RelatorioController::class, 'gerarPDF'])->name('relatorio.pdf');
 
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/dashboard-admin', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::resource('midias', MidiaController::class);
 
@@ -154,19 +148,32 @@ Route::get('/notificacoes/marcar-todas', function () {
     return back();
 })->name('notificacoes.marcarLidas');
 
+Route::get('/verificar-email', function (\Illuminate\Http\Request $request) {
+    $token = $request->query('token');
 
+    $usuario = User::where('verification_token', $token)->first();
 
-// Route::get('/teste-email', function () {
-//     $admin = User::find(1);
-//     $falso = new \App\Models\User([
-//         'name' => 'Teste',
-//         'email' => 'wheelkorner@gmail.com'
-//     ]);
+    if (!$usuario) {
+        return redirect('/login')->withErrors(['message' => 'Token inválido ou expirado.']);
+    }
 
-//     $admin->notify(new NovoUsuarioCadastrado($falso));
+    $usuario->email_verified_at = now();
+    $usuario->verification_token = null;
+    $usuario->save();
 
-//     return 'Notificação enviada';
-// });
+    return redirect('/login')->with('status', 'E-mail verificado com sucesso. Agora você pode acessar o sistema.');
+})->name('verificar.email');
 
-Route::get('/verificar-email/{token}', [EmailVerificacaoController::class, 'verificar'])
-    ->name('verificar.email');
+Route::post('/verificar-reativar', function () {
+    $user = Auth::user();
+
+    if (!$user->email_verified_at) {
+        $token = \Illuminate\Support\Str::random(64);
+        $user->verification_token = $token;
+        $user->save();
+
+        $user->notify(new \App\Notifications\VerificarEmail($token));
+    }
+
+    return redirect()->back()->with('status', 'E-mail de verificação reenviado com sucesso!');
+})->name('verificar.email.reativar')->middleware('auth');
