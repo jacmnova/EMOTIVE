@@ -7,6 +7,9 @@ use App\Models\Cliente;
 use App\Models\Formulario;
 use Illuminate\Http\Request;
 use App\Models\UsuarioFormulario;
+use App\Notifications\UsuarioCadastrado;
+
+use Illuminate\Support\Facades\Hash;
 
 class UsuariosController extends Controller
 {
@@ -28,14 +31,27 @@ class UsuariosController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
         ]);
 
-        User::create([
+        $senhaPadrao = 'mudar@123';
+
+        $dados = [
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-        ]);
+            'password' => Hash::make($senhaPadrao),
+            'email_verified_at' => now(),
+            'usuario' => $request->boolean('usuario'),
+            'gestor' => $request->boolean('gestor'),
+        ];
+
+        // Adiciona cliente_id somente se preenchido
+        if ($request->filled('cliente_id')) {
+            $dados['cliente_id'] = $request->cliente_id;
+        }
+
+        $user = User::create($dados);
+
+        $user->notify(new UsuarioCadastrado($senhaPadrao));
 
         return redirect()->route('usuarios.index')->with('success', 'Usuário criado com sucesso!');
     }

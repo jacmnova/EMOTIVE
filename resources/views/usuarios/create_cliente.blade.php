@@ -49,7 +49,7 @@
     <div class="card-header">
         <h3 class="card-title">Informações do Novo Usuário</h3>
     </div>
-    <form action="{{ route('usuarios.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('gestor.cliente.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="card-body">
             <div class="row">
@@ -65,15 +65,7 @@
                         <input type="email" name="email" class="form-control" required>
                     </div>
 
-                    <div class="form-group">
-                        <label for="cliente_id">Associar a cliente:</label>
-                        <select name="cliente_id" id="cliente_id" class="form-control select2">
-                            <option value="">-- Selecione --</option>
-                            @foreach($clientes as $cliente)
-                                <option value="{{ $cliente->id }}">{{ $cliente->nome_fantasia }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <input name="cliente_id" type="text" value="{{ Auth::user()->cliente_id}}" hidden>
 
                 </div>
                 <div class="col-md-6">

@@ -16,7 +16,7 @@ use App\Http\Controllers\FormulariosController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\QuestionariosController;
-
+use App\Http\Controllers\ImportarUsuariosController;
 use App\Http\Controllers\FormularioEtapaController;
 use App\Http\Controllers\UsuarioFormularioController;
 
@@ -53,7 +53,8 @@ Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])-
 Route::get('/gestao-usuarios', [GestorController::class, 'usuariosCliente'])->name('usuarios.cliente');
 Route::get('/editar-usuario/{id}', [GestorController::class, 'usuariosEditar'])->name('usuarios.editar');
 Route::get('/lista-formularios', [GestorController::class, 'listaFormularios'])->name('formularios.cliente');
-
+Route::get('/gestor/create-cliente', [GestorController::class, 'create_cliente'])->name('gestor.create.cliente');
+Route::post('/gestor/store-cliente', [GestorController::class, 'store'])->name('gestor.cliente.store');
 
 
 Route::put('/meusuario/{id}', [DadosController::class, 'updateUsuario'])->name('usuarioscli.update');
@@ -177,3 +178,8 @@ Route::post('/verificar-reativar', function () {
 
     return redirect()->back()->with('status', 'E-mail de verificação reenviado com sucesso!');
 })->name('verificar.email.reativar')->middleware('auth');
+
+
+Route::get('/usuarios/importar', [ImportarUsuariosController::class, 'form'])->name('usuarios.importar.form');
+Route::post('/usuarios/importar', [ImportarUsuariosController::class, 'importar'])->name('usuarios.importar');
+

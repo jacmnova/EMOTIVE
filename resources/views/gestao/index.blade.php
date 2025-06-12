@@ -43,7 +43,7 @@
         <h3 class="card-title ">Lista de Usuários</h3>
         <div class="card-tools d-flex align-items-center">
 
-            <button type="button" class="btn btn-block btn-default btn-sm" onclick="window.location.href='{{ route('usuarios.create') }}'" style="margin-right: 10px;">
+            <button type="button" class="btn btn-block btn-default btn-sm" onclick="window.location.href='{{ route('gestor.create.cliente') }}'" style="margin-right: 10px;">
                 <i class="fa-solid fa-plus" style="margin-right: 5px;"></i>
                 Adicionar Usuário
             </button>

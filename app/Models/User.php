@@ -17,7 +17,7 @@ class User extends Authenticatable
         'password',
         'verification_token',
         'avatar',
-
+        'email_verified_at',
         'sa',
         'admin',
         'cliente_id',

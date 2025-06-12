@@ -9,6 +9,7 @@ use App\Models\UsuarioFormulario;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use App\Notifications\UsuarioCadastrado;
 use Illuminate\Support\Facades\Validator;
 
 class GestorController extends Controller
@@ -38,4 +39,41 @@ class GestorController extends Controller
         $formularios = ClienteFormulario::where('cliente_id', Auth::user()->cliente_id)->get();
         return view('gestao.formularios', compact('formularios'));
     }
+
+    public function create_cliente()
+    {
+        $cliente_id = Auth::user()->cliente_id;
+        return view('usuarios.create_cliente', compact('cliente_id'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+        ]);
+
+        $senhaPadrao = 'mudar@123';
+
+        $dados = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($senhaPadrao),
+            'email_verified_at' => now(),
+            'usuario' => $request->boolean('usuario'),
+            'gestor' => $request->boolean('gestor'),
+        ];
+
+        // Adiciona cliente_id somente se preenchido
+        if ($request->filled('cliente_id')) {
+            $dados['cliente_id'] = $request->cliente_id;
+        }
+
+        $user = User::create($dados);
+
+        $user->notify(new UsuarioCadastrado($senhaPadrao));
+
+        return redirect()->route('usuarios.cliente')->with('success', 'Usuário criado com sucesso!');
+    }
+
 }
