@@ -43,14 +43,20 @@
         <h3 class="card-title ">Lista de Usuários</h3>
         <div class="card-tools d-flex align-items-center">
 
-            <button type="button" class="btn btn-block btn-default btn-sm" onclick="window.location.href='{{ route('gestor.create.cliente') }}'" style="margin-right: 10px;">
-                <i class="fa-solid fa-plus" style="margin-right: 5px;"></i>
+
+            <button type="button" class="btn btn-default btn-sm mr-2" onclick="window.location.href='{{ route('gestor.create.cliente') }}'">
+                <i class="fa-solid fa-plus mr-1"></i>
                 Adicionar Usuário
             </button>
 
-            <a href="#" class="btn btn-sm btn-tool d-sm-inline-block" title="Mais Informações">
-                <i class="fas fa-bars"></i>
-            </a>
+            <button type="button" class="btn btn-default btn-sm mr-2" onclick="window.location.href='{{ route('gestor.importar.form') }}'">
+                <i class="fa-solid fa-file-import mr-1"></i>
+                Importar em Lote
+            </button>
+
+
+
+
 
         </div>
     </div>

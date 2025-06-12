@@ -11,11 +11,11 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    <form action="{{ route('usuarios.importar') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('gestor.importar') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="form-group">
-            <label for="arquivo">Arquivo CSV:</label>
-            <input type="file" name="arquivo" id="arquivo" class="form-control" required>
+            <label for="arquivo">Selecione o arquivo CSV:</label>
+            <input type="file" name="arquivo" class="form-control" required>
         </div>
         <button type="submit" class="btn btn-primary mt-2">Importar</button>
     </form>

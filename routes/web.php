@@ -180,6 +180,6 @@ Route::post('/verificar-reativar', function () {
 })->name('verificar.email.reativar')->middleware('auth');
 
 
-Route::get('/usuarios/importar', [ImportarUsuariosController::class, 'form'])->name('usuarios.importar.form');
-Route::post('/usuarios/importar', [ImportarUsuariosController::class, 'importar'])->name('usuarios.importar');
+Route::get('/gestor/importar', [ImportarUsuariosController::class, 'form'])->name('gestor.importar.form');
+Route::post('/gestor/importar', [ImportarUsuariosController::class, 'importar'])->name('gestor.importar');
 
