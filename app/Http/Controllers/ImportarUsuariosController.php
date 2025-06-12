@@ -51,6 +51,6 @@ class ImportarUsuariosController extends Controller
             fclose($handle);
         }
 
-        return back()->with('success', "{$cadastrados} usuários importados com sucesso.");
+        return back()->with('msgSuccess', "{$cadastrados} usuários importados com sucesso.");
     }
 }
