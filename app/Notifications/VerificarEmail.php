@@ -24,10 +24,10 @@ class VerificarEmail extends Notification
         $url = route('verificar.email', ['token' => $this->token]);
 
         return (new MailMessage)
-            ->subject('Confirme seu e-mail - Sistema Burnout')
-            ->greeting('Olá!')
-            ->line('Clique no botão abaixo para confirmar seu endereço de e-mail.')
-            ->action('Confirmar E-mail', $url)
-            ->line('Se você não criou uma conta, ignore este e-mail.');
+            ->subject('Confirmação de E-mail - Sistema Burnout')
+            ->view('emails.verificacao', [
+                'usuario' => $notifiable,
+                'url' => $url
+            ]);
     }
 }
