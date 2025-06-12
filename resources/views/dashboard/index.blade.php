@@ -8,7 +8,6 @@
 
 @section('content')
 
-    @if(Auth::user()->sa !== true)
         <div class="row">
             <div class="col-lg-2 col-6">
                 <div class="small-box bg-info">
@@ -82,5 +81,5 @@
                 </div>
             </div>
         </div>
-    @endif
+
 @stop

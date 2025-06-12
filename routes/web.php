@@ -120,7 +120,7 @@ Route::resource('calculos', CalculosController::class);
 Route::get('/relatorio/pdf', [RelatorioController::class, 'gerarPDF'])->name('relatorio.pdf');
 
 
-Route::get('/dashboard-admin', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/dashadmin', [DashboardController::class, 'index'])->name('dashboard.admin');
 
 Route::resource('midias', MidiaController::class);
 
