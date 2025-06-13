@@ -47,7 +47,7 @@
         @include('participante.partials._analise')
     </div>
 
-        @if(Auth::user()->admin === true)
+        @if(Auth::user()->sa === true)
             @include('participante.partials._gabarito')
         @endif
 </div>
