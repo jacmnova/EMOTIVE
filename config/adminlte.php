@@ -421,6 +421,11 @@ return [
             'icon' => 'fa-solid fa-book-open-reader',
             'can' => 'usuario',
         ],
+        [
+            'text' => 'FAQs',
+            'url' => 'faqs',
+            'icon' => 'fa-solid fa-person-circle-question',
+        ],
     ],
 
     /*

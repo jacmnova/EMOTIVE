@@ -43,6 +43,10 @@ Route::get('/template', function () {
     return view('template.index');
 })->name('template.index');
 
+Route::get('/faqs', function () {
+    return view('faqs.index');
+})->name('faqs.index');
+
 
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
