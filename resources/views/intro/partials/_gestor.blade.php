@@ -15,14 +15,11 @@
     </div>
 
     <div class="card-body">
-        <p>
-            Como <strong>Gestor</strong>, você é peça-chave no cuidado com sua equipe.
-            Este formulário <strong>NR1 — Burnout</strong> foi pensado para ajudar a identificar como seus colaboradores estão emocionalmente diante das pressões do trabalho, avaliando exaustão, desmotivação e percepção do ambiente organizacional.
-        </p>
-        <p>
-            Ao incentivar a participação e prestar atenção aos resultados, você fortalece a confiança da equipe e demonstra compromisso com um ambiente mais saudável e produtivo.
-            Sua atenção aos indicadores identificados aqui será fundamental para implementar ajustes que previnam o adoecimento ocupacional e promovam bem-estar.
-        </p>
+        <p style="text-align: justify;">Ser líder nunca foi tão importante (e tão desafiador). Sabemos que a vida de um líder não é nada fácil; pressões, metas, demandas, crises e conflitos são problemas constantes. Com a atualização da NR-1, em vigor desde maio de 2025, empresas de todos os portes devem avaliar e gerenciar os riscos psicossociais no ambiente de trabalho para monitorar o estado emocional de seus funcionários, sob risco de arcar com pesadas multas, processos trabalhistas e indenizações.</p>  
+
+        <p style="text-align: justify;">Foi pensando em tudo isso que nós da <strong>FELLIPELLI</strong> elaboramos o novo formulário <strong>NR1 – Burnout</strong>, um instrumento ímpar e exclusivamente construído por nossos especialistas para blindar seu negócio e transformar sua empresa em um ambiente muito mais produtivo e saudável.</p>
+
+        <p style="text-align: justify;">Ao estimular a adesão do seu time e analisar cuidadosamente os resultados conosco, você estreitará os laços socioemocionais internos e será capaz de promover mudanças essenciais, evitando o adoecimento e proporcionando mais bem-estar para uma alta performance. Vamos juntos?</p>
     </div>
     
     <div class="card-footer text-right">

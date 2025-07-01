@@ -15,10 +15,16 @@
     </div>
 
     <div class="card-body">
-        <p>Como <strong>Administrador</strong>, você desempenha um papel essencial na supervisão e na garantia de que todos os processos relacionados à saúde ocupacional estejam sendo cumpridos corretamente.
-        Este formulário <strong>NR1 — Burnout</strong> foi projetado para avaliar o estado emocional, mental e profissional dos colaboradores, identificando sinais de estresse, esgotamento e fatores psicossociais críticos.
-        <p>Sua função vai além de apenas coletar dados: você assegura que as informações sejam usadas de forma ética, protegendo a confidencialidade e promovendo uma cultura organizacional saudável.
-        Sua liderança é vital para implementar melhorias e garantir que os resultados gerem ações práticas e transformadoras.</p>
+        <p style="text-align: justify;">
+            Cabe a você como <strong>Administrador</strong> assegurar que a saúde ocupacional da sua empresa esteja em dia, e agora você poderá contar com um grande aliado nessa jornada: o novo formulário <strong>NR1 – Burnout da FELLIPELLI!</strong>
+        </p>
+        <p style="text-align: justify;">
+            Idealizado com base nos mais recentes avanços neurocientíficos e desenvolvido com toda a expertise de nossa equipe, ele avalia com precisão e objetividade incomparáveis o panorama mental, emocional e profissional de cada membro da sua equipe, detectando sintomas de esgotamento, estresse e outros fatores psicossociais críticos.
+        </p>
+        <p style="text-align: justify;">
+            Trata-se de uma ferramenta completa que vai muito além de simples perguntas; com ele, você tem a garantia de que todos os dados serão processados de modo ético e confiável, preservando a confidencialidade e proporcionando um ambiente de trabalho muito mais humanizado e eficiente. 
+            Administrador, sua atuação junto ao instrumento <strong>NR1 – Burnout da FELLIPELLI</strong> é essencial para levar sua empresa a um novo patamar e conquistar resultados excepcionais!
+        </p>
     </div>
     
     <div class="card-footer text-right">

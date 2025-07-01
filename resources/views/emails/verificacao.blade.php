@@ -11,9 +11,7 @@
 
             <p style="font-size: 16px; color: #333;">Olá {{ $usuario->name ?? 'Usuário' }},</p>
 
-            <p style="font-size: 15px; color: #555;">
-                Clique no botão abaixo para confirmar seu endereço de e-mail e ativar sua conta.
-            </p>
+            <p style="font-size: 15px; color: #555;">Para concluir seu cadastro e começar a usar a plataforma, é necessário confirmar seu endereço de e-mail. Clique no botão abaixo para ativar sua conta de forma rápida e segura: </p>
 
             <p style="margin: 30px 0;">
                 <a href="{{ $url }}"
@@ -23,7 +21,7 @@
             </p>
 
             <p style="font-size: 14px; color: #777;">
-                Se você não criou esta conta, apenas ignore esta mensagem.
+                Se você não realizou esse cadastro, pode simplesmente desconsiderar esta mensagem.
             </p>
         </div>
 

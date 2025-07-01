@@ -53,7 +53,7 @@
             <main class="flex max-w-[335px] w-full flex-col-reverse lg:max-w-4xl lg:flex-row">
                 <div class="text-[13px] leading-[20px] flex-1 p-6 pb-12 lg:p-20 bg-white dark:bg-[#161615] dark:text-[#EDEDEC] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d] rounded-bl-lg rounded-br-lg lg:rounded-tl-lg lg:rounded-br-none">
                     <h1 class="mb-1 font-medium">Fellipelli - CORE</h1>
-                    <p class="mb-2 text-[#706f6c] dark:text-[#A1A09A]">Formularios de Bornout Ecosistema Fellipelli. <br> Para iniciar sugerimos a leitura dos termos.</p>
+                    <p class="mb-2 text-[#706f6c] dark:text-[#A1A09A]">Formularios de Bornout Ecosistema Fellipelli. <br> Para começar, recomendamos a leitura dos materiais abaixo:</p>
                     <ul class="flex flex-col mb-4 lg:mb-6">
                         <li class="flex items-center gap-4 py-2 relative before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A] before:top-1/2 before:bottom-0 before:left-[0.4rem] before:absolute">
                             <span class="relative py-1 bg-white dark:bg-[#161615]">
@@ -62,9 +62,9 @@
                                 </span>
                             </span>
                             <span>
-                                Politica e 
+                                Li e concordo com a Política e os  
                                 <a href="{{ route('termos') }}" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#f53003] dark:text-[#FF4433] ml-1">
-                                    <span>Termos de uso</span>
+                                    <span>Termos de Uso</span>
                                     <svg
                                         width="10"
                                         height="11"
@@ -89,7 +89,7 @@
                                 </span>
                             </span>
                             <span>
-                                Assista aqui os 
+                                Assista aos  
                                 <a href="{{ route('tutorial') }}" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#f53003] dark:text-[#FF4433] ml-1">
                                     <span>tutoriais do sistema.</span>
                                     <svg

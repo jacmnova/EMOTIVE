@@ -40,8 +40,8 @@
 
             <div class="card-body">
                 <div class="card m-2 p-4">
-                    <h5>Instruções</h5>
-                    <p>{!! $formulario->instrucoes !!}</p>
+                    <h5>Instruções:</h5>
+                    <p style="text-align: justify;">{!! $formulario->instrucoes !!}</p>
                 </div>
 
                 <div class="card m-2 p-4">
@@ -103,7 +103,7 @@
             <div class="card-body p-2">
                 <div class="alert alert-info small">
                     <strong>Instruções:</strong><br>
-                    {!! $formulario->instrucoes !!}
+                    <p style="text-align: justify;">{!! $formulario->instrucoes !!}<p>
                 </div>
 
                 @php $perguntasEtapa = $formulario->perguntas->whereBetween('id', [$etapaAtual->de, $etapaAtual->ate]); @endphp

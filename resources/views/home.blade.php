@@ -25,9 +25,9 @@
                 <h3 class="card-title">Confirmação de E-mail Necessária</h3>
             </div>
             <div class="card-body">
-                <p>Olá, {{ Auth::user()->name }}!</p>
-                <p>Detectamos que seu e-mail ainda não foi confirmado. Para acessar todas as funcionalidades do sistema, confirme seu endereço de e-mail.</p>
-                <p>Verifique sua caixa de entrada ou a pasta de spam. Caso não tenha recebido o e-mail, clique no botão abaixo para reenviar.</p>
+                <p>Oi, {{ Auth::user()->name }}!</p>
+                <p style="text-align: justify;">Ainda não conseguimos confirmar o seu e-mail. Para liberar o acesso completo à nossa plataforma, dá uma olhadinha na sua caixa de entrada (ou até na de spam).</p>
+                <p style="text-align: justify;">Não achou nada? Sem problemas! É só clicar no botão abaixo para reenviar o e-mail de verificação.</p>
 
                 <form action="{{ route('verificar.email.reativar') }}" method="POST">
                     @csrf
