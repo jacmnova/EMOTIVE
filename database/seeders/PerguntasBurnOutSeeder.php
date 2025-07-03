@@ -150,7 +150,7 @@ class PerguntasBurnOutSeeder extends Seeder
             [
                 'formulario_id' => 1,
                 'numero_da_pergunta' => 23,
-                'pergunta' => 'O tempo disponível para realizar minhas funções é insuficiente para executá-las com qualidade.',
+                'pergunta' => 'O tempo que tenho para cumprir minhas responsabilidades é limitado e não permite realiza-las com excelência.',
                 'created_at' => now(),
             ],
             [
@@ -244,7 +244,7 @@ class PerguntasBurnOutSeeder extends Seeder
             [
                 'formulario_id' => 1,
                 'numero_da_pergunta' => 2,
-                'pergunta' => 'Sinto-me exausto(a) ao final do dia.',
+                'pergunta' => 'Termino o dia mental e fisicamente esgotado(a).',
                 'created_at' => now(),
             ],
             [
@@ -337,7 +337,7 @@ class PerguntasBurnOutSeeder extends Seeder
             [
                 'formulario_id' => 1,
                 'numero_da_pergunta' => 1,
-                'pergunta' => 'Sinto-me emocionalmente sugado(a) pelo meu trabalho.',
+                'pergunta' => 'Sinto-me mentalmente esgotado(a) pelas demandas do meu trabalho.',
                 'created_at' => now(),
             ],
             [
@@ -379,7 +379,7 @@ class PerguntasBurnOutSeeder extends Seeder
             [
                 'formulario_id' => 1,
                 'numero_da_pergunta' => 8,
-                'pergunta' => 'Sinto-me completamente esgotado(a) pelo meu trabalho.',
+                'pergunta' => 'Sinto-me totalmente exaurido(a) pelas exigências do meu trabalho.',
                 'created_at' => now(),
             ],
             [
