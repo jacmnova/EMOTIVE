@@ -18,38 +18,14 @@ class ClientesSeeder extends Seeder
 
         $clientes = [
             [
-                'usuario_id' => 1, 
-                'tipo' => 'cpf',
-                'cpf_cnpj' => '01148890904',
-                'nome_fantasia' => 'DESENVOLVIMENTO DE SISTEMAS',
-                'razao_social' => 'ARLEY HUMBERTO RUEDA RINCON LTDA.',
-                'email' => 'arley@gmail.com',
-                'contato' => 'Arley',
-                'telefone' => '41978542635', 
-                'created_at' => now(), 
-                'ativo' => 1
-            ],
-            [
-                'usuario_id' => 2, 
-                'tipo' => 'cnpj',
-                'cpf_cnpj' => '26789226000107',
-                'nome_fantasia' => 'HAGUEN SYSTEM DESENVOLVIMENTO',
-                'razao_social' => 'HAGUEN SYSTEM LTDA.',
-                'email' => 'haguen@gmail.com',
-                'contato' => 'Amuneth',
-                'telefone' => '419989998996', 
-                'created_at' => now(), 
-                'ativo' => 1
-            ],
-            [
                 'usuario_id' => 3, 
-                'tipo' => 'internacional',
-                'cpf_cnpj' => '123456',
-                'nome_fantasia' => 'GOOGLE.COM',
-                'razao_social' => 'GOOGLE SA.',
-                'email' => 'google@gmail.com',
-                'contato' => 'Alikson',
-                'telefone' => '41978542635', 
+                'tipo' => 'cnpj',
+                'cpf_cnpj' => '07792897000182',
+                'nome_fantasia' => 'FELLIPELLI',
+                'razao_social' => 'FELLIPELLI INSTRUMENTOS DE DIAGNOSTICO E DESENVOLVIMENTO ORGANIZACIONAL LTDA.',
+                'email' => 'adriana.fellipelli@fellipelli.com.br',
+                'contato' => 'Adriana Fellipelli',
+                'telefone' => '1142807100', 
                 'created_at' => now(), 
                 'ativo' => 1
             ],
