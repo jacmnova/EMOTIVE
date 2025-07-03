@@ -22,7 +22,7 @@ class ClientesSeeder extends Seeder
                 'tipo' => 'cnpj',
                 'cpf_cnpj' => '07792897000182',
                 'nome_fantasia' => 'FELLIPELLI',
-                'razao_social' => 'FELLIPELLI INSTRUMENTOS DE DIAGNOSTICO E DESENVOLVIMENTO ORGANIZACIONAL LTDA.',
+                'razao_social' => 'FELLIPELLI INSTRUMENTOS DE DIAGNOSTICO LTDA.',
                 'email' => 'adriana.fellipelli@fellipelli.com.br',
                 'contato' => 'Adriana Fellipelli',
                 'telefone' => '1142807100', 
