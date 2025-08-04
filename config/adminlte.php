@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => 'FELLIPELLI CORE',
+    'title' => 'FELLIPELLI',
     'title_prefix' => '',
     'title_postfix' => '',
 
@@ -63,7 +63,7 @@ return [
     |
     */
 
-    'logo' => 'BURN<b>OUT</b>',
+    'logo' => '<b>E</b>MOTIVE',
     'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
     'logo_img_class' => 'brand-image img-circle elevation-1',
     'logo_img_xl' => null,
@@ -136,7 +136,7 @@ return [
     'usermenu_enabled' => true,
     'usermenu_header' => true,
     // 'usermenu_header_class' => 'bg-white',
-    'usermenu_header_class' => 'bg-info',
+    'usermenu_header_class' => 'bg-dark',
 
     'usermenu_image' => true,
     'usermenu_desc' => true,

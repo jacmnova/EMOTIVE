@@ -39,7 +39,6 @@
         </div>
     @endif
 
-
     @include('layouts.partials.whatsapp')
 
     @if(Auth::user()->admin === true)
@@ -51,11 +50,28 @@
     @endif
 
     @if(Auth::user()->usuario === true)
+        @include('dicas.partials._dica_acesso')
         @include('intro.partials._usuario')
     @else
         @include('intro.partials._novo')
     @endif
 
+    <!-- @if(Auth::user()->usuario === true)
+        @include('dicas.partials._dica_video')
+        <div class="row">
+            @include('infos.partials._status')
+            @include('infos.partials._libera_video')
+        </div>
+    @endif -->
+
+
+@stop
+
+@section('footer')
+    <div class="float-right d-none d-sm-block">
+    <b>Version</b> {{ config('app.version') }}
+    </div>
+    <strong>Copyright © 2000-2024 <a href="https://www.fellipelli.com.br">Fellipelli</a>.</strong> All rights reserved.
 @stop
 
 

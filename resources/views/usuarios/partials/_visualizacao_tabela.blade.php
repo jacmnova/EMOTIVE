@@ -66,6 +66,14 @@
                                                 <i class="fa-solid fa-user-gear" style="color: red;"></i>
                                             </a>
                                         </form>
+
+                                        <div class="d-inline">
+                                            <a href="#" class="btn btn-sm btn-tool d-sm-inline-block" title="Trocar Senha"
+                                            onclick="abrirModalTrocarSenha('{{ $perfil['id'] }}', '{{ $perfil['name'] }}')">
+                                                <i class="fa-solid fa-key text-warning"></i>
+                                            </a>
+                                        </div>
+
                                     @endif
 
                                 @endif

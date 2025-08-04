@@ -20,6 +20,8 @@ use App\Http\Controllers\ImportarUsuariosController;
 use App\Http\Controllers\FormularioEtapaController;
 use App\Http\Controllers\UsuarioFormularioController;
 
+use App\Http\Controllers\PasswordController;
+
 use App\Http\Controllers\AnaliseController;
 
 use App\Models\User;
@@ -187,3 +189,11 @@ Route::post('/verificar-reativar', function () {
 Route::get('/gestor/importar', [ImportarUsuariosController::class, 'form'])->name('gestor.importar.form');
 Route::post('/gestor/importar', [ImportarUsuariosController::class, 'importar'])->name('gestor.importar');
 
+
+Route::middleware(['auth', 'can:admin'])->group(function () {
+    Route::post('/admin/password/initiate/{id}', [PasswordController::class, 'initiateChange'])
+        ->name('password.change.initiate');
+
+    Route::post('/admin/password/update/{id}', [PasswordController::class, 'updatePassword'])
+        ->name('password.change.update');
+});

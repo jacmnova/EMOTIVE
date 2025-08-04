@@ -80,6 +80,14 @@
                                             <i class="fa-solid fa-user-gear text-danger"></i>
                                         </a>
                                     </form>
+                                    
+                                    <div class="d-inline">
+                                        <a href="#" class="btn btn-tool d-flex align-items-center" title="Trocar Senha"
+                                        onclick="abrirModalTrocarSenha('{{ $perfil['id'] }}', '{{ $perfil['name'] }}')">
+                                            <i class="fa-solid fa-key text-warning"></i>
+                                        </a>
+                                    </div>
+
                                 @endif    
                             @endif
                         </div>

@@ -62,6 +62,44 @@
         </a>
     </div>
 </div>
+
+
+<div class="modal fade" id="modalTrocarSenha" tabindex="-1" aria-labelledby="modalTrocarSenhaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="POST" id="formTrocarSenha">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Trocar Senha de <span id="nomeUsuarioModal"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" name="user_id" id="modalUserId">
+                    <div class="form-group">
+                        <label>Nova Senha</label>
+                        <input type="password" name="new_password" class="form-control" required minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmar Nova Senha</label>
+                        <input type="password" name="new_password_confirmation" class="form-control" required minlength="8">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
 @stop
 
 @section('js')
@@ -128,4 +166,14 @@
         }
     });
 </script>
+
+<script>
+    function abrirModalTrocarSenha(userId, userName) {
+        const form = document.getElementById('formTrocarSenha');
+        form.action = `/admin/password/update/${userId}`;
+        document.getElementById('nomeUsuarioModal').innerText = userName;
+        $('#modalTrocarSenha').modal('show');
+    }
+</script>
+
 @stop
