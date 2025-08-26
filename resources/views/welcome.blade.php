@@ -122,7 +122,8 @@
                 <div class="bg-[#fff2f2] dark:bg-[#1D0002] relative lg:-ml-px -mb-px lg:mb-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg aspect-[335/376] lg:aspect-auto w-full lg:w-[438px] shrink-0 overflow-hidden flex items-center justify-center p-4">
                     <div class="absolute inset-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]"></div>
                     
-                    <img src="{{ asset('img/logo_burnout.png') }}" alt="Logo Fellipelli Burnout" class="relative z-10 max-w-full h-auto">
+                    <!-- <img src="{{ asset('img/logo_burnout.png') }}" alt="Logo Fellipelli Burnout" class="relative z-10 max-w-full h-auto"> -->
+                    <img src="{{ asset('img/logo_emotive.png') }}" alt="E.MO.TI.VE — Burnout e Bem-estar" class="relative z-10 max-w-full h-auto">
                 </div>
 
             </main>
