@@ -214,14 +214,17 @@ class DadosController extends Controller
             ->first();
 
         if ($usuarioFormulario) {
-            $usuarioFormulario->status = 'pendente';
-            $usuarioFormulario->updated_at = now();
+            // Solo actualizar status si no está completo ya
+            if ($usuarioFormulario->status !== 'completo') {
+                $usuarioFormulario->status = 'pendente';
+                $usuarioFormulario->updated_at = now();
 
-            if ($respondidas >= $totalPerguntas && $totalPerguntas > 0) {
-                $usuarioFormulario->status = 'completo';
+                if ($respondidas >= $totalPerguntas && $totalPerguntas > 0) {
+                    $usuarioFormulario->status = 'completo';
+                }
+
+                $usuarioFormulario->save();
             }
-
-            $usuarioFormulario->save();
         }
 
         // Verificar se todas as perguntas da etapa atual foram respondidas
@@ -411,6 +414,92 @@ class DadosController extends Controller
         } else {
             return 'Alta';
         }
+    }
+
+    public function finalizar(Request $request)
+    {
+        $userId = Auth::user()->id;
+        $formularioId = $request->input('f_formulario_id') ?? $request->input('formulario_id');
+        
+        if (!$formularioId) {
+            return redirect()->back()->with('msgError', 'Formulário não identificado.');
+        }
+
+        // Verificar se todas as perguntas foram respondidas
+        $formulario = Formulario::with('perguntas')->findOrFail($formularioId);
+        $totalPerguntas = $formulario->perguntas->count();
+        
+        $respostasUsuario = Resposta::where('user_id', $userId)
+            ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
+            ->get()
+            ->keyBy('pergunta_id');
+        
+        $respondidas = $respostasUsuario->count();
+        
+        // Atualizar status do formulario
+        $usuarioFormulario = UsuarioFormulario::where('usuario_id', $userId)
+            ->where('formulario_id', $formularioId)
+            ->first();
+        
+        if (!$usuarioFormulario) {
+            return redirect()->back()->with('msgError', 'Formulário não encontrado.');
+        }
+        
+        // Marcar como completo
+        $usuarioFormulario->status = 'completo';
+        $usuarioFormulario->save();
+        
+        // Tentar gerar analise automaticamente (se não existir)
+        $analise = Analise::where('user_id', $userId)
+            ->where('formulario_id', $formularioId)
+            ->first();
+        
+        if (!$analise) {
+            // Gerar analise em background (puede tardar)
+            try {
+                $user = User::find($userId);
+                $variaveis = Variavel::with('perguntas')
+                    ->where('formulario_id', $formularioId)
+                    ->get();
+                
+                $pontuacoes = [];
+                foreach ($variaveis as $variavel) {
+                    $pontuacao = 0;
+                    foreach ($variavel->perguntas as $pergunta) {
+                        $resposta = $respostasUsuario->get($pergunta->id);
+                        if ($resposta) {
+                            $pontuacao += $resposta->valor_resposta ?? 0;
+                        }
+                    }
+                    $faixa = $this->classificarPontuacao($pontuacao, $variavel);
+                    $pontuacoes[] = [
+                        'tag' => strtoupper($variavel->tag),
+                        'valor' => $pontuacao,
+                        'faixa' => $faixa,
+                    ];
+                }
+                
+                $prompt = $this->gerarPrompt($user, $variaveis, $pontuacoes);
+                $analiseTexto = $this->gerarAnaliseViaOpenAI($prompt);
+                
+                if ($analiseTexto && !str_contains($analiseTexto, 'Erro')) {
+                    Analise::create([
+                        'user_id' => $userId,
+                        'formulario_id' => $formularioId,
+                        'texto' => $analiseTexto,
+                    ]);
+                }
+            } catch (\Exception $e) {
+                // Si falla, la analise se generará cuando acceda al relatorio
+                \Log::error('Error generando analise: ' . $e->getMessage());
+            }
+        }
+        
+        // Redirigir al relatorio
+        return redirect()->route('relatorio.show', [
+            'formulario_id' => $formularioId,
+            'usuario_id' => $userId,
+        ])->with('msgSuccess', 'Formulário finalizado com sucesso!');
     }
 
 }
