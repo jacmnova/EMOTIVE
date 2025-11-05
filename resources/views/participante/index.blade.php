@@ -83,7 +83,7 @@
                                     <span class="badge badge-{{ $statusClass }}">{{ strtoupper($formulario->status) }}</span>
                                 </td>
                                 <td>
-                                    @if($formulario->status !== 'completo')
+                                    @if($formulario->status === 'novo')
                                         <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm text-secondary">
                                             <i class="fa-regular fa-circle-play mr-1"></i> Responder
                                         </a>
@@ -98,8 +98,10 @@
                                             </button>
                                         @endif
 
-                                        @if($formulario->video_assistido)
-                                            <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}"  title="Visualizar Relatório" class="btn btn-sm text-info">
+                                        @if($formulario->video_assistido || !$formulario->midia || $formulario->status === 'pendente')
+                                            <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}" 
+                                               class="btn btn-sm text-info btnGerarRelatorio"
+                                               title="Visualizar Relatório">
                                                 <i class="fa-regular fa-rectangle-list"></i>
                                             </a>
                                             <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}"  title="Imprimir Relatório" target="_blank" class="btn btn-sm text-danger">
@@ -107,6 +109,12 @@
                                             </a>
                                         @else
                                             <span class="text-muted"><i class="fa-solid fa-spinner"></i> Pendente</span>
+                                        @endif
+                                        
+                                        @if($formulario->status === 'pendente')
+                                            <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm text-secondary">
+                                                <i class="fa-regular fa-circle-play mr-1"></i> Continuar
+                                            </a>
                                         @endif
                                     @endif
                                 </td>
@@ -152,7 +160,7 @@
                             </div>
                             <div class="card-footer bg-light border-top">
                                 <div class="d-flex flex-wrap justify-content-start gap-2">
-                                    @if($formulario->status !== 'completo')
+                                    @if($formulario->status === 'novo')
                                         <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm text-secondary">
                                             <i class="fa-regular fa-circle-play mr-1"></i> Responder
                                         </a>
@@ -167,8 +175,10 @@
                                             </button>
                                         @endif
 
-                                        @if($formulario->video_assistido)
-                                            <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}" title="Visualizar Relatório" class="btn btn-sm text-info">
+                                        @if($formulario->video_assistido || !$formulario->midia || $formulario->status === 'pendente')
+                                            <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}" 
+                                               class="btn btn-sm text-info btnGerarRelatorio"
+                                               title="Visualizar Relatório">
                                                 <i class="fa-regular fa-rectangle-list"></i>
                                             </a>
                                             <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}" target="_blank" title="Imprimir Relatório" class="btn btn-sm text-danger">
@@ -178,6 +188,12 @@
                                         <a href="#" class="btn btn-sm text-danger" title="Assista Vídeo">
                                             <i class="fa-solid fa-spinner"></i>
                                         </a>
+                                        @endif
+                                        
+                                        @if($formulario->status === 'pendente')
+                                            <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm text-secondary">
+                                                <i class="fa-regular fa-circle-play mr-1"></i> Continuar
+                                            </a>
                                         @endif
                                     @endif
                                 </div>
@@ -237,10 +253,9 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // Verificar si el elemento existe antes de agregar el event listener
-    const btnGerarRelatorio = document.getElementById('btnGerarRelatorio');
-    if (btnGerarRelatorio) {
-        btnGerarRelatorio.addEventListener('click', function(event) {
+    // Agregar event listener a todos los botones de generar relatorio
+    document.querySelectorAll('.btnGerarRelatorio').forEach(function(btn) {
+        btn.addEventListener('click', function(event) {
             event.preventDefault(); // impede redirecionamento imediato
 
             const url = this.href;
@@ -258,7 +273,7 @@
             // Agora redireciona manualmente (deixa o Swal aparecer)
             window.location.href = url;
         });
-    }
+    });
 </script>
 
 
