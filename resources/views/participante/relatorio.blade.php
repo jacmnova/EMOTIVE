@@ -721,12 +721,12 @@
     
     <div class="section">
         <h2>Dados do respondente</h2>
-        <p><strong>Formulário:</strong> {{ $formulario->label }} – {{ $formulario->nome }}</p>
-        <p><strong>Participante:</strong> {{ $user->name }}</p>
-        <p><strong>({{ $user->email }})</strong></p>
-        <p><strong>Data:</strong> {{ $dataResposta }}</p>
-        <p><strong>Respostas registradas:</strong> {{ $respostasUsuario->count() }} de {{ $formulario->perguntas->count() ?? 'N/A' }}</p>
-        <p><strong>Dimensões avaliadas:</strong> {{ $variaveis->pluck('nome')->join(', ') }}</p>
+        <p><strong>Formulário:</strong> {{ $formulario->label ?? '' }} – {{ $formulario->nome ?? '' }}</p>
+        <p><strong>Participante:</strong> {{ $user->name ?? '' }}</p>
+        <p><strong>({{ $user->email ?? '' }})</strong></p>
+        <p><strong>Data:</strong> {{ $dataResposta ?? now()->format('d/m/Y') }}</p>
+        <p><strong>Respostas registradas:</strong> {{ isset($respostasUsuario) ? $respostasUsuario->count() : 0 }} de {{ isset($formulario->perguntas) ? $formulario->perguntas->count() : 'N/A' }}</p>
+        <p><strong>Dimensões avaliadas:</strong> {{ isset($variaveis) && $variaveis ? $variaveis->pluck('nome')->join(', ') : 'N/A' }}</p>
     </div>
 
     <div class="section">
@@ -737,13 +737,17 @@
             $grupoModerada = [];
             $grupoBaixa = [];
             
-            foreach ($pontuacoes as $ponto) {
-                if ($ponto['faixa'] == 'Alta') {
-                    $grupoAlta[] = $ponto['nome'] . ' (' . $ponto['tag'] . ')';
-                } elseif ($ponto['faixa'] == 'Moderada') {
-                    $grupoModerada[] = $ponto['nome'] . ' (' . $ponto['tag'] . ')';
-                } else {
-                    $grupoBaixa[] = $ponto['nome'] . ' (' . $ponto['tag'] . ')';
+            if (isset($pontuacoes) && is_array($pontuacoes)) {
+                foreach ($pontuacoes as $ponto) {
+                    if (isset($ponto['faixa']) && isset($ponto['nome']) && isset($ponto['tag'])) {
+                        if ($ponto['faixa'] == 'Alta') {
+                            $grupoAlta[] = $ponto['nome'] . ' (' . $ponto['tag'] . ')';
+                        } elseif ($ponto['faixa'] == 'Moderada') {
+                            $grupoModerada[] = $ponto['nome'] . ' (' . $ponto['tag'] . ')';
+                        } else {
+                            $grupoBaixa[] = $ponto['nome'] . ' (' . $ponto['tag'] . ')';
+                        }
+                    }
                 }
             }
         @endphp
@@ -785,7 +789,7 @@
     <div class="section">
         <h2>Radar E.MO.TI.VE</h2>
         <div class="radar-container">
-            @if($imagemRadar)
+            @if(isset($imagemRadar) && $imagemRadar)
                 <img src="{{ $imagemRadar }}" alt="Radar E.MO.TI.VE" style="max-width: 100%; height: auto;">
             @else
                 <p style="text-align: center; color: #999;">Gráfico no disponible</p>
@@ -820,21 +824,24 @@
         </div>
     </div>
 
+    @if(isset($pontuacoes) && count($pontuacoes) > 0)
     @foreach(array_slice($pontuacoes, 0, 2) as $ponto)
+    @if(isset($ponto['nome']) && isset($ponto['tag']))
     <div class="section">
         <h3 style="color: #42B8D4;">{{ $ponto['nome'] }} ({{ $ponto['tag'] }})</h3>
         <div class="dimension-score-box">
-            <span class="faixa-{{ strtolower($ponto['faixa']) }}">Faixa {{ $ponto['faixa'] }}</span>
-            <span class="dimension-score-value">{{ round($ponto['normalizada']) }}</span>
+            <span class="faixa-{{ strtolower($ponto['faixa'] ?? 'Baixa') }}">Faixa {{ $ponto['faixa'] ?? 'Baixa' }}</span>
+            <span class="dimension-score-value">{{ round($ponto['normalizada'] ?? 0) }}</span>
         </div>
         <p>
             @php
                 $variavel = $variaveis->firstWhere('tag', strtoupper($ponto['tag']));
                 $texto = '';
                 if ($variavel) {
-                    if ($ponto['faixa'] == 'Baixa') {
+                    $faixa = $ponto['faixa'] ?? 'Baixa';
+                    if ($faixa == 'Baixa') {
                         $texto = $variavel->baixa ?? '';
-                    } elseif ($ponto['faixa'] == 'Moderada') {
+                    } elseif ($faixa == 'Moderada') {
                         $texto = $variavel->moderada ?? '';
                     } else {
                         $texto = $variavel->alta ?? '';
@@ -844,7 +851,9 @@
             {{ $texto }}
         </p>
     </div>
+    @endif
     @endforeach
+    @endif
 
     <div class="footer">
         <div class="footer-logos">
@@ -860,21 +869,24 @@
 <div class="page">
     <h1>ESTADO EMOCIONAL E PSICOSSOCIAL</h1>
     
+    @if(isset($pontuacoes) && count($pontuacoes) > 2)
     @foreach(array_slice($pontuacoes, 2, 4) as $ponto)
+    @if(isset($ponto['nome']) && isset($ponto['tag']))
     <div class="section">
         <h3 style="color: #42B8D4;">{{ $ponto['nome'] }} ({{ $ponto['tag'] }})</h3>
         <div class="dimension-score-box">
-            <span class="faixa-{{ strtolower($ponto['faixa']) }}">Faixa {{ $ponto['faixa'] }}</span>
-            <span class="dimension-score-value">{{ round($ponto['normalizada']) }}</span>
+            <span class="faixa-{{ strtolower($ponto['faixa'] ?? 'Baixa') }}">Faixa {{ $ponto['faixa'] ?? 'Baixa' }}</span>
+            <span class="dimension-score-value">{{ round($ponto['normalizada'] ?? 0) }}</span>
         </div>
         <p>
             @php
                 $variavel = $variaveis->firstWhere('tag', strtoupper($ponto['tag']));
                 $texto = '';
                 if ($variavel) {
-                    if ($ponto['faixa'] == 'Baixa') {
+                    $faixa = $ponto['faixa'] ?? 'Baixa';
+                    if ($faixa == 'Baixa') {
                         $texto = $variavel->baixa ?? '';
-                    } elseif ($ponto['faixa'] == 'Moderada') {
+                    } elseif ($faixa == 'Moderada') {
                         $texto = $variavel->moderada ?? '';
                     } else {
                         $texto = $variavel->alta ?? '';
@@ -884,7 +896,9 @@
             {{ $texto }}
         </p>
     </div>
+    @endif
     @endforeach
+    @endif
 
     <div class="footer">
         <div class="footer-logos">
@@ -910,9 +924,9 @@
 
     @foreach($eixosLista as $eixoInfo)
     @php
-        $eixo = $eixos[$eixoInfo['key']] ?? null;
-        if (!$eixo) continue;
-        $interpretacao = $eixo['interpretacao_detalhada'] ?? [];
+        $eixo = isset($eixos[$eixoInfo['key']]) ? $eixos[$eixoInfo['key']] : null;
+        if (!$eixo || !isset($eixo['valor'])) continue;
+        $interpretacao = isset($eixo['interpretacao_detalhada']) ? $eixo['interpretacao_detalhada'] : [];
     @endphp
     <div class="eixo-container">
         <h3 class="eixo-title">{{ $eixoInfo['nome'] }}</h3>
@@ -921,15 +935,15 @@
         <div class="eixo-data-table">
             <div class="eixo-dim-item">
                 <div class="eixo-dim-label">{{ $eixoInfo['dims'][0] }}</div>
-                <div class="eixo-dim-badge {{ strtolower($eixo['faixa']) }}">Faixa {{ $eixo['faixa'] }}</div>
+                <div class="eixo-dim-badge {{ strtolower($eixo['faixa'] ?? 'Baixa') }}">Faixa {{ $eixo['faixa'] ?? 'Baixa' }}</div>
             </div>
             <div class="eixo-dim-item">
                 <div class="eixo-dim-label">TOTAL</div>
-                <div class="eixo-total">{{ round($eixo['valor']) }}</div>
+                <div class="eixo-total">{{ round($eixo['valor'] ?? 0) }}</div>
             </div>
             <div class="eixo-dim-item">
                 <div class="eixo-dim-label">{{ $eixoInfo['dims'][1] }}</div>
-                <div class="eixo-dim-badge {{ strtolower($eixo['faixa']) }}">Faixa {{ $eixo['faixa'] }}</div>
+                <div class="eixo-dim-badge {{ strtolower($eixo['faixa'] ?? 'Baixa') }}">Faixa {{ $eixo['faixa'] ?? 'Baixa' }}</div>
             </div>
         </div>
 
@@ -968,13 +982,14 @@
     </div>
 
     @php
-        $iid = $eixos['iid'] ?? null;
-        if (!$iid) {
+        $iid = isset($eixos['iid']) ? $eixos['iid'] : null;
+        if (!$iid || !is_array($iid)) {
             $iid = ['valor' => 0, 'zona' => 'Zona de equilíbrio emocional', 'descricao' => '', 'interpretacao' => '', 'acao' => '', 'nivel_risco' => 'Baixo'];
         }
-        $percentual = $iid['valor'];
+        $percentual = isset($iid['valor']) ? $iid['valor'] : 0;
         $indicatorWidth = min(100, max(0, ($percentual / 100) * 100));
-        $riscoColor = $iid['nivel_risco'] == 'Baixo' ? '#4CAF50' : ($iid['nivel_risco'] == 'Médio' ? '#E6C25A' : ($iid['nivel_risco'] == 'Atenção' ? '#FF9800' : '#F44336'));
+        $nivelRisco = isset($iid['nivel_risco']) ? $iid['nivel_risco'] : 'Baixo';
+        $riscoColor = $nivelRisco == 'Baixo' ? '#4CAF50' : ($nivelRisco == 'Médio' ? '#E6C25A' : ($nivelRisco == 'Atenção' ? '#FF9800' : '#F44336'));
     @endphp
 
     <div class="section">
@@ -989,15 +1004,15 @@
         
         <div style="text-align: center; margin: 25px 0;">
             <span style="font-size: 18px; color: {{ $riscoColor }}; font-weight: bold;">
-                Pontuação = {{ round($iid['valor']) }} - {{ $iid['zona'] }}
+                Pontuação = {{ round($iid['valor'] ?? 0) }} - {{ $iid['zona'] ?? 'Zona de equilíbrio emocional' }}
             </span>
         </div>
     </div>
 
     <div class="section">
-        <p><strong>{{ $iid['descricao'] }}</strong></p>
-        <p>{{ $iid['interpretacao'] }}</p>
-        <p>{{ $iid['acao'] }}</p>
+        <p><strong>{{ $iid['descricao'] ?? '' }}</strong></p>
+        <p>{{ $iid['interpretacao'] ?? '' }}</p>
+        <p>{{ $iid['acao'] ?? '' }}</p>
     </div>
 
     <div class="quote-box-teal" style="margin-top: 30px;">
@@ -1034,9 +1049,12 @@
 
     @foreach($dimensoesPrincipais as $dimInfo)
     @php
-        $ponto = collect($pontuacoes)->firstWhere('tag', $dimInfo['tag']);
-        if (!$ponto) continue;
-        $variavel = $variaveis->firstWhere('tag', $dimInfo['tag']);
+        $ponto = null;
+        if (isset($pontuacoes) && is_array($pontuacoes)) {
+            $ponto = collect($pontuacoes)->firstWhere('tag', $dimInfo['tag']);
+        }
+        if (!$ponto || !isset($ponto['faixa'])) continue;
+        $variavel = $variaveis ? $variaveis->firstWhere('tag', $dimInfo['tag']) : null;
     @endphp
     <div class="dimension-box">
         <div class="dimension-header {{ strtolower($dimInfo['tag']) }}">
@@ -1108,9 +1126,12 @@
 
     @foreach($dimensoesSecundarias as $dimInfo)
     @php
-        $ponto = collect($pontuacoes)->firstWhere('tag', $dimInfo['tag']);
-        if (!$ponto) continue;
-        $variavel = $variaveis->firstWhere('tag', $dimInfo['tag']);
+        $ponto = null;
+        if (isset($pontuacoes) && is_array($pontuacoes)) {
+            $ponto = collect($pontuacoes)->firstWhere('tag', $dimInfo['tag']);
+        }
+        if (!$ponto || !isset($ponto['faixa'])) continue;
+        $variavel = $variaveis ? $variaveis->firstWhere('tag', $dimInfo['tag']) : null;
     @endphp
     <div class="dimension-box">
         <div class="dimension-header {{ strtolower($dimInfo['tag']) }}">
@@ -1176,9 +1197,9 @@
     <h1>PLANO DE DESENVOLVIMENTO PESSOAL</h1>
     
     @php
-        $iid = $eixos['iid'] ?? null;
-        $nivelRisco = $iid['nivel_risco'] ?? 'Médio';
-        $zona = $iid['zona'] ?? 'Zona de atenção preventiva';
+        $iid = isset($eixos['iid']) ? $eixos['iid'] : null;
+        $nivelRisco = ($iid && isset($iid['nivel_risco'])) ? $iid['nivel_risco'] : 'Médio';
+        $zona = ($iid && isset($iid['zona'])) ? $iid['zona'] : 'Zona de atenção preventiva';
     @endphp
 
     <div class="section">

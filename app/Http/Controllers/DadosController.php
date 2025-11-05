@@ -255,28 +255,34 @@ class DadosController extends Controller
 
     public function relatorioShow(Request $request)
     {
-        $validated = $request->validate([
-            'formulario_id' => ['required', 'integer', 'exists:formularios,id'],
-            'usuario_id' => ['required', 'integer', 'exists:users,id'],
-        ]);
+        try {
+            $validated = $request->validate([
+                'formulario_id' => ['required', 'integer', 'exists:formularios,id'],
+                'usuario_id' => ['required', 'integer', 'exists:users,id'],
+            ]);
 
-        $formularioId = $validated['formulario_id'];
-        $usuarioId = $validated['usuario_id'];
+            $formularioId = $validated['formulario_id'];
+            $usuarioId = $validated['usuario_id'];
 
-        $user = User::find($usuarioId);
-        $formulario = Formulario::with('perguntas.variaveis')->findOrFail($formularioId);
+            $user = User::findOrFail($usuarioId);
+            $formulario = Formulario::with('perguntas')->findOrFail($formularioId);
 
-        $respostasUsuario = Resposta::where('user_id', $user->id)
-            ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
-            ->get()
-            ->keyBy('pergunta_id');
+            $respostasUsuario = Resposta::where('user_id', $user->id)
+                ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
+                ->get()
+                ->keyBy('pergunta_id');
 
-        $variaveis = Variavel::with('perguntas')
-            ->where('formulario_id', $formulario->id)
-            ->get();
+            $variaveis = Variavel::with('perguntas')
+                ->where('formulario_id', $formulario->id)
+                ->get();
+            
+            if ($variaveis->isEmpty()) {
+                \Log::warning("No variables found for formulario_id: {$formularioId}");
+                return redirect()->back()->with('msgError', 'Não há variáveis configuradas para este formulário.');
+            }
 
-        $pontuacoes = [];
-        foreach ($variaveis as $variavel) {
+            $pontuacoes = [];
+            foreach ($variaveis as $variavel) {
             $pontuacao = 0;
             foreach ($variavel->perguntas as $pergunta) {
                 $resposta = $respostasUsuario->get($pergunta->id);
@@ -324,21 +330,39 @@ class DadosController extends Controller
                 'm' => $m,
                 'a' => $a,
             ];
-        }
+            }
 
-        // Calcular ejes analíticos y IID
-        $eixos = $this->calcularEixosAnaliticos($pontuacoes);
-        
-        // Obtener interpretaciones detalladas de cada eje
-        $eixos['eixo1']['interpretacao_detalhada'] = $this->obtenerInterpretacaoEixo(1, $eixos['eixo1']['dimensoes'], $pontuacoes);
-        $eixos['eixo2']['interpretacao_detalhada'] = $this->obtenerInterpretacaoEixo(2, $eixos['eixo2']['dimensoes'], $pontuacoes);
-        $eixos['eixo3']['interpretacao_detalhada'] = $this->obtenerInterpretacaoEixo(3, $eixos['eixo3']['dimensoes'], $pontuacoes);
+            // Calcular ejes analíticos y IID
+            $eixos = [];
+            try {
+                $eixos = $this->calcularEixosAnaliticos($pontuacoes);
+                
+                // Obtener interpretaciones detalladas de cada eje
+                if (isset($eixos['eixo1'])) {
+                    $eixos['eixo1']['interpretacao_detalhada'] = $this->obtenerInterpretacaoEixo(1, $eixos['eixo1']['dimensoes'] ?? [], $pontuacoes);
+                }
+                if (isset($eixos['eixo2'])) {
+                    $eixos['eixo2']['interpretacao_detalhada'] = $this->obtenerInterpretacaoEixo(2, $eixos['eixo2']['dimensoes'] ?? [], $pontuacoes);
+                }
+                if (isset($eixos['eixo3'])) {
+                    $eixos['eixo3']['interpretacao_detalhada'] = $this->obtenerInterpretacaoEixo(3, $eixos['eixo3']['dimensoes'] ?? [], $pontuacoes);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Error calculando eixos: ' . $e->getMessage());
+                // Crear estructura por defecto
+                $eixos = [
+                    'eixo1' => ['nome' => 'Energia Emocional', 'valor' => 0, 'faixa' => 'Baixa', 'dimensoes' => [], 'interpretacao_detalhada' => []],
+                    'eixo2' => ['nome' => 'Propósito e Relações', 'valor' => 0, 'faixa' => 'Baixa', 'dimensoes' => [], 'interpretacao_detalhada' => []],
+                    'eixo3' => ['nome' => 'Sustentabilidade Ocupacional', 'valor' => 0, 'faixa' => 'Baixa', 'dimensoes' => [], 'interpretacao_detalhada' => []],
+                    'iid' => ['valor' => 0, 'zona' => 'Zona de equilíbrio emocional', 'descricao' => '', 'interpretacao' => '', 'acao' => '', 'nivel_risco' => 'Baixo'],
+                ];
+            }
 
-        $analise = Analise::where('user_id', $usuarioId)
-            ->where('formulario_id', $formularioId)
-            ->first();
+            $analise = Analise::where('user_id', $usuarioId)
+                ->where('formulario_id', $formularioId)
+                ->first();
 
-        if (!$analise) {
+            if (!$analise) {
             $prompt = $this->gerarPrompt($user, $variaveis, $pontuacoes);
 
             try {
@@ -356,98 +380,120 @@ class DadosController extends Controller
             } else {
                 $analiseTexto = 'A análise está em processamento. Em breve ela será disponibilizada neste relatório.';
             }
-        } else {
-            $analiseTexto = $analise->texto;
-        }
-
-        $analiseData = $analise?->created_at;
-
-        // === FORMATAÇÃO DE MARCAÇÕES BÁSICAS DO TEXTO GERADO ===
-        $analiseHtml = nl2br(e($analiseTexto));
-        $analiseHtml = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $analiseHtml);
-        $analiseHtml = preg_replace('/###\s?(.*)/', '<h4>$1</h4>', $analiseHtml);
-
-        // Variables adicionales para el HTML
-        $dataResposta = $respostasUsuario->first()?->created_at?->format('d/m/Y') ?? now()->format('d/m/Y');
-        
-        // Generar gráfico radar para HTML
-        $imagemRadar = null;
-        $graficosDir = storage_path('app/public/graficos');
-        if (!file_exists($graficosDir)) {
-            mkdir($graficosDir, 0755, true);
-        }
-
-        if (count($pontuacoes) > 0) {
-            $labels = collect($pontuacoes)->pluck('tag');
-            $dataValores = collect($pontuacoes)->pluck('normalizada');
-            
-            $configRadar = [
-                'type' => 'radar',
-                'data' => [
-                    'labels' => $labels->toArray(),
-                    'datasets' => [[
-                        'label' => 'Pontuação',
-                        'data' => $dataValores->toArray(),
-                        'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
-                        'borderColor' => 'rgba(54, 162, 235, 1)',
-                        'pointBackgroundColor' => 'rgba(54, 162, 235, 1)',
-                        'pointBorderColor' => '#fff',
-                        'pointHoverBackgroundColor' => '#fff',
-                        'pointHoverBorderColor' => 'rgba(54, 162, 235, 1)'
-                    ]]
-                ],
-                'options' => [
-                    'responsive' => true,
-                    'plugins' => [
-                        'legend' => ['display' => false],
-                        'title' => ['display' => true, 'text' => 'Radar E.MO.TI.VE']
-                    ],
-                    'scales' => [
-                        'r' => [
-                            'angleLines' => ['display' => true],
-                            'min' => 0,
-                            'max' => 100,
-                            'ticks' => [
-                                'stepSize' => 20,
-                                'min' => 0,
-                                'max' => 100
-                            ]
-                        ]
-                    ]
-                ]
-            ];
-
-            $urlGraficoRadar = 'https://quickchart.io/chart?c=' . urlencode(json_encode($configRadar));
-            $imagemRadarPath = $graficosDir . '/radar_' . uniqid() . '.png';
-            
-            $context = stream_context_create([
-                'http' => [
-                    'method' => 'GET',
-                    'timeout' => 30,
-                    'ignore_errors' => true
-                ]
-            ]);
-            
-            $imagenData = @file_get_contents($urlGraficoRadar, false, $context);
-            if ($imagenData) {
-                file_put_contents($imagemRadarPath, $imagenData);
-                $imagemRadar = asset('storage/graficos/' . basename($imagemRadarPath));
+            } else {
+                $analiseTexto = $analise->texto ?? 'Análise não disponível.';
             }
-        }
 
-        return view('participante.relatorio', compact(
-            'formulario',
-            'respostasUsuario',
-            'pontuacoes',
-            'variaveis',
-            'user',
-            'analiseTexto',
-            'analiseHtml',
-            'analiseData',
-            'eixos',
-            'dataResposta',
-            'imagemRadar'
-        ));
+            $analiseData = $analise?->created_at;
+
+            // === FORMATAÇÃO DE MARCAÇÕES BÁSICAS DO TEXTO GERADO ===
+            $analiseHtml = nl2br(e($analiseTexto ?? ''));
+            $analiseHtml = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $analiseHtml);
+            $analiseHtml = preg_replace('/###\s?(.*)/', '<h4>$1</h4>', $analiseHtml);
+
+            // Variables adicionales para el HTML
+            $dataResposta = $respostasUsuario->first()?->created_at?->format('d/m/Y') ?? now()->format('d/m/Y');
+        
+            // Generar gráfico radar para HTML
+            $imagemRadar = null;
+            $graficosDir = storage_path('app/public/graficos');
+            if (!file_exists($graficosDir)) {
+                mkdir($graficosDir, 0755, true);
+            }
+
+            if (is_array($pontuacoes) && count($pontuacoes) > 0) {
+                try {
+                    $labels = [];
+                    $dataValores = [];
+                    
+                    foreach ($pontuacoes as $ponto) {
+                        if (isset($ponto['tag'])) {
+                            $labels[] = $ponto['tag'];
+                            $dataValores[] = isset($ponto['normalizada']) ? $ponto['normalizada'] : (isset($ponto['valor']) ? $ponto['valor'] : 0);
+                        }
+                    }
+                    
+                    if (count($labels) > 0 && count($dataValores) > 0) {
+                        $configRadar = [
+                            'type' => 'radar',
+                            'data' => [
+                                'labels' => $labels,
+                                'datasets' => [[
+                                    'label' => 'Pontuação',
+                                    'data' => $dataValores,
+                                    'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
+                                    'borderColor' => 'rgba(54, 162, 235, 1)',
+                                    'pointBackgroundColor' => 'rgba(54, 162, 235, 1)',
+                                    'pointBorderColor' => '#fff',
+                                    'pointHoverBackgroundColor' => '#fff',
+                                    'pointHoverBorderColor' => 'rgba(54, 162, 235, 1)'
+                                ]]
+                            ],
+                            'options' => [
+                                'responsive' => true,
+                                'plugins' => [
+                                    'legend' => ['display' => false],
+                                    'title' => ['display' => true, 'text' => 'Radar E.MO.TI.VE']
+                                ],
+                                'scales' => [
+                                    'r' => [
+                                        'angleLines' => ['display' => true],
+                                        'min' => 0,
+                                        'max' => 100,
+                                        'ticks' => [
+                                            'stepSize' => 20,
+                                            'min' => 0,
+                                            'max' => 100
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ];
+
+                        $urlGraficoRadar = 'https://quickchart.io/chart?c=' . urlencode(json_encode($configRadar));
+                        $imagemRadarPath = $graficosDir . '/radar_' . uniqid() . '.png';
+                        
+                        $context = stream_context_create([
+                            'http' => [
+                                'method' => 'GET',
+                                'timeout' => 30,
+                                'ignore_errors' => true
+                            ]
+                        ]);
+                        
+                        $imagenData = @file_get_contents($urlGraficoRadar, false, $context);
+                        if ($imagenData && strlen($imagenData) > 100) {
+                            file_put_contents($imagemRadarPath, $imagenData);
+                            $imagemRadar = asset('storage/graficos/' . basename($imagemRadarPath));
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Error generando gráfico radar: ' . $e->getMessage());
+                    $imagemRadar = null;
+                }
+            }
+
+            return view('participante.relatorio', compact(
+                'formulario',
+                'respostasUsuario',
+                'pontuacoes',
+                'variaveis',
+                'user',
+                'analiseTexto',
+                'analiseHtml',
+                'analiseData',
+                'eixos',
+                'dataResposta',
+                'imagemRadar'
+            ));
+        } catch (\Exception $e) {
+            \Log::error('Error en relatorioShow: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            return response()->view('errors.500', [
+                'message' => 'Erro ao gerar relatório: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
 
@@ -533,26 +579,37 @@ class DadosController extends Controller
      */
     private function calcularEixosAnaliticos($pontuacoes): array
     {
+        if (empty($pontuacoes)) {
+            return [
+                'eixo1' => ['nome' => 'Energia Emocional', 'valor' => 0, 'faixa' => 'Baixa', 'dimensoes' => []],
+                'eixo2' => ['nome' => 'Propósito e Relações', 'valor' => 0, 'faixa' => 'Baixa', 'dimensoes' => []],
+                'eixo3' => ['nome' => 'Sustentabilidade Ocupacional', 'valor' => 0, 'faixa' => 'Baixa', 'dimensoes' => []],
+                'iid' => ['valor' => 0, 'nivel_risco' => 'Baixo', 'zona' => 'Zona de equilíbrio emocional', 'descricao' => '', 'interpretacao' => '', 'acao' => ''],
+            ];
+        }
+        
         $dimensoes = [];
         foreach ($pontuacoes as $ponto) {
-            $dimensoes[$ponto['tag']] = $ponto;
+            if (isset($ponto['tag'])) {
+                $dimensoes[$ponto['tag']] = $ponto;
+            }
         }
 
         // EJE 1: ENERGIA EMOCIONAL
-        $exEm = $dimensoes['EXEM']['normalizada'] ?? 0;
-        $rePr = $dimensoes['REPR']['normalizada'] ?? 0;
+        $exEm = isset($dimensoes['EXEM']['normalizada']) ? $dimensoes['EXEM']['normalizada'] : 0;
+        $rePr = isset($dimensoes['REPR']['normalizada']) ? $dimensoes['REPR']['normalizada'] : 0;
         $rePrInvertida = 100 - $rePr;
         $eixo1 = round(($exEm + $rePrInvertida) / 2, 2);
 
         // EJE 2: PROPÓSITO E RELAÇÕES
-        $deCi = $dimensoes['DECI']['normalizada'] ?? 0;
-        $faPs = $dimensoes['FAPS']['normalizada'] ?? 0;
+        $deCi = isset($dimensoes['DECI']['normalizada']) ? $dimensoes['DECI']['normalizada'] : 0;
+        $faPs = isset($dimensoes['FAPS']['normalizada']) ? $dimensoes['FAPS']['normalizada'] : 0;
         $faPsInvertida = 100 - $faPs;
         $eixo2 = round(($deCi + $faPsInvertida) / 2, 2);
 
         // EJE 3: SUSTENTABILIDADE OCUPACIONAL
-        $exTr = $dimensoes['EXTR']['normalizada'] ?? 0;
-        $asMo = $dimensoes['ASMO']['normalizada'] ?? 0;
+        $exTr = isset($dimensoes['EXTR']['normalizada']) ? $dimensoes['EXTR']['normalizada'] : 0;
+        $asMo = isset($dimensoes['ASMO']['normalizada']) ? $dimensoes['ASMO']['normalizada'] : 0;
         $asMoInvertida = 100 - $asMo;
         $eixo3 = round(($exTr + $asMoInvertida) / 2, 2);
 
@@ -644,24 +701,35 @@ class DadosController extends Controller
      */
     private function obtenerInterpretacaoEixo($eixo, $dimensoes, $pontuacoes): array
     {
-        if ($eixo == 1) {
-            $exEmOriginal = collect($pontuacoes)->firstWhere('tag', 'EXEM')['normalizada'] ?? 0;
-            $rePrOriginal = collect($pontuacoes)->firstWhere('tag', 'REPR')['normalizada'] ?? 0;
-            $exaustaoFaixa = $this->obtenerFaixaNormalizada($exEmOriginal);
-            $realizacaoFaixa = $this->obtenerFaixaNormalizada($rePrOriginal);
-            return $this->interpretarEixo1($exaustaoFaixa, $realizacaoFaixa);
-        } elseif ($eixo == 2) {
-            $deCiOriginal = collect($pontuacoes)->firstWhere('tag', 'DECI')['normalizada'] ?? 0;
-            $faPsOriginal = collect($pontuacoes)->firstWhere('tag', 'FAPS')['normalizada'] ?? 0;
-            $cinismoFaixa = $this->obtenerFaixaNormalizada($deCiOriginal);
-            $fatoresFaixa = $this->obtenerFaixaNormalizada($faPsOriginal);
-            return $this->interpretarEixo2($cinismoFaixa, $fatoresFaixa);
-        } else {
-            $exTrOriginal = collect($pontuacoes)->firstWhere('tag', 'EXTR')['normalizada'] ?? 0;
-            $asMoOriginal = collect($pontuacoes)->firstWhere('tag', 'ASMO')['normalizada'] ?? 0;
-            $excessoFaixa = $this->obtenerFaixaNormalizada($exTrOriginal);
-            $assedioFaixa = $this->obtenerFaixaNormalizada($asMoOriginal);
-            return $this->interpretarEixo3($excessoFaixa, $assedioFaixa);
+        try {
+            if ($eixo == 1) {
+                $exEmPonto = collect($pontuacoes)->firstWhere('tag', 'EXEM');
+                $rePrPonto = collect($pontuacoes)->firstWhere('tag', 'REPR');
+                $exEmOriginal = ($exEmPonto && isset($exEmPonto['normalizada'])) ? $exEmPonto['normalizada'] : 0;
+                $rePrOriginal = ($rePrPonto && isset($rePrPonto['normalizada'])) ? $rePrPonto['normalizada'] : 0;
+                $exaustaoFaixa = $this->obtenerFaixaNormalizada($exEmOriginal);
+                $realizacaoFaixa = $this->obtenerFaixaNormalizada($rePrOriginal);
+                return $this->interpretarEixo1($exaustaoFaixa, $realizacaoFaixa);
+            } elseif ($eixo == 2) {
+                $deCiPonto = collect($pontuacoes)->firstWhere('tag', 'DECI');
+                $faPsPonto = collect($pontuacoes)->firstWhere('tag', 'FAPS');
+                $deCiOriginal = ($deCiPonto && isset($deCiPonto['normalizada'])) ? $deCiPonto['normalizada'] : 0;
+                $faPsOriginal = ($faPsPonto && isset($faPsPonto['normalizada'])) ? $faPsPonto['normalizada'] : 0;
+                $cinismoFaixa = $this->obtenerFaixaNormalizada($deCiOriginal);
+                $fatoresFaixa = $this->obtenerFaixaNormalizada($faPsOriginal);
+                return $this->interpretarEixo2($cinismoFaixa, $fatoresFaixa);
+            } else {
+                $exTrPonto = collect($pontuacoes)->firstWhere('tag', 'EXTR');
+                $asMoPonto = collect($pontuacoes)->firstWhere('tag', 'ASMO');
+                $exTrOriginal = ($exTrPonto && isset($exTrPonto['normalizada'])) ? $exTrPonto['normalizada'] : 0;
+                $asMoOriginal = ($asMoPonto && isset($asMoPonto['normalizada'])) ? $asMoPonto['normalizada'] : 0;
+                $excessoFaixa = $this->obtenerFaixaNormalizada($exTrOriginal);
+                $assedioFaixa = $this->obtenerFaixaNormalizada($asMoOriginal);
+                return $this->interpretarEixo3($excessoFaixa, $assedioFaixa);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error obteniendo interpretación de eje: ' . $e->getMessage());
+            return ['interpretacao' => 'Estado de Equilíbrio', 'significado' => 'Equilíbrio entre as dimensões avaliadas.', 'orientacao' => 'Continue mantendo práticas saudáveis.'];
         }
     }
 
