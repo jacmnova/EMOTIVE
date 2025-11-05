@@ -1,0 +1,266 @@
+{
+  "descripcion": "Estructura de datos completa que se pasa a la vista del reporte (participante.relatorio)",
+  "metodo": "DadosController::relatorioShow()",
+  "datos_pasados_a_la_vista": {
+    "formulario": {
+      "id": 1,
+      "nome": "Questionário de Riscos Psicossociais (Base NR-1 e MBI Adaptado)",
+      "label": "NR-1",
+      "descricao": "<p>Questionário de Riscos Psicossociais...</p>",
+      "instrucoes": "Instruções para preenchimento...",
+      "score_ini": 1,
+      "score_fim": 5,
+      "calculo_id": 1,
+      "status": true,
+      "created_at": "2024-01-15T10:00:00.000000Z",
+      "updated_at": "2024-01-15T10:00:00.000000Z",
+      "perguntas": {
+        "relacion": "hasMany(Pergunta)",
+        "ejemplo": [
+          {
+            "id": 1,
+            "formulario_id": 1,
+            "numero_da_pergunta": 1,
+            "pergunta": "Como você se sente em relação ao seu trabalho?",
+            "variaveis": [
+              {
+                "id": 1,
+                "nome": "Satisfação no Trabalho",
+                "tag": "ST"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "respostasUsuario": {
+      "tipo": "Collection keyedBy('pergunta_id')",
+      "estructura": {
+        "1": {
+          "id": 100,
+          "user_id": 5,
+          "pergunta_id": 1,
+          "valor_resposta": 4,
+          "created_at": "2024-01-20T14:30:00.000000Z",
+          "updated_at": "2024-01-20T14:30:00.000000Z"
+        },
+        "2": {
+          "id": 101,
+          "user_id": 5,
+          "pergunta_id": 2,
+          "valor_resposta": 3,
+          "created_at": "2024-01-20T14:30:00.000000Z",
+          "updated_at": "2024-01-20T14:30:00.000000Z"
+        }
+      },
+      "nota": "Las respuestas están indexadas por pergunta_id para acceso rápido"
+    },
+    "pontuacoes": {
+      "tipo": "Array de objetos",
+      "estructura": [
+        {
+          "tag": "ST",
+          "nome": "Satisfação no Trabalho",
+          "valor": 45,
+          "faixa": "Moderada",
+          "recomendacao": "Recomendações para faixa moderada...",
+          "badge": "warning",
+          "b": 20,
+          "m": 40,
+          "a": 60
+        },
+        {
+          "tag": "EM",
+          "nome": "Exaustão Emocional",
+          "valor": 65,
+          "faixa": "Alta",
+          "recomendacao": "Recomendações para faixa alta...",
+          "badge": "danger",
+          "b": 25,
+          "m": 45,
+          "a": 65
+        },
+        {
+          "tag": "RP",
+          "nome": "Realização Profissional",
+          "valor": 15,
+          "faixa": "Baixa",
+          "recomendacao": "Recomendações para faixa baixa...",
+          "badge": "info",
+          "b": 10,
+          "m": 20,
+          "a": 30
+        }
+      ],
+      "calculo": {
+        "valor": "Suma de valor_resposta de todas las respuestas asociadas a las perguntas de la variável",
+        "faixa": "Clasificación basada en: valor <= B = 'Baixa', valor <= M = 'Moderada', valor > M = 'Alta'",
+        "badge": "info (Baixa), warning (Moderada), danger (Alta)"
+      }
+    },
+    "variaveis": {
+      "tipo": "Collection de Variavel con relaciones",
+      "estructura": [
+        {
+          "id": 1,
+          "nome": "Satisfação no Trabalho",
+          "descricao": "Nível de satisfação do funcionário...",
+          "tag": "ST",
+          "B": 20,
+          "M": 40,
+          "A": 60,
+          "baixa": "Baixa satisfação",
+          "moderada": "Satisfação moderada",
+          "alta": "Alta satisfação",
+          "r_baixa": "Recomendação para faixa baixa...",
+          "r_moderada": "Recomendação para faixa moderada...",
+          "r_alta": "Recomendação para faixa alta...",
+          "d_baixa": "Descrição da faixa baixa...",
+          "d_moderada": "Descrição da faixa moderada...",
+          "d_alta": "Descrição da faixa alta...",
+          "formulario_id": 1,
+          "created_at": "2024-01-15T10:00:00.000000Z",
+          "updated_at": "2024-01-15T10:00:00.000000Z",
+          "perguntas": {
+            "relacion": "belongsToMany(Pergunta)",
+            "ejemplo": [
+              {
+                "id": 1,
+                "formulario_id": 1,
+                "numero_da_pergunta": 1,
+                "pergunta": "Como você se sente em relação ao seu trabalho?"
+              },
+              {
+                "id": 5,
+                "formulario_id": 1,
+                "numero_da_pergunta": 5,
+                "pergunta": "Você se sente realizado profissionalmente?"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "user": {
+      "id": 5,
+      "name": "João Silva",
+      "email": "joao.silva@example.com",
+      "avatar": "storage/avatars/user_5.jpg",
+      "email_verified_at": "2024-01-10T08:00:00.000000Z",
+      "sa": false,
+      "admin": false,
+      "cliente_id": 1,
+      "gestor": false,
+      "usuario": true,
+      "ativo": true,
+      "created_at": "2024-01-10T08:00:00.000000Z",
+      "updated_at": "2024-01-10T08:00:00.000000Z"
+    },
+    "analiseTexto": {
+      "tipo": "string",
+      "contenido": "Olá, João Silva. Você é um assistente especializado em saúde emocional...\n\n[Texto completo generado por OpenAI con análisis personalizado de aproximadamente 500 palabras]\n\nAssinado por FELLIPELLI",
+      "origen": "Generado por OpenAI API usando el método gerarAnaliseViaOpenAI()",
+      "si_no_existe": "Si no se puede generar, muestra: 'A análise está em processamento. Em breve ela será disponibilizada neste relatório.'"
+    },
+    "analiseHtml": {
+      "tipo": "string HTML",
+      "contenido": "Olá, João Silva.<br><br>Você é um assistente especializado em <strong>saúde emocional</strong>...<br><br><h4>Seção 1</h4><br>...",
+      "formateo": {
+        "saltos_de_linea": "nl2br() - Convierte \\n a <br>",
+        "negrita": "preg_replace() - Convierte **texto** a <strong>texto</strong>",
+        "titulos": "preg_replace() - Convierte ### Título a <h4>Título</h4>",
+        "escape": "e() - Escapa HTML para seguridad"
+      }
+    },
+    "analiseData": {
+      "tipo": "Carbon DateTime o null",
+      "formato": "2024-01-20T15:45:30.000000Z",
+      "origen": "analise->created_at",
+      "si_no_existe": "null si no hay análisis generado"
+    }
+  },
+  "proceso_de_calculo": {
+    "paso_1": "Obtener todas las variables del formulario con sus preguntas relacionadas",
+    "paso_2": "Para cada variable, sumar los valor_resposta de todas las respuestas asociadas a sus preguntas",
+    "paso_3": "Clasificar la puntuación según los límites B, M, A de la variable",
+    "paso_4": "Determinar recomendación y badge según la faixa clasificada",
+    "paso_5": "Generar o recuperar el análisis de OpenAI si existe"
+  },
+  "ejemplo_completo_json": {
+    "formulario": {
+      "id": 1,
+      "nome": "Questionário de Riscos Psicossociais",
+      "descricao": "<p>Questionário de Riscos Psicossociais...</p>"
+    },
+    "user": {
+      "id": 5,
+      "name": "João Silva",
+      "email": "joao.silva@example.com"
+    },
+    "pontuacoes": [
+      {
+        "tag": "ST",
+        "nome": "Satisfação no Trabalho",
+        "valor": 45,
+        "faixa": "Moderada",
+        "recomendacao": "Recomendações específicas...",
+        "badge": "warning",
+        "b": 20,
+        "m": 40,
+        "a": 60
+      },
+      {
+        "tag": "EM",
+        "nome": "Exaustão Emocional",
+        "valor": 65,
+        "faixa": "Alta",
+        "recomendacao": "Recomendações específicas...",
+        "badge": "danger",
+        "b": 25,
+        "m": 45,
+        "a": 65
+      }
+    ],
+    "variaveis": [
+      {
+        "id": 1,
+        "nome": "Satisfação no Trabalho",
+        "tag": "ST",
+        "B": 20,
+        "M": 40,
+        "A": 60,
+        "r_baixa": "Recomendação baixa...",
+        "r_moderada": "Recomendação moderada...",
+        "r_alta": "Recomendação alta..."
+      }
+    ],
+    "respostasUsuario": {
+      "1": {
+        "pergunta_id": 1,
+        "valor_resposta": 4
+      },
+      "2": {
+        "pergunta_id": 2,
+        "valor_resposta": 3
+      }
+    },
+    "analiseTexto": "Olá, João Silva. Você é um assistente especializado...\n\nAssinado por FELLIPELLI",
+    "analiseHtml": "Olá, João Silva.<br><br>Você é um assistente especializado...<br><br>Assinado por FELLIPELLI",
+    "analiseData": "2024-01-20T15:45:30.000000Z"
+  },
+  "uso_en_la_vista": {
+    "graficos": {
+      "chart_js": "Se usa el array $pontuacoes para generar gráficos de barras y radar",
+      "datos": "const pontuacoes = @json($pontuacoes);"
+    },
+    "tablas": {
+      "dimensiones": "Se itera sobre $variaveis y se busca la puntuación correspondiente en $pontuacoes",
+      "recomendaciones": "Se muestra la recomendación según la faixa de cada variable"
+    },
+    "analisis": {
+      "visualizacion": "Se muestra $analiseHtml (ya formateado) en la vista",
+      "fecha": "Se muestra $analiseData formateada"
+    }
+  }
+}
+

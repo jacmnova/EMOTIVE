@@ -58,12 +58,91 @@
 @section('css')
     {{-- Add here extra stylesheets --}}
     {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
-
+    <style>
+        .json-display {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
 @stop
 
 @section('js')
     <script src="{{ asset('../js/utils.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+@if(Session::has('pythonApiError'))
+<!-- Modal para mostrar error de API Python -->
+<div class="modal fade" id="modalErrorPython" tabindex="-1" role="dialog" aria-labelledby="modalErrorPythonLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger">
+                <h5 class="modal-title" id="modalErrorPythonLabel">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Error al Enviar Datos a la API de Python
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <strong><i class="fa-solid fa-info-circle"></i> Información:</strong>
+                    <p class="mb-0">No se pudo enviar los datos a la API de Python. A continuación se muestra la estructura JSON que se intentó enviar:</p>
+                </div>
+                
+                @if(Session::has('pythonApiErrorMessage'))
+                <div class="alert alert-danger">
+                    <strong>Error:</strong> {{ Session::get('pythonApiErrorMessage') }}
+                </div>
+                @endif
+                
+                <h6 class="mb-2"><strong>Estructura JSON:</strong></h6>
+                <div class="json-display">
+{{ Session::get('pythonApiErrorData', 'No hay datos disponibles') }}
+                </div>
+                
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="fa-solid fa-lightbulb"></i> 
+                        <strong>Nota:</strong> Puedes copiar este JSON y enviarlo manualmente a tu API de Python, o verificar la configuración de <code>PYTHON_RELATORIO_API_URL</code> en el archivo .env
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="copiarJSON()">
+                    <i class="fa-regular fa-copy"></i> Copiar JSON
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Mostrar modal automáticamente cuando hay error
+    $(document).ready(function() {
+        $('#modalErrorPython').modal('show');
+    });
+    
+    // Función para copiar JSON al portapapeles
+    function copiarJSON() {
+        const jsonText = document.querySelector('.json-display').textContent;
+        navigator.clipboard.writeText(jsonText).then(function() {
+            alert('JSON copiado al portapapeles');
+        }, function(err) {
+            console.error('Error al copiar:', err);
+            alert('Error al copiar. Por favor, selecciona y copia manualmente.');
+        });
+    }
+</script>
+@endif
 
 <script>
     const pontuacoes = @json($pontuacoes);

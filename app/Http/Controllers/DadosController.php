@@ -416,6 +416,137 @@ class DadosController extends Controller
         }
     }
 
+    /**
+     * Prepara los datos del reporte en formato JSON simplificado para enviar a la API de Python
+     */
+    private function prepararDatosParaRelatorio($userId, $formularioId): array
+    {
+        $user = User::find($userId);
+        $formulario = Formulario::with('perguntas')->findOrFail($formularioId);
+        
+        // Obtener respuestas del usuario
+        $respostasUsuario = Resposta::where('user_id', $userId)
+            ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
+            ->get();
+        
+        // Obtener variables con sus límites
+        $variaveis = Variavel::with('perguntas')
+            ->where('formulario_id', $formularioId)
+            ->get();
+        
+        // Calcular puntuaciones y organizar por secciones para la API de Python
+        $sections = [];
+        foreach ($variaveis as $variavel) {
+            $pontuacao = 0;
+            foreach ($variavel->perguntas as $pergunta) {
+                $resposta = $respostasUsuario->firstWhere('pergunta_id', $pergunta->id);
+                if ($resposta) {
+                    $pontuacao += $resposta->valor_resposta ?? 0;
+                }
+            }
+            $faixa = $this->classificarPontuacao($pontuacao, $variavel);
+            
+            // Determinar recomendación según la faixa
+            $recomendacao = '';
+            switch ($faixa) {
+                case 'Baixa':
+                    $recomendacao = $variavel->r_baixa ?? '';
+                    break;
+                case 'Moderada':
+                    $recomendacao = $variavel->r_moderada ?? '';
+                    break;
+                case 'Alta':
+                    $recomendacao = $variavel->r_alta ?? '';
+                    break;
+            }
+            
+            // Construir el body de la sección con información detallada
+            $body = "<h4>{$variavel->nome} ({$variavel->tag})</h4>";
+            $body .= "<p><strong>Puntuación:</strong> {$pontuacao} puntos</p>";
+            $body .= "<p><strong>Clasificación:</strong> <span class='badge badge-" . ($faixa == 'Baixa' ? 'info' : ($faixa == 'Moderada' ? 'warning' : 'danger')) . "'>{$faixa}</span></p>";
+            $body .= "<p><strong>Límites:</strong> Baixa (≤{$variavel->B}), Moderada (≤{$variavel->M}), Alta (>{$variavel->M})</p>";
+            if ($recomendacao) {
+                $body .= "<div class='mt-3'><strong>Recomendación:</strong><br><p>{$recomendacao}</p></div>";
+            }
+            
+            $sections[] = [
+                'title' => $variavel->nome . " ({$variavel->tag})",
+                'body' => $body
+            ];
+        }
+        
+        // Formato compatible con la API de Python de generación de documentos
+        return [
+            'template_id' => str_pad($formularioId, 3, '0', STR_PAD_LEFT), // Template ID basado en el ID del formulario (001, 002, etc.)
+            'data' => [
+                'header' => [
+                    'title' => $formulario->nome . ' - ' . $formulario->label
+                ],
+                'welcome_screen' => [
+                    'title' => 'Bienvenido, ' . $user->name,
+                    'body' => '<p>Este es tu reporte personalizado del formulario <strong>' . $formulario->nome . '</strong>.</p><p>Fecha de generación: ' . now()->format('d/m/Y H:i') . '</p>',
+                    'show_btn' => false,
+                    'text_btn' => '',
+                    'link_btn' => ''
+                ],
+                'explanation_screen' => [
+                    'title' => 'Sobre este Reporte',
+                    'body' => $formulario->descricao ?? '<p>Este reporte presenta el análisis de las dimensiones evaluadas.</p>',
+                    'show_img' => false,
+                    'img_link' => ''
+                ],
+                'respuestas' => [
+                    'sections' => $sections
+                ]
+            ],
+            'output_format' => 'both' // Genera tanto HTML como PDF
+        ];
+    }
+
+    /**
+     * Envía los datos del reporte a la API de Python
+     * Retorna array con ['success' => bool, 'error' => string|null, 'datos' => array|null]
+     */
+    private function enviarDatosAPython($datos): array
+    {
+        $apiUrl = env('PYTHON_RELATORIO_API_URL', 'http://localhost:5000/generate');
+        
+        try {
+            $response = Http::timeout(30)
+                ->post($apiUrl, $datos);
+            
+            if ($response->successful()) {
+                \Log::info('Datos enviados exitosamente a la API de Python', [
+                    'usuario_id' => $datos['usuario']['id'],
+                    'formulario_id' => $datos['formulario']['id'],
+                ]);
+                return ['success' => true, 'error' => null, 'datos' => null];
+            } else {
+                $error = "Error HTTP {$response->status()}: " . $response->body();
+                \Log::error('Error al enviar datos a la API de Python', [
+                    'status' => $response->status(),
+                    'response' => $response->body(),
+                ]);
+                return [
+                    'success' => false,
+                    'error' => $error,
+                    'datos' => $datos
+                ];
+            }
+        } catch (\Exception $e) {
+            $error = "Excepción: " . $e->getMessage();
+            \Log::error('Excepción al enviar datos a la API de Python', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return [
+                'success' => false,
+                'error' => $error,
+                'datos' => $datos
+            ];
+        }
+    }
+
     public function finalizar(Request $request)
     {
         $userId = Auth::user()->id;
@@ -448,6 +579,30 @@ class DadosController extends Controller
         // Marcar como completo
         $usuarioFormulario->status = 'completo';
         $usuarioFormulario->save();
+        
+        // Generar JSON simplificado y enviar a la API de Python
+        try {
+            $datosRelatorio = $this->prepararDatosParaRelatorio($userId, $formularioId);
+            $resultado = $this->enviarDadosAPython($datosRelatorio);
+            
+            // Si hay error, guardar los datos en la sesión para mostrar en el modal
+            if (!$resultado['success']) {
+                session()->flash('pythonApiError', true);
+                session()->flash('pythonApiErrorData', json_encode($resultado['datos'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                session()->flash('pythonApiErrorMessage', $resultado['error']);
+            }
+        } catch (\Exception $e) {
+            // Log del error pero no interrumpir el flujo
+            \Log::error('Error al preparar/enviar datos a la API de Python', [
+                'user_id' => $userId,
+                'formulario_id' => $formularioId,
+                'error' => $e->getMessage(),
+            ]);
+            
+            // Guardar error en sesión para mostrar en modal
+            session()->flash('pythonApiError', true);
+            session()->flash('pythonApiErrorMessage', 'Error al preparar datos: ' . $e->getMessage());
+        }
         
         // Tentar gerar analise automaticamente (se não existir)
         $analise = Analise::where('user_id', $userId)
