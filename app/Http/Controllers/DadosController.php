@@ -512,13 +512,25 @@ class DadosController extends Controller
         $apiUrl = env('PYTHON_RELATORIO_API_URL', 'http://localhost:5000/generate');
         
         try {
+            // Log del payload que se va a enviar
+            \Log::info('Enviando datos a la API de Python', [
+                'url' => $apiUrl,
+                'payload' => $datos
+            ]);
+            
+            // Enviar como JSON con headers correctos
             $response = Http::timeout(30)
+                ->acceptJson()
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json'
+                ])
                 ->post($apiUrl, $datos);
             
             if ($response->successful()) {
                 \Log::info('Datos enviados exitosamente a la API de Python', [
-                    'usuario_id' => $datos['usuario']['id'],
-                    'formulario_id' => $datos['formulario']['id'],
+                    'template_id' => $datos['template_id'] ?? 'N/A',
+                    'response' => $response->json()
                 ]);
                 return ['success' => true, 'error' => null, 'datos' => null];
             } else {
@@ -526,6 +538,7 @@ class DadosController extends Controller
                 \Log::error('Error al enviar datos a la API de Python', [
                     'status' => $response->status(),
                     'response' => $response->body(),
+                    'payload_enviado' => $datos
                 ]);
                 return [
                     'success' => false,
@@ -538,6 +551,7 @@ class DadosController extends Controller
             \Log::error('Excepción al enviar datos a la API de Python', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
+                'payload_intentado' => $datos
             ]);
             return [
                 'success' => false,
@@ -572,6 +586,13 @@ class DadosController extends Controller
         try {
             // Preparar datos para la API
             $datosRelatorio = $this->prepararDatosParaRelatorio($userId, $formularioId);
+            
+            // Log para debug
+            \Log::info('Datos preparados para la API de Python', [
+                'user_id' => $userId,
+                'formulario_id' => $formularioId,
+                'datos_preparados' => $datosRelatorio
+            ]);
             
             // Enviar a la API de Python
             $resultado = $this->enviarDatosAPython($datosRelatorio);
