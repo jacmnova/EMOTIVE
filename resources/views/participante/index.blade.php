@@ -83,47 +83,43 @@
                                     <span class="badge badge-{{ $statusClass }}">{{ strtoupper($formulario->status) }}</span>
                                 </td>
                                 <td>
-                                    @if($formulario->status === 'novo')
+                                    @if($formulario->status !== 'completo')
                                         <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm text-secondary">
                                             <i class="fa-regular fa-circle-play mr-1"></i> Responder
                                         </a>
                                     @else
-                                        @if($formulario->midia && $formulario->midia->tipo == 'url')
-                                            <button class="btn btn-sm text-primary" onclick="abrirMidiaModal('url', '{{ $formulario->midia->url }}', {{ $formulario->id }})">
-                                                <i class="fa-solid fa-link"></i>
-                                            </button>
-                                        @elseif($formulario->midia && $formulario->midia->tipo == 'video' && $formulario->midia->arquivo)
-                                            <button class="btn btn-sm text-success" title="Assista Vídeo" onclick="abrirMidiaModal('video', '{{ asset('storage/' . $formulario->midia->arquivo) }}', {{ $formulario->id }})">
-                                                <i class="fa-solid fa-video"></i>
-                                            </button>
-                                        @endif
+                                        @php
+                                            $temMidia = $formulario->midia && (($formulario->midia->tipo == 'url') || ($formulario->midia->tipo == 'video' && $formulario->midia->arquivo));
+                                        @endphp
 
-                                        @if($formulario->video_assistido || !$formulario->midia || $formulario->status === 'pendente')
-                                            <button type="button" 
-                                                    class="btn btn-sm btn-success btnGenerarRelatorioAPI" 
-                                                    data-formulario-id="{{ $formulario->formulario->id }}"
-                                                    data-usuario-id="{{ $user->id }}"
-                                                    title="Generar Relatório vía API">
-                                                <i class="fas fa-sync-alt"></i> Generar
-                                            </button>
-                                            <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}" 
-                                               class="btn btn-sm text-info btnGerarRelatorio"
-                                               title="Visualizar Relatório">
+                                        @if($temMidia)
+                                            @if($formulario->midia->tipo == 'url')
+                                                <button class="btn btn-sm text-primary" onclick="abrirMidiaModal('url', '{{ $formulario->midia->url }}', {{ $formulario->id }})">
+                                                    <i class="fa-solid fa-link"></i>
+                                                </button>
+                                            @elseif($formulario->midia->tipo == 'video' && $formulario->midia->arquivo)
+                                                <button class="btn btn-sm text-success" title="Assista Vídeo" onclick="abrirMidiaModal('video', '{{ asset('storage/' . $formulario->midia->arquivo) }}', {{ $formulario->id }})">
+                                                    <i class="fa-solid fa-video"></i>
+                                                </button>
+                                            @endif
+
+                                            @if($formulario->video_assistido)
+                                                <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}"  title="Visualizar Relatório" class="btn btn-sm text-info">
+                                                    <i class="fa-regular fa-rectangle-list"></i>
+                                                </a>
+                                                <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}"  title="Imprimir Relatório" target="_blank" class="btn btn-sm text-danger">
+                                                    <i class="fas fa-file-pdf"></i>
+                                                </a>
+                                            @else
+                                                <span class="text-muted"><i class="fa-solid fa-spinner"></i> Pendente</span>
+                                            @endif
+                                        @else
+                                            {{-- Se não há mídia, mostra o relatório diretamente --}}
+                                            <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}"  title="Visualizar Relatório" class="btn btn-sm text-info">
                                                 <i class="fa-regular fa-rectangle-list"></i>
                                             </a>
-                                            <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}"  title="Descargar PDF" class="btn btn-sm text-danger" download>
+                                            <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}"  title="Imprimir Relatório" target="_blank" class="btn btn-sm text-danger">
                                                 <i class="fas fa-file-pdf"></i>
-                                            </a>
-                                            <a href="{{ route('relatorio.html', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}"  title="Ver en HTML" target="_blank" class="btn btn-sm text-info">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                        @else
-                                            <span class="text-muted"><i class="fa-solid fa-spinner"></i> Pendente</span>
-                                        @endif
-                                        
-                                        @if($formulario->status === 'pendente')
-                                            <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm text-secondary">
-                                                <i class="fa-regular fa-circle-play mr-1"></i> Continuar
                                             </a>
                                         @endif
                                     @endif
@@ -170,49 +166,43 @@
                             </div>
                             <div class="card-footer bg-light border-top">
                                 <div class="d-flex flex-wrap justify-content-start gap-2">
-                                    @if($formulario->status === 'novo')
+                                    @if($formulario->status !== 'completo')
                                         <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm text-secondary">
                                             <i class="fa-regular fa-circle-play mr-1"></i> Responder
                                         </a>
                                     @else
-                                        @if($formulario->midia && $formulario->midia->tipo == 'url')
-                                            <button class="btn btn-sm text-primary" onclick="abrirMidiaModal('url', '{{ $formulario->midia->url }}', {{ $formulario->id }})">
-                                                <i class="fa-solid fa-link"></i>
-                                            </button>
-                                        @elseif($formulario->midia && $formulario->midia->tipo == 'video' && $formulario->midia->arquivo)
-                                            <button class="btn btn-sm text-success" title="Assista Vídeo" onclick="abrirMidiaModal('video', '{{ asset('storage/' . $formulario->midia->arquivo) }}', {{ $formulario->id }})">
-                                                <i class="fa-solid fa-video"></i>
-                                            </button>
-                                        @endif
+                                        @php
+                                            $temMidia = $formulario->midia && (($formulario->midia->tipo == 'url') || ($formulario->midia->tipo == 'video' && $formulario->midia->arquivo));
+                                        @endphp
 
-                                        @if($formulario->video_assistido || !$formulario->midia || $formulario->status === 'pendente')
-                                            <button type="button" 
-                                                    class="btn btn-sm btn-success btnGenerarRelatorioAPI" 
-                                                    data-formulario-id="{{ $formulario->formulario->id }}"
-                                                    data-usuario-id="{{ $user->id }}"
-                                                    title="Generar Relatório vía API">
-                                                <i class="fas fa-sync-alt"></i> Generar
-                                            </button>
-                                            <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}" 
-                                               class="btn btn-sm text-info btnGerarRelatorio"
-                                               title="Visualizar Relatório">
+                                        @if($temMidia)
+                                            @if($formulario->midia->tipo == 'url')
+                                                <button class="btn btn-sm text-primary" onclick="abrirMidiaModal('url', '{{ $formulario->midia->url }}', {{ $formulario->id }})">
+                                                    <i class="fa-solid fa-link"></i>
+                                                </button>
+                                            @elseif($formulario->midia->tipo == 'video' && $formulario->midia->arquivo)
+                                                <button class="btn btn-sm text-success" title="Assista Vídeo" onclick="abrirMidiaModal('video', '{{ asset('storage/' . $formulario->midia->arquivo) }}', {{ $formulario->id }})">
+                                                    <i class="fa-solid fa-video"></i>
+                                                </button>
+                                            @endif
+
+                                            @if($formulario->video_assistido)
+                                                <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}" title="Visualizar Relatório" class="btn btn-sm text-info">
+                                                    <i class="fa-regular fa-rectangle-list"></i>
+                                                </a>
+                                                <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}" target="_blank" title="Imprimir Relatório" class="btn btn-sm text-danger">
+                                                    <i class="fas fa-file-pdf"></i>
+                                                </a>
+                                            @else
+                                                <span class="text-muted"><i class="fa-solid fa-spinner"></i> Pendente</span>
+                                            @endif
+                                        @else
+                                            {{-- Se não há mídia, mostra o relatório diretamente --}}
+                                            <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}" title="Visualizar Relatório" class="btn btn-sm text-info">
                                                 <i class="fa-regular fa-rectangle-list"></i>
                                             </a>
-                                            <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}" title="Descargar PDF" class="btn btn-sm text-danger" download>
+                                            <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}" target="_blank" title="Imprimir Relatório" class="btn btn-sm text-danger">
                                                 <i class="fas fa-file-pdf"></i>
-                                            </a>
-                                            <a href="{{ route('relatorio.html', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}" title="Ver en HTML" target="_blank" class="btn btn-sm text-info">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                        @else
-                                        <a href="#" class="btn btn-sm text-danger" title="Assista Vídeo">
-                                            <i class="fa-solid fa-spinner"></i>
-                                        </a>
-                                        @endif
-                                        
-                                        @if($formulario->status === 'pendente')
-                                            <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm text-secondary">
-                                                <i class="fa-regular fa-circle-play mr-1"></i> Continuar
                                             </a>
                                         @endif
                                     @endif
@@ -273,105 +263,23 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // Agregar event listener a todos los botones de generar relatorio
-    document.querySelectorAll('.btnGerarRelatorio').forEach(function(btn) {
-        btn.addEventListener('click', function(event) {
-            event.preventDefault(); // impede redirecionamento imediato
+    document.getElementById('btnGerarRelatorio').addEventListener('click', function(event) {
+        event.preventDefault(); // impede redirecionamento imediato
 
-            const url = this.href;
+        const url = this.href;
 
-            Swal.fire({
-                title: 'Gerando análise...',
-                text: 'Por favor, aguarde enquanto processamos seu relatório.',
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            // Agora redireciona manualmente (deixa o Swal aparecer)
-            window.location.href = url;
+        Swal.fire({
+            title: 'Gerando análise...',
+            text: 'Por favor, aguarde enquanto processamos seu relatório.',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
         });
-    });
 
-    // Agregar event listener a todos los botones de generar relatorio vía API
-    document.querySelectorAll('.btnGenerarRelatorioAPI').forEach(function(btn) {
-        btn.addEventListener('click', function(event) {
-            event.preventDefault();
-            
-            const formularioId = this.getAttribute('data-formulario-id');
-            const usuarioId = this.getAttribute('data-usuario-id');
-            const btnOriginal = this;
-            
-            // Deshabilitar botón mientras procesa
-            btnOriginal.disabled = true;
-            const originalHTML = btnOriginal.innerHTML;
-            btnOriginal.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
-
-            Swal.fire({
-                title: 'Generando relatorio vía API...',
-                text: 'Por favor, aguarde enquanto processamos seu relatório na API de Python.',
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                showConfirmButton: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            // Enviar petición AJAX a la API
-            fetch('{{ route("relatorio.generar.api") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    formulario_id: formularioId,
-                    usuario_id: usuarioId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                btnOriginal.disabled = false;
-                btnOriginal.innerHTML = originalHTML;
-                
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Éxito!',
-                        text: data.message || 'Relatorio generado exitosamente vía API de Python.',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        // Opcional: recargar la página o redirigir
-                        // window.location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        html: '<p>' + (data.error || 'Error al generar el relatorio') + '</p>' +
-                              (data.data ? '<pre style="text-align: left; font-size: 10px; max-height: 200px; overflow: auto;">' + 
-                               JSON.stringify(data.data, null, 2) + '</pre>' : ''),
-                        confirmButtonText: 'OK',
-                        width: '600px'
-                    });
-                }
-            })
-            .catch(error => {
-                btnOriginal.disabled = false;
-                btnOriginal.innerHTML = originalHTML;
-                
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error de conexión',
-                    text: 'No se pudo conectar con el servidor. Error: ' + error.message,
-                    confirmButtonText: 'OK'
-                });
-            });
-        });
+        // Agora redireciona manualmente (deixa o Swal aparecer)
+        window.location.href = url;
     });
 </script>
 

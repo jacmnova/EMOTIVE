@@ -16,10 +16,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
+use App\Traits\CalculaEjesAnaliticos;
 
 
 class DadosController extends Controller
 {
+    use CalculaEjesAnaliticos;
     public function index()
     {
         $user = Auth::user();
@@ -199,11 +201,25 @@ class DadosController extends Controller
 
         $formulario = Formulario::with('perguntas')->find($formularioId);
         $totalPerguntas = $formulario->perguntas->count();
+        
+        // Obtém IDs das perguntas do formulário
+        $perguntasIds = $formulario->perguntas->pluck('id')->toArray();
 
+        // Busca todas as respostas do usuário para este formulário
         $respostasUsuario = Resposta::where('user_id', $userId)
-            ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
+            ->whereIn('pergunta_id', $perguntasIds)
+            ->whereNotNull('valor_resposta') // Só conta respostas com valor válido
             ->get()
             ->keyBy('pergunta_id');
+
+        // Verifica se todas as perguntas têm respostas válidas
+        $todasRespondidas = true;
+        foreach ($formulario->perguntas as $pergunta) {
+            if (!isset($respostasUsuario[$pergunta->id]) || $respostasUsuario[$pergunta->id]->valor_resposta === null) {
+                $todasRespondidas = false;
+                break;
+            }
+        }
 
         $respondidas = $respostasUsuario->count();
         $percentual = $totalPerguntas > 0 ? round(($respondidas / $totalPerguntas) * 100) : 0;
@@ -214,17 +230,14 @@ class DadosController extends Controller
             ->first();
 
         if ($usuarioFormulario) {
-            // Solo actualizar status si no está completo ya
-            if ($usuarioFormulario->status !== 'completo') {
+            // Atualiza status baseado na verificação completa
+            if ($todasRespondidas && $totalPerguntas > 0 && $respondidas == $totalPerguntas) {
+                $usuarioFormulario->status = 'completo';
+            } else {
                 $usuarioFormulario->status = 'pendente';
-                $usuarioFormulario->updated_at = now();
-
-                if ($respondidas >= $totalPerguntas && $totalPerguntas > 0) {
-                    $usuarioFormulario->status = 'completo';
-                }
-
-                $usuarioFormulario->save();
             }
+            $usuarioFormulario->updated_at = now();
+            $usuarioFormulario->save();
         }
 
         // Verificar se todas as perguntas da etapa atual foram respondidas
@@ -255,34 +268,28 @@ class DadosController extends Controller
 
     public function relatorioShow(Request $request)
     {
-        try {
-            $validated = $request->validate([
-                'formulario_id' => ['required', 'integer', 'exists:formularios,id'],
-                'usuario_id' => ['required', 'integer', 'exists:users,id'],
-            ]);
+        $validated = $request->validate([
+            'formulario_id' => ['required', 'integer', 'exists:formularios,id'],
+            'usuario_id' => ['required', 'integer', 'exists:users,id'],
+        ]);
 
-            $formularioId = $validated['formulario_id'];
-            $usuarioId = $validated['usuario_id'];
+        $formularioId = $validated['formulario_id'];
+        $usuarioId = $validated['usuario_id'];
 
-            $user = User::findOrFail($usuarioId);
-            $formulario = Formulario::with('perguntas')->findOrFail($formularioId);
+        $user = User::find($usuarioId);
+        $formulario = Formulario::with('perguntas.variaveis')->findOrFail($formularioId);
 
-            $respostasUsuario = Resposta::where('user_id', $user->id)
-                ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
-                ->get()
-                ->keyBy('pergunta_id');
+        $respostasUsuario = Resposta::where('user_id', $user->id)
+            ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
+            ->get()
+            ->keyBy('pergunta_id');
 
-            $variaveis = Variavel::with('perguntas')
-                ->where('formulario_id', $formulario->id)
-                ->get();
-            
-            if ($variaveis->isEmpty()) {
-                \Log::warning("No variables found for formulario_id: {$formularioId}");
-                return redirect()->back()->with('msgError', 'Não há variáveis configuradas para este formulário.');
-            }
+        $variaveis = Variavel::with('perguntas')
+            ->where('formulario_id', $formulario->id)
+            ->get();
 
-            $pontuacoes = [];
-            foreach ($variaveis as $variavel) {
+        $pontuacoes = [];
+        foreach ($variaveis as $variavel) {
             $pontuacao = 0;
             foreach ($variavel->perguntas as $pergunta) {
                 $resposta = $respostasUsuario->get($pergunta->id);
@@ -291,14 +298,7 @@ class DadosController extends Controller
                 }
             }
 
-            $b = $variavel->B ?? 0;
-            $m = $variavel->M ?? 0;
-            $a = $variavel->A ?? ($m + ($m - $b));
-            
-            // Normalizar a escala 0-100
-            $pontuacaoNormalizada = $this->normalizarPuntuacion($pontuacao, $b, $m, $a);
             $faixa = $this->classificarPontuacao($pontuacao, $variavel);
-            
             switch ($faixa) {
                 case 'Baixa':
                     $recomendacao = $variavel->r_baixa;
@@ -318,11 +318,14 @@ class DadosController extends Controller
                     break;
             }
 
+            $b = $variavel->B ?? 0;
+            $m = $variavel->M ?? 0;
+            $a = $variavel->A ?? ($m + ($m - $b));
+
             $pontuacoes[] = [
                 'tag' => strtoupper($variavel->tag),
                 'nome' => $variavel->nome,
                 'valor' => $pontuacao,
-                'normalizada' => $pontuacaoNormalizada,
                 'faixa' => $faixa,
                 'recomendacao' => $recomendacao,
                 'badge' => $badge,
@@ -330,39 +333,13 @@ class DadosController extends Controller
                 'm' => $m,
                 'a' => $a,
             ];
-            }
+        }
 
-            // Calcular ejes analíticos y IID
-            $eixos = [];
-            try {
-                $eixos = $this->calcularEixosAnaliticos($pontuacoes);
-                
-                // Obtener interpretaciones detalladas de cada eje
-                if (isset($eixos['eixo1'])) {
-                    $eixos['eixo1']['interpretacao_detalhada'] = $this->obtenerInterpretacaoEixo(1, $eixos['eixo1']['dimensoes'] ?? [], $pontuacoes);
-                }
-                if (isset($eixos['eixo2'])) {
-                    $eixos['eixo2']['interpretacao_detalhada'] = $this->obtenerInterpretacaoEixo(2, $eixos['eixo2']['dimensoes'] ?? [], $pontuacoes);
-                }
-                if (isset($eixos['eixo3'])) {
-                    $eixos['eixo3']['interpretacao_detalhada'] = $this->obtenerInterpretacaoEixo(3, $eixos['eixo3']['dimensoes'] ?? [], $pontuacoes);
-                }
-            } catch (\Exception $e) {
-                \Log::error('Error calculando eixos: ' . $e->getMessage());
-                // Crear estructura por defecto
-                $eixos = [
-                    'eixo1' => ['nome' => 'Energia Emocional', 'valor' => 0, 'faixa' => 'Baixa', 'dimensoes' => [], 'interpretacao_detalhada' => []],
-                    'eixo2' => ['nome' => 'Propósito e Relações', 'valor' => 0, 'faixa' => 'Baixa', 'dimensoes' => [], 'interpretacao_detalhada' => []],
-                    'eixo3' => ['nome' => 'Sustentabilidade Ocupacional', 'valor' => 0, 'faixa' => 'Baixa', 'dimensoes' => [], 'interpretacao_detalhada' => []],
-                    'iid' => ['valor' => 0, 'zona' => 'Zona de equilíbrio emocional', 'descricao' => '', 'interpretacao' => '', 'acao' => '', 'nivel_risco' => 'Baixo'],
-                ];
-            }
+        $analise = Analise::where('user_id', $usuarioId)
+            ->where('formulario_id', $formularioId)
+            ->first();
 
-            $analise = Analise::where('user_id', $usuarioId)
-                ->where('formulario_id', $formularioId)
-                ->first();
-
-            if (!$analise) {
+        if (!$analise) {
             $prompt = $this->gerarPrompt($user, $variaveis, $pontuacoes);
 
             try {
@@ -380,100 +357,35 @@ class DadosController extends Controller
             } else {
                 $analiseTexto = 'A análise está em processamento. Em breve ela será disponibilizada neste relatório.';
             }
-            } else {
-                $analiseTexto = $analise->texto ?? 'Análise não disponível.';
-            }
+        } else {
+            $analiseTexto = $analise->texto;
+        }
 
-            $analiseData = $analise?->created_at;
+        $analiseData = $analise?->created_at;
 
-            // === FORMATAÇÃO DE MARCAÇÕES BÁSICAS DO TEXTO GERADO ===
-            $analiseHtml = nl2br(e($analiseTexto ?? ''));
-            $analiseHtml = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $analiseHtml);
-            $analiseHtml = preg_replace('/###\s?(.*)/', '<h4>$1</h4>', $analiseHtml);
+        // === FORMATAÇÃO DE MARCAÇÕES BÁSICAS DO TEXTO GERADO ===
+        $analiseHtml = nl2br(e($analiseTexto));
+        $analiseHtml = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $analiseHtml);
+        $analiseHtml = preg_replace('/###\s?(.*)/', '<h4>$1</h4>', $analiseHtml);
 
-            // Variables adicionales para el HTML
-            $dataResposta = $respostasUsuario->first()?->created_at?->format('d/m/Y') ?? now()->format('d/m/Y');
-        
-            // Generar gráfico radar para HTML
-            $imagemRadar = null;
-            $graficosDir = storage_path('app/public/graficos');
-            if (!file_exists($graficosDir)) {
-                mkdir($graficosDir, 0755, true);
-            }
+        // === CALCULAR EJES ANALÍTICOS Y IID ===
+        // Preparar pontuacoes para o cálculo (garantir formato correto)
+        $pontuacoesParaCalculo = [];
+        foreach ($pontuacoes as $ponto) {
+            $pontuacoesParaCalculo[] = [
+                'tag' => $ponto['tag'],
+                'valor' => $ponto['valor'],
+                'faixa' => $ponto['faixa']
+            ];
+        }
+        $ejesAnaliticos = $this->calcularEjesAnaliticos($pontuacoesParaCalculo);
+        $iid = $this->calcularIID($ejesAnaliticos);
+        $nivelRisco = $this->determinarNivelRisco($iid);
+        $planDesenvolvimento = $this->getPlanDesenvolvimento($nivelRisco);
 
-            if (is_array($pontuacoes) && count($pontuacoes) > 0) {
-                try {
-                    $labels = [];
-                    $dataValores = [];
-                    
-                    foreach ($pontuacoes as $ponto) {
-                        if (isset($ponto['tag'])) {
-                            $labels[] = $ponto['tag'];
-                            $dataValores[] = isset($ponto['normalizada']) ? $ponto['normalizada'] : (isset($ponto['valor']) ? $ponto['valor'] : 0);
-                        }
-                    }
-                    
-                    if (count($labels) > 0 && count($dataValores) > 0) {
-                        $configRadar = [
-                            'type' => 'radar',
-                            'data' => [
-                                'labels' => $labels,
-                                'datasets' => [[
-                                    'label' => 'Pontuação',
-                                    'data' => $dataValores,
-                                    'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
-                                    'borderColor' => 'rgba(54, 162, 235, 1)',
-                                    'pointBackgroundColor' => 'rgba(54, 162, 235, 1)',
-                                    'pointBorderColor' => '#fff',
-                                    'pointHoverBackgroundColor' => '#fff',
-                                    'pointHoverBorderColor' => 'rgba(54, 162, 235, 1)'
-                                ]]
-                            ],
-                            'options' => [
-                                'responsive' => true,
-                                'plugins' => [
-                                    'legend' => ['display' => false],
-                                    'title' => ['display' => true, 'text' => 'Radar E.MO.TI.VE']
-                                ],
-                                'scales' => [
-                                    'r' => [
-                                        'angleLines' => ['display' => true],
-                                        'min' => 0,
-                                        'max' => 100,
-                                        'ticks' => [
-                                            'stepSize' => 20,
-                                            'min' => 0,
-                                            'max' => 100
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ];
-
-                        $urlGraficoRadar = 'https://quickchart.io/chart?c=' . urlencode(json_encode($configRadar));
-                        $imagemRadarPath = $graficosDir . '/radar_' . uniqid() . '.png';
-                        
-                        $context = stream_context_create([
-                            'http' => [
-                                'method' => 'GET',
-                                'timeout' => 30,
-                                'ignore_errors' => true
-                            ]
-                        ]);
-                        
-                        $imagenData = @file_get_contents($urlGraficoRadar, false, $context);
-                        if ($imagenData && strlen($imagenData) > 100) {
-                            file_put_contents($imagemRadarPath, $imagenData);
-                            $imagemRadar = asset('storage/graficos/' . basename($imagemRadarPath));
-                        }
-                    }
-                } catch (\Exception $e) {
-                    \Log::error('Error generando gráfico radar: ' . $e->getMessage());
-                    $imagemRadar = null;
-                }
-            }
-
-            return view('participante.relatorio', compact(
+        // Usar la nueva vista E.MO.TI.VE si existe, sino la antigua
+        if (view()->exists('participante.relatorio_emotive')) {
+            return view('participante.relatorio_emotive', compact(
                 'formulario',
                 'respostasUsuario',
                 'pontuacoes',
@@ -482,18 +394,27 @@ class DadosController extends Controller
                 'analiseTexto',
                 'analiseHtml',
                 'analiseData',
-                'eixos',
-                'dataResposta',
-                'imagemRadar'
+                'ejesAnaliticos',
+                'iid',
+                'nivelRisco',
+                'planDesenvolvimento'
             ));
-        } catch (\Exception $e) {
-            \Log::error('Error en relatorioShow: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
-            
-            return response()->view('errors.500', [
-                'message' => 'Erro ao gerar relatório: ' . $e->getMessage()
-            ], 500);
         }
+        
+        return view('participante.relatorio', compact(
+            'formulario',
+            'respostasUsuario',
+            'pontuacoes',
+            'variaveis',
+            'user',
+            'analiseTexto',
+            'analiseHtml',
+            'analiseData',
+            'ejesAnaliticos',
+            'iid',
+            'nivelRisco',
+            'planDesenvolvimento'
+        ));
     }
 
 
@@ -545,561 +466,78 @@ class DadosController extends Controller
         }
     }
 
-    /**
-     * Normaliza una puntuación a escala 0-100 basado en los límites B, M, A
-     */
-    private function normalizarPuntuacion($puntuacion, $b, $m, $a): float
-    {
-        if ($puntuacion <= $b) {
-            return round(($puntuacion / ($b > 0 ? $b : 1)) * 33, 2);
-        } elseif ($puntuacion <= $m) {
-            return round(33 + (($puntuacion - $b) / (($m - $b) > 0 ? ($m - $b) : 1)) * 33, 2);
-        } else {
-            $max = $a > $m ? $a : ($m * 1.5);
-            return round(66 + (min($puntuacion, $max) - $m) / (($max - $m) > 0 ? ($max - $m) : 1) * 34, 2);
-        }
-    }
 
     /**
-     * Obtiene la faixa de una puntuación normalizada (0-100)
+     * Verifica e corrige o status de um formulário baseado nas respostas
      */
-    private function obtenerFaixaNormalizada($puntuacionNormalizada): string
+    public function verificarStatusFormulario(Request $request)
     {
-        if ($puntuacionNormalizada <= 33) {
-            return 'Baixa';
-        } elseif ($puntuacionNormalizada <= 66) {
-            return 'Moderada';
-        } else {
-            return 'Alta';
-        }
-    }
-
-    /**
-     * Calcula los tres ejes analíticos y el IID
-     */
-    private function calcularEixosAnaliticos($pontuacoes): array
-    {
-        if (empty($pontuacoes)) {
-            return [
-                'eixo1' => ['nome' => 'Energia Emocional', 'valor' => 0, 'faixa' => 'Baixa', 'dimensoes' => []],
-                'eixo2' => ['nome' => 'Propósito e Relações', 'valor' => 0, 'faixa' => 'Baixa', 'dimensoes' => []],
-                'eixo3' => ['nome' => 'Sustentabilidade Ocupacional', 'valor' => 0, 'faixa' => 'Baixa', 'dimensoes' => []],
-                'iid' => ['valor' => 0, 'nivel_risco' => 'Baixo', 'zona' => 'Zona de equilíbrio emocional', 'descricao' => '', 'interpretacao' => '', 'acao' => ''],
-            ];
-        }
-        
-        $dimensoes = [];
-        foreach ($pontuacoes as $ponto) {
-            if (isset($ponto['tag'])) {
-                $dimensoes[$ponto['tag']] = $ponto;
-            }
-        }
-
-        // EJE 1: ENERGIA EMOCIONAL
-        $exEm = isset($dimensoes['EXEM']['normalizada']) ? $dimensoes['EXEM']['normalizada'] : 0;
-        $rePr = isset($dimensoes['REPR']['normalizada']) ? $dimensoes['REPR']['normalizada'] : 0;
-        $rePrInvertida = 100 - $rePr;
-        $eixo1 = round(($exEm + $rePrInvertida) / 2, 2);
-
-        // EJE 2: PROPÓSITO E RELAÇÕES
-        $deCi = isset($dimensoes['DECI']['normalizada']) ? $dimensoes['DECI']['normalizada'] : 0;
-        $faPs = isset($dimensoes['FAPS']['normalizada']) ? $dimensoes['FAPS']['normalizada'] : 0;
-        $faPsInvertida = 100 - $faPs;
-        $eixo2 = round(($deCi + $faPsInvertida) / 2, 2);
-
-        // EJE 3: SUSTENTABILIDADE OCUPACIONAL
-        $exTr = isset($dimensoes['EXTR']['normalizada']) ? $dimensoes['EXTR']['normalizada'] : 0;
-        $asMo = isset($dimensoes['ASMO']['normalizada']) ? $dimensoes['ASMO']['normalizada'] : 0;
-        $asMoInvertida = 100 - $asMo;
-        $eixo3 = round(($exTr + $asMoInvertida) / 2, 2);
-
-        // IID
-        $iid = round(($eixo1 + $eixo2 + $eixo3) / 3, 2);
-        $nivelRisco = $this->clasificarRiscoIID($iid);
-
-        return [
-            'eixo1' => [
-                'nome' => 'Energia Emocional',
-                'valor' => $eixo1,
-                'faixa' => $this->obtenerFaixaNormalizada($eixo1),
-                'dimensoes' => [
-                    'exaustao_emocional' => $exEm,
-                    'realizacao_profissional' => $rePrInvertida,
-                ]
-            ],
-            'eixo2' => [
-                'nome' => 'Propósito e Relações',
-                'valor' => $eixo2,
-                'faixa' => $this->obtenerFaixaNormalizada($eixo2),
-                'dimensoes' => [
-                    'despersonalizacao_cinismo' => $deCi,
-                    'fatores_psicossociais' => $faPsInvertida,
-                ]
-            ],
-            'eixo3' => [
-                'nome' => 'Sustentabilidade Ocupacional',
-                'valor' => $eixo3,
-                'faixa' => $this->obtenerFaixaNormalizada($eixo3),
-                'dimensoes' => [
-                    'excesso_trabalho' => $exTr,
-                    'assedio_moral' => $asMoInvertida,
-                ]
-            ],
-            'iid' => [
-                'valor' => $iid,
-                'nivel_risco' => $nivelRisco['nivel'],
-                'zona' => $nivelRisco['zona'],
-                'descricao' => $nivelRisco['descricao'],
-                'interpretacao' => $nivelRisco['interpretacao'],
-                'acao' => $nivelRisco['acao'],
-            ]
-        ];
-    }
-
-    /**
-     * Clasifica el riesgo según el IID
-     */
-    private function clasificarRiscoIID($iid): array
-    {
-        if ($iid <= 40) {
-            return [
-                'nivel' => 'Baixo',
-                'zona' => 'Zona de equilíbrio emocional',
-                'descricao' => 'O participante demonstra autorregulação e boa adaptação ao ambiente.',
-                'interpretacao' => 'Capacidade emocional adequada para lidar com desafios e mudanças.',
-                'acao' => 'Manter hábitos saudáveis, pausas regulares e comunicação transparente.',
-            ];
-        } elseif ($iid <= 65) {
-            return [
-                'nivel' => 'Médio',
-                'zona' => 'Zona de atenção preventiva',
-                'descricao' => 'Pequenas oscilações de energia e propósito, mas ainda sem impacto funcional.',
-                'interpretacao' => 'Pode haver início de fadiga ou leve desconexão emocional.',
-                'acao' => 'Reequilibrar rotinas e priorizar autocuidado. Conversar sobre sobrecarga antes que se intensifique.',
-            ];
-        } elseif ($iid <= 89) {
-            return [
-                'nivel' => 'Atenção',
-                'zona' => 'Zona de vulnerabilidade',
-                'descricao' => 'Sinais de esgotamento, desânimo ou desconforto relacional já perceptíveis.',
-                'interpretacao' => 'Indica acúmulo de estresse e risco de perda de engajamento.',
-                'acao' => 'Acionar estratégias de suporte (RH, liderança, coaching). Evitar manter o mesmo ritmo.',
-            ];
-        } else {
-            return [
-                'nivel' => 'Alto',
-                'zona' => 'Zona crítica',
-                'descricao' => 'O equilíbrio emocional e ocupacional foi comprometido. Alto risco de burnout ou afastamento.',
-                'interpretacao' => 'Indica exaustão, sensação de impotência e isolamento emocional.',
-                'acao' => 'Intervenção imediata. Pausa, revisão de carga e suporte psicológico recomendado.',
-            ];
-        }
-    }
-
-    /**
-     * Obtiene la interpretación detallada de un eje según las combinaciones
-     */
-    private function obtenerInterpretacaoEixo($eixo, $dimensoes, $pontuacoes): array
-    {
-        try {
-            if ($eixo == 1) {
-                $exEmPonto = collect($pontuacoes)->firstWhere('tag', 'EXEM');
-                $rePrPonto = collect($pontuacoes)->firstWhere('tag', 'REPR');
-                $exEmOriginal = ($exEmPonto && isset($exEmPonto['normalizada'])) ? $exEmPonto['normalizada'] : 0;
-                $rePrOriginal = ($rePrPonto && isset($rePrPonto['normalizada'])) ? $rePrPonto['normalizada'] : 0;
-                $exaustaoFaixa = $this->obtenerFaixaNormalizada($exEmOriginal);
-                $realizacaoFaixa = $this->obtenerFaixaNormalizada($rePrOriginal);
-                return $this->interpretarEixo1($exaustaoFaixa, $realizacaoFaixa);
-            } elseif ($eixo == 2) {
-                $deCiPonto = collect($pontuacoes)->firstWhere('tag', 'DECI');
-                $faPsPonto = collect($pontuacoes)->firstWhere('tag', 'FAPS');
-                $deCiOriginal = ($deCiPonto && isset($deCiPonto['normalizada'])) ? $deCiPonto['normalizada'] : 0;
-                $faPsOriginal = ($faPsPonto && isset($faPsPonto['normalizada'])) ? $faPsPonto['normalizada'] : 0;
-                $cinismoFaixa = $this->obtenerFaixaNormalizada($deCiOriginal);
-                $fatoresFaixa = $this->obtenerFaixaNormalizada($faPsOriginal);
-                return $this->interpretarEixo2($cinismoFaixa, $fatoresFaixa);
-            } else {
-                $exTrPonto = collect($pontuacoes)->firstWhere('tag', 'EXTR');
-                $asMoPonto = collect($pontuacoes)->firstWhere('tag', 'ASMO');
-                $exTrOriginal = ($exTrPonto && isset($exTrPonto['normalizada'])) ? $exTrPonto['normalizada'] : 0;
-                $asMoOriginal = ($asMoPonto && isset($asMoPonto['normalizada'])) ? $asMoPonto['normalizada'] : 0;
-                $excessoFaixa = $this->obtenerFaixaNormalizada($exTrOriginal);
-                $assedioFaixa = $this->obtenerFaixaNormalizada($asMoOriginal);
-                return $this->interpretarEixo3($excessoFaixa, $assedioFaixa);
-            }
-        } catch (\Exception $e) {
-            \Log::error('Error obteniendo interpretación de eje: ' . $e->getMessage());
-            return ['interpretacao' => 'Estado de Equilíbrio', 'significado' => 'Equilíbrio entre as dimensões avaliadas.', 'orientacao' => 'Continue mantendo práticas saudáveis.'];
-        }
-    }
-
-    private function interpretarEixo1($exaustaoFaixa, $realizacaoFaixa): array
-    {
-        $interpretacoes = [
-            'Exaustão Alta / Realização Baixa' => ['interpretacao' => '⚠️ Estado Crítico', 'significado' => 'Alto risco de esgotamento. A sensação de impotência e perda de propósito indica necessidade de pausa e apoio.', 'orientacao' => 'Reduza o ritmo, priorize descanso, converse com sua liderança e reflita sobre o que dá sentido ao seu trabalho.'],
-            'Exaustão Alta / Realização Moderada' => ['interpretacao' => 'Estado de Esforço Contínuo', 'significado' => 'Há sobrecarga, mas o propósito ainda motiva. O risco é ultrapassar o limite sem perceber.', 'orientacao' => 'Preserve seus espaços de recuperação e delegue tarefas. Sustente a motivação sem comprometer a saúde.'],
-            'Exaustão Alta / Realização Alta' => ['interpretacao' => 'Engajamento em Excesso', 'significado' => 'Energia e propósito coexistem, mas o corpo pode estar pagando o preço.', 'orientacao' => 'Valorize pausas, reconheça sinais de fadiga e equilibre ambição com autocuidado.'],
-            'Exaustão Moderada / Realização Alta' => ['interpretacao' => 'Equilíbrio Dinâmico', 'significado' => 'Boa realização com cansaço controlado. Indica produtividade saudável.', 'orientacao' => 'Mantenha rituais de descanso e reconheça conquistas. Esse é um ponto ótimo.'],
-            'Exaustão Moderada / Realização Baixa' => ['interpretacao' => 'Desânimo Progressivo', 'significado' => 'Esforço emocional sem retorno de propósito. Pode evoluir para desmotivação.', 'orientacao' => 'Busque feedbacks e alinhe expectativas. Reencontre significado nas atividades.'],
-            'Exaustão Moderada / Realização Moderada' => ['interpretacao' => 'Estado de Manutenção', 'significado' => 'Equilíbrio funcional. Nem sobrecarregado, nem entediado.', 'orientacao' => 'Continue cuidando do ritmo e do engajamento. Práticas de gratidão ajudam a fortalecer esse equilíbrio.'],
-            'Exaustão Baixa / Realização Alta' => ['interpretacao' => '💚 Zona de Vitalidade', 'significado' => 'Estado ideal. Boa energia e satisfação no trabalho.', 'orientacao' => 'Continue praticando hábitos saudáveis, compartilhando boas práticas e inspirando colegas.'],
-            'Exaustão Baixa / Realização Moderada' => ['interpretacao' => 'Tranquilidade Operacional', 'significado' => 'Rotina estável, mas com espaço para mais propósito.', 'orientacao' => 'Defina novos desafios e metas inspiradoras.'],
-            'Exaustão Baixa / Realização Baixa' => ['interpretacao' => 'Apatia Emocional', 'significado' => 'Baixo estresse, mas também baixo envolvimento. Indica tédio ou falta de desafio.', 'orientacao' => 'Reavalie seus objetivos e busque oportunidades que reativem seu entusiasmo.'],
-        ];
-        $chave = "Exaustão {$exaustaoFaixa} / Realização {$realizacaoFaixa}";
-        return $interpretacoes[$chave] ?? ['interpretacao' => 'Estado de Equilíbrio', 'significado' => 'Equilíbrio entre as dimensões avaliadas.', 'orientacao' => 'Continue mantendo práticas saudáveis.'];
-    }
-
-    private function interpretarEixo2($cinismoFaixa, $fatoresFaixa): array
-    {
-        $interpretacoes = [
-            'Cinismo Alto / Fatores Baixos' => ['interpretacao' => '⚠️ Isolamento e Desconfiança', 'significado' => 'Indica desgaste relacional e perda de vínculo com o ambiente. Pode haver sensação de injustiça ou frieza no time.', 'orientacao' => 'Reabra canais de diálogo. Se possível, busque apoio em pessoas de confiança e em práticas colaborativas.'],
-            'Cinismo Alto / Fatores Moderados' => ['interpretacao' => 'Proteção Emocional', 'significado' => 'Tentativa de se proteger de tensões. O ambiente oferece algum suporte, mas há barreiras emocionais.', 'orientacao' => 'Trabalhe a empatia e reforce vínculos leves e sinceros.'],
-            'Cinismo Alto / Fatores Altos' => ['interpretacao' => 'Cansaço Relacional', 'significado' => 'O ambiente é bom, mas há esgotamento pessoal. O cinismo pode vir de excesso de exposição ou idealismo frustrado.', 'orientacao' => 'Tire pausas de interação, sem se isolar. Retome o propósito em pequenas vitórias.'],
-            'Cinismo Moderado / Fatores Altos' => ['interpretacao' => 'Conexão Consciente', 'significado' => 'Relacionamento saudável com limites claros.', 'orientacao' => 'Mantenha equilíbrio e evite absorver tensões alheias.'],
-            'Cinismo Moderado / Fatores Moderados' => ['interpretacao' => 'Relações Neutras', 'significado' => 'Conexões estáveis, porém pouco afetivas.', 'orientacao' => 'Estimule momentos de reconhecimento e humanização nas relações.'],
-            'Cinismo Moderado / Fatores Baixos' => ['interpretacao' => 'Desencanto', 'significado' => 'Sensação de distância emocional e falta de suporte.', 'orientacao' => 'Invista em comunicação e peça clareza sobre expectativas.'],
-            'Cinismo Baixo / Fatores Altos' => ['interpretacao' => '💚 Pertencimento Saudável', 'significado' => 'Relações de confiança, empatia e apoio mútuo.', 'orientacao' => 'Continue nutrindo o ambiente com colaboração e reconhecimento.'],
-            'Cinismo Baixo / Fatores Moderados' => ['interpretacao' => 'Equilíbrio Social', 'significado' => 'Boa convivência, ainda que nem sempre profunda.', 'orientacao' => 'Cultive pequenas atitudes de escuta e feedbacks positivos.'],
-            'Cinismo Baixo / Fatores Baixos' => ['interpretacao' => 'Engajamento Solitário', 'significado' => 'Você se mantém aberto e positivo mesmo em contextos frios.', 'orientacao' => 'Proteja sua energia e incentive práticas coletivas de cooperação.'],
-        ];
-        $chave = "Cinismo {$cinismoFaixa} / Fatores {$fatoresFaixa}";
-        return $interpretacoes[$chave] ?? ['interpretacao' => 'Relações Estáveis', 'significado' => 'Relações profissionais equilibradas.', 'orientacao' => 'Continue mantendo comunicação clara e respeitosa.'];
-    }
-
-    private function interpretarEixo3($excessoFaixa, $assedioFaixa): array
-    {
-        $interpretacoes = [
-            'Excesso Alto / Assédio Alto' => ['interpretacao' => '⚠️ Risco Crítico', 'significado' => 'Indica ambiente tóxico, com sobrecarga e desrespeito. Altíssimo risco psicossocial.', 'orientacao' => 'Acione canais formais de apoio. Nenhum resultado justifica adoecimento.'],
-            'Excesso Alto / Assédio Moderado' => ['interpretacao' => 'Sobrecarga Controlada', 'significado' => 'Alta pressão, mas ainda com algum nível de segurança emocional.', 'orientacao' => 'Converse com a liderança sobre prazos e prioridades. Pratique pausas regenerativas.'],
-            'Excesso Alto / Assédio Baixo' => ['interpretacao' => 'Dedicação Intensa', 'significado' => 'Carga alta em ambiente respeitoso. O risco é o corpo não acompanhar o ritmo.', 'orientacao' => 'Estabeleça limites de jornada e celebre pausas.'],
-            'Excesso Moderado / Assédio Alto' => ['interpretacao' => 'Ambiente Desgastante', 'significado' => 'As demandas são gerenciáveis, mas o clima é hostil ou tenso.', 'orientacao' => 'Busque apoio institucional. Priorize relações seguras e comunicação assertiva.'],
-            'Excesso Moderado / Assédio Moderado' => ['interpretacao' => 'Zona de Atenção', 'significado' => 'Indica ambiente exigente, com riscos pontuais de tensão.', 'orientacao' => 'Monitore sinais de estresse e pratique pausas semanais.'],
-            'Excesso Moderado / Assédio Baixo' => ['interpretacao' => '💚 Sustentabilidade Saudável', 'significado' => 'Boa produtividade com respeito mútuo.', 'orientacao' => 'Mantenha práticas saudáveis e incentive o mesmo no grupo.'],
-            'Excesso Baixo / Assédio Alto' => ['interpretacao' => 'Ambiente Inseguro', 'significado' => 'Baixa demanda, mas clima emocional ruim. O problema está nas relações, não na carga.', 'orientacao' => 'Não se isole. Procure espaços seguros e promova conversas francas.'],
-            'Excesso Baixo / Assédio Moderado' => ['interpretacao' => 'Cautela Social', 'significado' => 'Carga leve, mas interações sensíveis.', 'orientacao' => 'Mantenha postura empática e evite conflitos desnecessários.'],
-            'Excesso Baixo / Assédio Baixo' => ['interpretacao' => 'Zona de Bem-Estar', 'significado' => 'Ambiente saudável, equilibrado e ético.', 'orientacao' => 'Valorize e proteja esse equilíbrio. Compartilhe práticas positivas.'],
-        ];
-        $chave = "Excesso {$excessoFaixa} / Assédio {$assedioFaixa}";
-        return $interpretacoes[$chave] ?? ['interpretacao' => 'Sustentabilidade Equilibrada', 'significado' => 'Equilíbrio entre esforço e suporte.', 'orientacao' => 'Continue mantendo práticas saudáveis.'];
-    }
-
-    /**
-     * Prepara los datos del reporte en formato JSON simplificado para enviar a la API de Python
-     */
-    private function prepararDatosParaRelatorio($userId, $formularioId): array
-    {
-        $user = User::find($userId);
-        $formulario = Formulario::with('perguntas')->findOrFail($formularioId);
-        
-        // Obtener respuestas del usuario
-        $respostasUsuario = Resposta::where('user_id', $userId)
-            ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
-            ->get();
-        
-        // Obtener variables con sus límites
-        $variaveis = Variavel::with('perguntas')
-            ->where('formulario_id', $formularioId)
-            ->get();
-        
-        // Calcular puntuaciones y organizar por secciones para la API de Python
-        $sections = [];
-        foreach ($variaveis as $variavel) {
-            $pontuacao = 0;
-            foreach ($variavel->perguntas as $pergunta) {
-                $resposta = $respostasUsuario->firstWhere('pergunta_id', $pergunta->id);
-                if ($resposta) {
-                    $pontuacao += $resposta->valor_resposta ?? 0;
-                }
-            }
-            $faixa = $this->classificarPontuacao($pontuacao, $variavel);
-            
-            // Determinar recomendación según la faixa
-            $recomendacao = '';
-            switch ($faixa) {
-                case 'Baixa':
-                    $recomendacao = $variavel->r_baixa ?? '';
-                    break;
-                case 'Moderada':
-                    $recomendacao = $variavel->r_moderada ?? '';
-                    break;
-                case 'Alta':
-                    $recomendacao = $variavel->r_alta ?? '';
-                    break;
-            }
-            
-            // Construir el body de la sección con información detallada
-            $body = "<h4>{$variavel->nome} ({$variavel->tag})</h4>";
-            $body .= "<p><strong>Puntuación:</strong> {$pontuacao} puntos</p>";
-            $body .= "<p><strong>Clasificación:</strong> <span class='badge badge-" . ($faixa == 'Baixa' ? 'info' : ($faixa == 'Moderada' ? 'warning' : 'danger')) . "'>{$faixa}</span></p>";
-            $body .= "<p><strong>Límites:</strong> Baixa (≤{$variavel->B}), Moderada (≤{$variavel->M}), Alta (>{$variavel->M})</p>";
-            if ($recomendacao) {
-                $body .= "<div class='mt-3'><strong>Recomendación:</strong><br><p>{$recomendacao}</p></div>";
-            }
-            
-            $sections[] = [
-                'title' => $variavel->nome . " ({$variavel->tag})",
-                'body' => $body
-            ];
-        }
-        
-        // Formato compatible con la API de Python de generación de documentos
-        return [
-            'template_id' => str_pad($formularioId, 3, '0', STR_PAD_LEFT), // Template ID basado en el ID del formulario (001, 002, etc.)
-            'data' => [
-                'header' => [
-                    'title' => $formulario->nome . ' - ' . $formulario->label
-                ],
-                'welcome_screen' => [
-                    'title' => 'Bienvenido, ' . $user->name,
-                    'body' => '<p>Este es tu reporte personalizado del formulario <strong>' . $formulario->nome . '</strong>.</p><p>Fecha de generación: ' . now()->format('d/m/Y H:i') . '</p>',
-                    'show_btn' => false,
-                    'text_btn' => '',
-                    'link_btn' => ''
-                ],
-                'explanation_screen' => [
-                    'title' => 'Sobre este Reporte',
-                    'body' => $formulario->descricao ?? '<p>Este reporte presenta el análisis de las dimensiones evaluadas.</p>',
-                    'show_img' => false,
-                    'img_link' => ''
-                ],
-                'respuestas' => [
-                    'sections' => $sections
-                ]
-            ],
-            'output_format' => 'both' // Genera tanto HTML como PDF
-        ];
-    }
-
-    /**
-     * Envía los datos del reporte a la API de Python
-     * Retorna array con ['success' => bool, 'error' => string|null, 'datos' => array|null]
-     */
-    private function enviarDatosAPython($datos): array
-    {
-        $apiUrl = env('PYTHON_RELATORIO_API_URL', 'http://localhost:5000/generate');
-        
-        try {
-            // Log del payload que se va a enviar
-            \Log::info('Enviando datos a la API de Python', [
-                'url' => $apiUrl,
-                'payload' => $datos
-            ]);
-            
-            // Enviar como JSON con headers correctos
-            $response = Http::timeout(30)
-                ->acceptJson()
-                ->withHeaders([
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json'
-                ])
-                ->post($apiUrl, $datos);
-            
-            if ($response->successful()) {
-                \Log::info('Datos enviados exitosamente a la API de Python', [
-                    'template_id' => $datos['template_id'] ?? 'N/A',
-                    'response' => $response->json()
-                ]);
-                return ['success' => true, 'error' => null, 'datos' => null];
-            } else {
-                $error = "Error HTTP {$response->status()}: " . $response->body();
-                \Log::error('Error al enviar datos a la API de Python', [
-                    'status' => $response->status(),
-                    'response' => $response->body(),
-                    'payload_enviado' => $datos
-                ]);
-                return [
-                    'success' => false,
-                    'error' => $error,
-                    'datos' => $datos
-                ];
-            }
-        } catch (\Exception $e) {
-            $error = "Excepción: " . $e->getMessage();
-            \Log::error('Excepción al enviar datos a la API de Python', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'payload_intentado' => $datos
-            ]);
-            return [
-                'success' => false,
-                'error' => $error,
-                'datos' => $datos
-            ];
-        }
-    }
-
-    /**
-     * Genera el relatorio vía API de Python
-     * Endpoint público para ser llamado desde el frontend
-     */
-    public function generarRelatorioAPI(Request $request)
-    {
-        $request->validate([
-            'formulario_id' => 'required|integer|exists:formularios,id',
-            'usuario_id' => 'required|integer|exists:users,id',
+        $validated = $request->validate([
+            'formulario_id' => ['required', 'integer', 'exists:formularios,id'],
+            'usuario_id' => ['required', 'integer', 'exists:users,id'],
         ]);
 
-        $userId = $request->input('usuario_id');
-        $formularioId = $request->input('formulario_id');
+        $formularioId = $validated['formulario_id'];
+        $usuarioId = $validated['usuario_id'];
 
-        // Verificar que el usuario tiene permiso (solo puede generar su propio relatorio o ser admin)
-        if (Auth::id() != $userId && !Auth::user()->admin) {
-            return response()->json([
-                'success' => false,
-                'error' => 'No tienes permiso para generar este relatorio.'
-            ], 403);
-        }
-
-        try {
-            // Preparar datos para la API
-            $datosRelatorio = $this->prepararDatosParaRelatorio($userId, $formularioId);
-            
-            // Log para debug
-            \Log::info('Datos preparados para la API de Python', [
-                'user_id' => $userId,
-                'formulario_id' => $formularioId,
-                'datos_preparados' => $datosRelatorio
-            ]);
-            
-            // Enviar a la API de Python
-            $resultado = $this->enviarDatosAPython($datosRelatorio);
-            
-            if ($resultado['success']) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Relatorio generado exitosamente vía API de Python.',
-                    'data' => null
-                ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'error' => $resultado['error'],
-                    'data' => $resultado['datos']
-                ], 500);
-            }
-        } catch (\Exception $e) {
-            \Log::error('Error al generar relatorio vía API', [
-                'user_id' => $userId,
-                'formulario_id' => $formularioId,
-                'error' => $e->getMessage(),
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'error' => 'Error al generar relatorio: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function finalizar(Request $request)
-    {
-        $userId = Auth::user()->id;
-        $formularioId = $request->input('f_formulario_id') ?? $request->input('formulario_id');
-        
-        if (!$formularioId) {
-            return redirect()->back()->with('msgError', 'Formulário não identificado.');
-        }
-
-        // Verificar se todas as perguntas foram respondidas
         $formulario = Formulario::with('perguntas')->findOrFail($formularioId);
         $totalPerguntas = $formulario->perguntas->count();
         
-        $respostasUsuario = Resposta::where('user_id', $userId)
-            ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
+        $perguntasIds = $formulario->perguntas->pluck('id')->toArray();
+
+        $respostasUsuario = Resposta::where('user_id', $usuarioId)
+            ->whereIn('pergunta_id', $perguntasIds)
+            ->whereNotNull('valor_resposta')
             ->get()
             ->keyBy('pergunta_id');
+
+        $todasRespondidas = true;
+        $perguntasSemResposta = [];
         
-        $respondidas = $respostasUsuario->count();
-        
-        // Atualizar status do formulario
-        $usuarioFormulario = UsuarioFormulario::where('usuario_id', $userId)
+        foreach ($formulario->perguntas as $pergunta) {
+            if (!isset($respostasUsuario[$pergunta->id]) || $respostasUsuario[$pergunta->id]->valor_resposta === null) {
+                $todasRespondidas = false;
+                $perguntasSemResposta[] = $pergunta->numero_da_pergunta ?? $pergunta->id;
+            }
+        }
+
+        $usuarioFormulario = UsuarioFormulario::where('usuario_id', $usuarioId)
             ->where('formulario_id', $formularioId)
             ->first();
-        
+
         if (!$usuarioFormulario) {
-            return redirect()->back()->with('msgError', 'Formulário não encontrado.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Formulário não encontrado para este usuário.'
+            ], 404);
         }
-        
-        // Marcar como completo
-        $usuarioFormulario->status = 'completo';
-        $usuarioFormulario->save();
-        
-        // Generar JSON simplificado y enviar a la API de Python
-        try {
-            $datosRelatorio = $this->prepararDatosParaRelatorio($userId, $formularioId);
-            $resultado = $this->enviarDadosAPython($datosRelatorio);
+
+        $statusAnterior = $usuarioFormulario->status;
+        $respondidas = $respostasUsuario->count();
+
+        if ($todasRespondidas && $totalPerguntas > 0 && $respondidas == $totalPerguntas) {
+            $usuarioFormulario->status = 'completo';
+            $usuarioFormulario->save();
             
-            // Si hay error, guardar los datos en la sesión para mostrar en el modal
-            if (!$resultado['success']) {
-                session()->flash('pythonApiError', true);
-                session()->flash('pythonApiErrorData', json_encode($resultado['datos'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                session()->flash('pythonApiErrorMessage', $resultado['error']);
-            }
-        } catch (\Exception $e) {
-            // Log del error pero no interrumpir el flujo
-            \Log::error('Error al preparar/enviar datos a la API de Python', [
-                'user_id' => $userId,
-                'formulario_id' => $formularioId,
-                'error' => $e->getMessage(),
+            return response()->json([
+                'success' => true,
+                'message' => 'Status atualizado para "completo".',
+                'status_anterior' => $statusAnterior,
+                'status_atual' => 'completo',
+                'total_perguntas' => $totalPerguntas,
+                'respostas_encontradas' => $respondidas
             ]);
-            
-            // Guardar error en sesión para mostrar en modal
-            session()->flash('pythonApiError', true);
-            session()->flash('pythonApiErrorMessage', 'Error al preparar datos: ' . $e->getMessage());
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Formulário não está completo.',
+                'status_atual' => $statusAnterior,
+                'total_perguntas' => $totalPerguntas,
+                'respostas_encontradas' => $respondidas,
+                'perguntas_sem_resposta' => $perguntasSemResposta,
+                'faltam' => $totalPerguntas - $respondidas
+            ]);
         }
-        
-        // Tentar gerar analise automaticamente (se não existir)
-        $analise = Analise::where('user_id', $userId)
-            ->where('formulario_id', $formularioId)
-            ->first();
-        
-        if (!$analise) {
-            // Gerar analise em background (puede tardar)
-            try {
-                $user = User::find($userId);
-                $variaveis = Variavel::with('perguntas')
-                    ->where('formulario_id', $formularioId)
-                    ->get();
-                
-                $pontuacoes = [];
-                foreach ($variaveis as $variavel) {
-                    $pontuacao = 0;
-                    foreach ($variavel->perguntas as $pergunta) {
-                        $resposta = $respostasUsuario->get($pergunta->id);
-                        if ($resposta) {
-                            $pontuacao += $resposta->valor_resposta ?? 0;
-                        }
-                    }
-                    $faixa = $this->classificarPontuacao($pontuacao, $variavel);
-                    $pontuacoes[] = [
-                        'tag' => strtoupper($variavel->tag),
-                        'valor' => $pontuacao,
-                        'faixa' => $faixa,
-                    ];
-                }
-                
-                $prompt = $this->gerarPrompt($user, $variaveis, $pontuacoes);
-                $analiseTexto = $this->gerarAnaliseViaOpenAI($prompt);
-                
-                if ($analiseTexto && !str_contains($analiseTexto, 'Erro')) {
-                    Analise::create([
-                        'user_id' => $userId,
-                        'formulario_id' => $formularioId,
-                        'texto' => $analiseTexto,
-                    ]);
-                }
-            } catch (\Exception $e) {
-                // Si falla, la analise se generará cuando acceda al relatorio
-                \Log::error('Error generando analise: ' . $e->getMessage());
-            }
-        }
-        
-        // Redirigir al relatorio
-        return redirect()->route('relatorio.show', [
-            'formulario_id' => $formularioId,
-            'usuario_id' => $userId,
-        ])->with('msgSuccess', 'Formulário finalizado com sucesso!');
     }
 
 }

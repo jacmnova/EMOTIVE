@@ -52,7 +52,7 @@ Route::get('/faqs', function () {
 
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
+Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 
 // GESTAO
@@ -114,10 +114,9 @@ Route::post('/respostas/salvar', [DadosController::class, 'salvarRespostas'])->n
 
 Route::post('/usuario-formulario/finalizar', [DadosController::class, 'finalizar'])->name('usuarioFormulario.finalizar');
 
-Route::post('/relatorio/generar-api', [DadosController::class, 'generarRelatorioAPI'])->name('relatorio.generar.api')->middleware('auth');
-
 
 Route::get('/meurelatorio/show', [DadosController::class, 'relatorioShow'])->name('relatorio.show');
+Route::post('/formulario/verificar-status', [DadosController::class, 'verificarStatusFormulario'])->name('formulario.verificar-status');
 
 
 Route::get('/variaveis/formulario/{id}', [VariavelController::class, 'getPorFormulario']);
@@ -127,7 +126,6 @@ Route::resource('calculos', CalculosController::class);
 
 
 Route::get('/relatorio/pdf', [RelatorioController::class, 'gerarPDF'])->name('relatorio.pdf');
-Route::get('/relatorio/html', [RelatorioController::class, 'mostrarHTML'])->name('relatorio.html');
 
 
 Route::get('/dashadmin', [DashboardController::class, 'index'])->name('dashboard.admin');

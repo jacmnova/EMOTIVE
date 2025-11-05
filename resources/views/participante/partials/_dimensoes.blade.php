@@ -14,11 +14,9 @@
                     @foreach($variaveis as $registro)
                         @php
                             $pontuacao = null;
-                            $pontuacaoNormalizada = null;
                             foreach($pontuacoes as $pontos) {
                                 if (mb_strtoupper($registro->tag, 'UTF-8') === $pontos['tag']) {
                                     $pontuacao = $pontos['valor'];
-                                    $pontuacaoNormalizada = $pontos['normalizada'] ?? null;
                                     break;
                                 }
                             }
@@ -50,10 +48,7 @@
                                 <div class="small">{{ $registro->nome }}</div>
                             </td>
                             <td style="min-width: 100px; text-align: center;">
-                                <label class="badge badge-dark">{{ $pontuacao ?? '–' }} pts</label>
-                                @if($pontuacaoNormalizada)
-                                    <br><small class="text-muted">({{ round($pontuacaoNormalizada) }}/100)</small>
-                                @endif
+                                <label class="badge badge-dark">{{ $pontuacao ?? '–' }} pontos</label>
                             </td>
                             <td>
                                 @if($tipo)
@@ -75,11 +70,9 @@
             @foreach($variaveis as $registro)
                 @php
                     $pontuacao = null;
-                    $pontuacaoNormalizada = null;
                     foreach($pontuacoes as $pontos) {
                         if (mb_strtoupper($registro->tag, 'UTF-8') === $pontos['tag']) {
                             $pontuacao = $pontos['valor'];
-                            $pontuacaoNormalizada = $pontos['normalizada'] ?? null;
                             break;
                         }
                     }
@@ -111,10 +104,7 @@
                         {{ $registro->nome }}
                     </h5>
                     <p class="mb-1">
-                        <label class="badge badge-dark">{{ $pontuacao ?? '–' }} pts</label>
-                        @if($pontuacaoNormalizada)
-                            <br><small class="text-muted">({{ round($pontuacaoNormalizada) }}/100)</small>
-                        @endif
+                        <label class="badge badge-dark">{{ $pontuacao ?? '–' }} pontos</label>
                     </p>
                     <p class="mb-1">
                         @if($tipo)

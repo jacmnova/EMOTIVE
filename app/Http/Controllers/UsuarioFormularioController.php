@@ -125,10 +125,21 @@ class UsuarioFormularioController extends Controller
     public function marcarAssistido(Request $request, $id)
     {
         $registro = UsuarioFormulario::findOrFail($id);
+        
+        // Verificar se o usuário tem permissão (é o dono do formulário ou admin)
+        if (!auth()->check()) {
+            return response()->json(['success' => false, 'message' => 'Não autorizado'], 401);
+        }
+
+        $user = auth()->user();
+        if ($registro->usuario_id != $user->id && !$user->admin) {
+            return response()->json(['success' => false, 'message' => 'Não autorizado'], 403);
+        }
+
         $registro->video_assistido = true;
         $registro->save();
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'message' => 'Vídeo marcado como assistido']);
     }
 
 
