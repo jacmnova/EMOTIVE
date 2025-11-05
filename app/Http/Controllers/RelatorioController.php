@@ -28,10 +28,168 @@ class RelatorioController extends Controller
             ->where('formulario_id', $request->formulario_id)
             ->delete();
 
+        // Regenerar y enviar a la API de Python con la nueva estructura
+        try {
+            $dadosController = new \App\Http\Controllers\DadosController();
+            $datosRelatorio = $this->prepararDadosParaRelatorio($request->usuario_id, $request->formulario_id);
+            $resultado = $this->enviarDatosAPython($datosRelatorio);
+            
+            if (!$resultado['success']) {
+                session()->flash('pythonApiError', true);
+                session()->flash('pythonApiErrorData', json_encode($resultado['datos'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                session()->flash('pythonApiErrorMessage', $resultado['error']);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error al regenerar y enviar a la API de Python', [
+                'user_id' => $request->usuario_id,
+                'formulario_id' => $request->formulario_id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         return redirect()->route('relatorio.show', [
             'formulario_id' => $request->formulario_id,
             'usuario_id' => $request->usuario_id,
         ])->with('msgSuccess', 'Análise regenerada com sucesso.');
+    }
+
+    /**
+     * Prepara los datos del reporte en formato compatible con la API de Python
+     * (Mismo método que en DadosController para mantener consistencia)
+     */
+    private function prepararDadosParaRelatorio($userId, $formularioId): array
+    {
+        $user = User::find($userId);
+        $formulario = Formulario::with('perguntas')->findOrFail($formularioId);
+        
+        // Obtener respuestas del usuario
+        $respostasUsuario = Resposta::where('user_id', $userId)
+            ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
+            ->get();
+        
+        // Obtener variables con sus límites
+        $variaveis = Variavel::with('perguntas')
+            ->where('formulario_id', $formularioId)
+            ->get();
+        
+        // Calcular puntuaciones y organizar por secciones
+        $sections = [];
+        foreach ($variaveis as $variavel) {
+            $pontuacao = 0;
+            foreach ($variavel->perguntas as $pergunta) {
+                $resposta = $respostasUsuario->firstWhere('pergunta_id', $pergunta->id);
+                if ($resposta) {
+                    $pontuacao += $resposta->valor_resposta ?? 0;
+                }
+            }
+            
+            // Clasificar faixa
+            $faixa = 'Baixa';
+            if ($pontuacao <= $variavel->B) {
+                $faixa = 'Baixa';
+            } elseif ($pontuacao <= $variavel->M) {
+                $faixa = 'Moderada';
+            } else {
+                $faixa = 'Alta';
+            }
+            
+            // Determinar recomendación según la faixa
+            $recomendacao = '';
+            switch ($faixa) {
+                case 'Baixa':
+                    $recomendacao = $variavel->r_baixa ?? '';
+                    break;
+                case 'Moderada':
+                    $recomendacao = $variavel->r_moderada ?? '';
+                    break;
+                case 'Alta':
+                    $recomendacao = $variavel->r_alta ?? '';
+                    break;
+            }
+            
+            // Construir el body de la sección
+            $body = "<h4>{$variavel->nome} ({$variavel->tag})</h4>";
+            $body .= "<p><strong>Puntuación:</strong> {$pontuacao} puntos</p>";
+            $body .= "<p><strong>Clasificación:</strong> <span class='badge badge-" . ($faixa == 'Baixa' ? 'info' : ($faixa == 'Moderada' ? 'warning' : 'danger')) . "'>{$faixa}</span></p>";
+            $body .= "<p><strong>Límites:</strong> Baixa (≤{$variavel->B}), Moderada (≤{$variavel->M}), Alta (>{$variavel->M})</p>";
+            if ($recomendacao) {
+                $body .= "<div class='mt-3'><strong>Recomendación:</strong><br><p>{$recomendacao}</p></div>";
+            }
+            
+            $sections[] = [
+                'title' => $variavel->nome . " ({$variavel->tag})",
+                'body' => $body
+            ];
+        }
+        
+        // Formato compatible con la API de Python
+        return [
+            'template_id' => str_pad($formularioId, 3, '0', STR_PAD_LEFT),
+            'data' => [
+                'header' => [
+                    'title' => $formulario->nome . ' - ' . $formulario->label
+                ],
+                'welcome_screen' => [
+                    'title' => 'Bienvenido, ' . $user->name,
+                    'body' => '<p>Este es tu reporte personalizado del formulario <strong>' . $formulario->nome . '</strong>.</p><p>Fecha de generación: ' . now()->format('d/m/Y H:i') . '</p>',
+                    'show_btn' => false,
+                    'text_btn' => '',
+                    'link_btn' => ''
+                ],
+                'explanation_screen' => [
+                    'title' => 'Sobre este Reporte',
+                    'body' => $formulario->descricao ?? '<p>Este reporte presenta el análisis de las dimensiones evaluadas.</p>',
+                    'show_img' => false,
+                    'img_link' => ''
+                ],
+                'respuestas' => [
+                    'sections' => $sections
+                ]
+            ],
+            'output_format' => 'both'
+        ];
+    }
+
+    /**
+     * Envía los datos del reporte a la API de Python
+     */
+    private function enviarDatosAPython($datos): array
+    {
+        $apiUrl = env('PYTHON_RELATORIO_API_URL', 'http://localhost:5000/generate');
+        
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(30)
+                ->post($apiUrl, $datos);
+            
+            if ($response->successful()) {
+                \Log::info('Datos enviados exitosamente a la API de Python (regeneración)', [
+                    'usuario_id' => $datos['data']['welcome_screen']['title'],
+                    'formulario_id' => $datos['template_id'],
+                ]);
+                return ['success' => true, 'error' => null, 'datos' => null];
+            } else {
+                $error = "Error HTTP {$response->status()}: " . $response->body();
+                \Log::error('Error al enviar datos a la API de Python (regeneración)', [
+                    'status' => $response->status(),
+                    'response' => $response->body(),
+                ]);
+                return [
+                    'success' => false,
+                    'error' => $error,
+                    'datos' => $datos
+                ];
+            }
+        } catch (\Exception $e) {
+            $error = "Excepción: " . $e->getMessage();
+            \Log::error('Excepción al enviar datos a la API de Python (regeneración)', [
+                'message' => $e->getMessage(),
+            ]);
+            return [
+                'success' => false,
+                'error' => $error,
+                'datos' => $datos
+            ];
+        }
     }
 
     public function gerarPDF(Request $request)

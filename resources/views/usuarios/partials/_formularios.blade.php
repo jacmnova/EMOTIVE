@@ -41,13 +41,23 @@
                                 @endif
                             </td>
                             <td>
-                                @if($formulario->status === 'completo')
+                                @if($formulario->status === 'completo' || (Auth::user()->admin && $formulario->status === 'pendente'))
                                     <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario_id, 'usuario_id' => $usuario->id]) }}" class="btn btn-sm btn-tool" title="Relatório">
                                         <i class="fa-regular fa-rectangle-list" style="color: #008ca5"></i>
                                     </a>
                                     <a href="{{ route('relatorio.pdf', ['user' => $usuario->id, 'formulario' => $formulario->formulario_id]) }}" class="btn btn-sm btn-tool" target="_blank">
                                         <i class="fas fa-file-pdf" style="color: #008ca5"></i>
                                     </a>
+                                    @if(Auth::user()->admin)
+                                        <form method="POST" action="{{ route('relatorio.regenerar') }}" class="d-inline">
+                                            @csrf
+                                            <input type="hidden" name="formulario_id" value="{{ $formulario->formulario_id }}">
+                                            <input type="hidden" name="usuario_id" value="{{ $usuario->id }}">
+                                            <button type="submit" class="btn btn-sm btn-tool" title="Regenerar con Nueva Estructura JSON">
+                                                <i class="fas fa-rotate-right" style="color: #28a745"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                 @endif
                             </td>
                             <td>
@@ -89,7 +99,7 @@
                                 <span class="badge badge-success">{{ strtoupper($formulario->status) }}</span>
                             @endif
                         </p>
-                        @if($formulario->status === 'completo')
+                        @if($formulario->status === 'completo' || (Auth::user()->admin && $formulario->status === 'pendente'))
                             <div class="my-2">
                                 <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario_id, 'usuario_id' => $usuario->id]) }}" class="btn btn-sm btn-tool" title="Relatório">
                                     <i class="fa-regular fa-rectangle-list" style="color: #008ca5"></i>
@@ -97,8 +107,24 @@
                                 <a href="{{ route('relatorio.pdf', ['user' => $usuario->id, 'formulario' => $formulario->formulario_id]) }}" class="btn btn-sm btn-tool" target="_blank">
                                     <i class="fas fa-file-pdf" style="color: #008ca5"></i>
                                 </a>
+                                @if(Auth::user()->admin)
+                                    <form method="POST" action="{{ route('relatorio.regenerar') }}" class="d-inline">
+                                        @csrf
+                                        <input type="hidden" name="formulario_id" value="{{ $formulario->formulario_id }}">
+                                        <input type="hidden" name="usuario_id" value="{{ $usuario->id }}">
+                                        <button type="submit" class="btn btn-sm btn-tool" title="Regenerar con Nueva Estructura JSON">
+                                            <i class="fas fa-rotate-right" style="color: #28a745"></i>
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
-                            <p class="small text-muted">Finalizado em: {{ $formulario->updated_at->translatedFormat('d \d\e F \d\e Y \à\s H:i') }}</p>
+                            <p class="small text-muted">
+                                @if($formulario->status === 'completo')
+                                    Finalizado em: {{ $formulario->updated_at->translatedFormat('d \d\e F \d\e Y \à\s H:i') }}
+                                @else
+                                    Pendente - Última atualização: {{ $formulario->updated_at->translatedFormat('d \d\e F \d\e Y \à\s H:i') }}
+                                @endif
+                            </p>
                         @else
                             <div class="my-2">
                                 <a href="#" class="btn btn-sm btn-tool" title="Iniciar">
