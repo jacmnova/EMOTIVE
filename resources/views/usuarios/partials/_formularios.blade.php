@@ -45,8 +45,11 @@
                                     <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario_id, 'usuario_id' => $usuario->id]) }}" class="btn btn-sm btn-tool" title="Relatório">
                                         <i class="fa-regular fa-rectangle-list" style="color: #008ca5"></i>
                                     </a>
-                                    <a href="{{ route('relatorio.pdf', ['user' => $usuario->id, 'formulario' => $formulario->formulario_id]) }}" class="btn btn-sm btn-tool" target="_blank">
+                                    <a href="{{ route('relatorio.pdf', ['user' => $usuario->id, 'formulario' => $formulario->formulario_id]) }}" class="btn btn-sm btn-tool" download>
                                         <i class="fas fa-file-pdf" style="color: #008ca5"></i>
+                                    </a>
+                                    <a href="{{ route('relatorio.html', ['user' => $usuario->id, 'formulario' => $formulario->formulario_id]) }}" class="btn btn-sm btn-tool" target="_blank" title="Ver en HTML">
+                                        <i class="fas fa-eye" style="color: #008ca5"></i>
                                     </a>
                                     @if(Auth::user()->admin)
                                         <form method="POST" action="{{ route('relatorio.regenerar') }}" class="d-inline">
@@ -104,8 +107,11 @@
                                 <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario_id, 'usuario_id' => $usuario->id]) }}" class="btn btn-sm btn-tool" title="Relatório">
                                     <i class="fa-regular fa-rectangle-list" style="color: #008ca5"></i>
                                 </a>
-                                <a href="{{ route('relatorio.pdf', ['user' => $usuario->id, 'formulario' => $formulario->formulario_id]) }}" class="btn btn-sm btn-tool" target="_blank">
+                                <a href="{{ route('relatorio.pdf', ['user' => $usuario->id, 'formulario' => $formulario->formulario_id]) }}" class="btn btn-sm btn-tool" download>
                                     <i class="fas fa-file-pdf" style="color: #008ca5"></i>
+                                </a>
+                                <a href="{{ route('relatorio.html', ['user' => $usuario->id, 'formulario' => $formulario->formulario_id]) }}" class="btn btn-sm btn-tool" target="_blank" title="Ver en HTML">
+                                    <i class="fas fa-eye" style="color: #008ca5"></i>
                                 </a>
                                 @if(Auth::user()->admin)
                                     <form method="POST" action="{{ route('relatorio.regenerar') }}" class="d-inline">

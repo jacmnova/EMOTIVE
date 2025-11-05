@@ -695,6 +695,140 @@ class RelatorioController extends Controller
     }
 
     /**
+     * Muestra el relatorio en HTML
+     */
+    public function mostrarHTML(Request $request)
+    {
+        $formularioId = $request->formulario;
+        $usuarioId = $request->user;
+
+        $user = User::findOrFail($usuarioId);
+        $formulario = Formulario::with('perguntas.variaveis')->findOrFail($formularioId);
+
+        $respostasUsuario = Resposta::where('user_id', $user->id)
+            ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
+            ->get()
+            ->keyBy('pergunta_id');
+
+        $variaveis = Variavel::with('perguntas')
+            ->where('formulario_id', $formulario->id)
+            ->get();
+
+        // Calcular puntuaciones brutas y normalizadas
+        $pontuacoes = [];
+        foreach ($variaveis as $variavel) {
+            $pontuacao = 0;
+            foreach ($variavel->perguntas as $pergunta) {
+                $resposta = $respostasUsuario->get($pergunta->id);
+                if ($resposta) {
+                    $pontuacao += $resposta->valor_resposta ?? 0;
+                }
+            }
+
+            $b = $variavel->B ?? 0;
+            $m = $variavel->M ?? 0;
+            $a = $variavel->A ?? ($m + ($m - $b));
+            
+            $pontuacaoNormalizada = $this->normalizarPuntuacion($pontuacao, $b, $m, $a);
+            $faixa = $this->classificarPontuacao($pontuacao, $variavel);
+
+            $pontuacoes[] = [
+                'nome' => $variavel->nome,
+                'tag' => strtoupper($variavel->tag),
+                'pontuacao' => $pontuacao,
+                'normalizada' => $pontuacaoNormalizada,
+                'faixa' => $faixa,
+                'b' => $b,
+                'm' => $m,
+                'a' => $a,
+            ];
+        }
+
+        // Calcular ejes analíticos y IID
+        $eixos = $this->calcularEixosAnaliticos($pontuacoes);
+
+        // Obtener interpretaciones detalladas de cada eje
+        $eixos['eixo1']['interpretacao_detalhada'] = $this->obtenerInterpretacaoEixo(1, $eixos['eixo1']['dimensoes'], $pontuacoes);
+        $eixos['eixo2']['interpretacao_detalhada'] = $this->obtenerInterpretacaoEixo(2, $eixos['eixo2']['dimensoes'], $pontuacoes);
+        $eixos['eixo3']['interpretacao_detalhada'] = $this->obtenerInterpretacaoEixo(3, $eixos['eixo3']['dimensoes'], $pontuacoes);
+
+        // Generar gráfico radar con puntuaciones normalizadas (0-100)
+        $labels = collect($pontuacoes)->pluck('tag');
+        $dataValores = collect($pontuacoes)->pluck('normalizada');
+
+        $graficosDir = storage_path('app/public/graficos');
+        if (!file_exists($graficosDir)) {
+            mkdir($graficosDir, 0755, true);
+        }
+
+        // GRÁFICO DE RADAR con escala 0-100
+        $configRadar = [
+            'type' => 'radar',
+            'data' => [
+                'labels' => $labels->toArray(),
+                'datasets' => [[
+                    'label' => 'Pontuação',
+                    'data' => $dataValores->toArray(),
+                    'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
+                    'borderColor' => 'rgba(54, 162, 235, 1)',
+                    'pointBackgroundColor' => 'rgba(54, 162, 235, 1)',
+                    'pointBorderColor' => '#fff',
+                    'pointHoverBackgroundColor' => '#fff',
+                    'pointHoverBorderColor' => 'rgba(54, 162, 235, 1)'
+                ]]
+            ],
+            'options' => [
+                'responsive' => true,
+                'plugins' => [
+                    'legend' => ['display' => false],
+                    'title' => ['display' => true, 'text' => 'Radar E.MO.TI.VE']
+                ],
+                'scales' => [
+                    'r' => [
+                        'angleLines' => ['display' => true],
+                        'min' => 0,
+                        'max' => 100,
+                        'ticks' => [
+                            'stepSize' => 20,
+                            'min' => 0,
+                            'max' => 100
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $urlGraficoRadar = 'https://quickchart.io/chart?c=' . urlencode(json_encode($configRadar));
+        $imagemRadarPath = $graficosDir . '/radar_' . uniqid() . '.png';
+        file_put_contents($imagemRadarPath, file_get_contents($urlGraficoRadar));
+        $imagemRadarPublicPath = 'storage/graficos/' . basename($imagemRadarPath);
+
+        // ANALISE GERADA PELA IA
+        $analise = Analise::where('user_id', $usuarioId)
+            ->where('formulario_id', $formularioId)
+            ->first();
+
+        $analiseTexto = $analise?->texto ?? 'Análise não disponível.';
+
+        // DADOS PARA A VIEW
+        $data = [
+            'user' => $user,
+            'formulario' => $formulario,
+            'respostasUsuario' => $respostasUsuario,
+            'pontuacoes' => $pontuacoes,
+            'variaveis' => $variaveis,
+            'eixos' => $eixos,
+            'hoje' => now()->format('d/m/Y'),
+            'dataResposta' => $respostasUsuario->first()?->created_at?->format('d/m/Y') ?? now()->format('d/m/Y'),
+            'imagemRadar' => $imagemRadarPublicPath,
+            'analiseTexto' => $analiseTexto,
+        ];
+
+        // Retorna la vista HTML
+        return view('relatorios.emotive', $data);
+    }
+
+    /**
      * Clasifica una puntuación según los límites de la variable
      */
     private function classificarPontuacao($pontuacao, $variavel): string

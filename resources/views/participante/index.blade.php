@@ -111,8 +111,11 @@
                                                title="Visualizar Relatório">
                                                 <i class="fa-regular fa-rectangle-list"></i>
                                             </a>
-                                            <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}"  title="Imprimir Relatório" target="_blank" class="btn btn-sm text-danger">
+                                            <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}"  title="Descargar PDF" class="btn btn-sm text-danger" download>
                                                 <i class="fas fa-file-pdf"></i>
+                                            </a>
+                                            <a href="{{ route('relatorio.html', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}"  title="Ver en HTML" target="_blank" class="btn btn-sm text-info">
+                                                <i class="fas fa-eye"></i>
                                             </a>
                                         @else
                                             <span class="text-muted"><i class="fa-solid fa-spinner"></i> Pendente</span>
@@ -195,8 +198,11 @@
                                                title="Visualizar Relatório">
                                                 <i class="fa-regular fa-rectangle-list"></i>
                                             </a>
-                                            <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}" target="_blank" title="Imprimir Relatório" class="btn btn-sm text-danger">
+                                            <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}" title="Descargar PDF" class="btn btn-sm text-danger" download>
                                                 <i class="fas fa-file-pdf"></i>
+                                            </a>
+                                            <a href="{{ route('relatorio.html', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}" title="Ver en HTML" target="_blank" class="btn btn-sm text-info">
+                                                <i class="fas fa-eye"></i>
                                             </a>
                                         @else
                                         <a href="#" class="btn btn-sm text-danger" title="Assista Vídeo">
