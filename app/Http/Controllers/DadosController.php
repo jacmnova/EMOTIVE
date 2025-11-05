@@ -547,6 +547,62 @@ class DadosController extends Controller
         }
     }
 
+    /**
+     * Genera el relatorio vía API de Python
+     * Endpoint público para ser llamado desde el frontend
+     */
+    public function generarRelatorioAPI(Request $request)
+    {
+        $request->validate([
+            'formulario_id' => 'required|integer|exists:formularios,id',
+            'usuario_id' => 'required|integer|exists:users,id',
+        ]);
+
+        $userId = $request->input('usuario_id');
+        $formularioId = $request->input('formulario_id');
+
+        // Verificar que el usuario tiene permiso (solo puede generar su propio relatorio o ser admin)
+        if (Auth::id() != $userId && !Auth::user()->admin) {
+            return response()->json([
+                'success' => false,
+                'error' => 'No tienes permiso para generar este relatorio.'
+            ], 403);
+        }
+
+        try {
+            // Preparar datos para la API
+            $datosRelatorio = $this->prepararDatosParaRelatorio($userId, $formularioId);
+            
+            // Enviar a la API de Python
+            $resultado = $this->enviarDatosAPython($datosRelatorio);
+            
+            if ($resultado['success']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Relatorio generado exitosamente vía API de Python.',
+                    'data' => null
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'error' => $resultado['error'],
+                    'data' => $resultado['datos']
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error al generar relatorio vía API', [
+                'user_id' => $userId,
+                'formulario_id' => $formularioId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al generar relatorio: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function finalizar(Request $request)
     {
         $userId = Auth::user()->id;

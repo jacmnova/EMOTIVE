@@ -99,6 +99,13 @@
                                         @endif
 
                                         @if($formulario->video_assistido || !$formulario->midia || $formulario->status === 'pendente')
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-success btnGenerarRelatorioAPI" 
+                                                    data-formulario-id="{{ $formulario->formulario->id }}"
+                                                    data-usuario-id="{{ $user->id }}"
+                                                    title="Generar Relatório vía API">
+                                                <i class="fas fa-sync-alt"></i> Generar
+                                            </button>
                                             <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}" 
                                                class="btn btn-sm text-info btnGerarRelatorio"
                                                title="Visualizar Relatório">
@@ -176,6 +183,13 @@
                                         @endif
 
                                         @if($formulario->video_assistido || !$formulario->midia || $formulario->status === 'pendente')
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-success btnGenerarRelatorioAPI" 
+                                                    data-formulario-id="{{ $formulario->formulario->id }}"
+                                                    data-usuario-id="{{ $user->id }}"
+                                                    title="Generar Relatório vía API">
+                                                <i class="fas fa-sync-alt"></i> Generar
+                                            </button>
                                             <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}" 
                                                class="btn btn-sm text-info btnGerarRelatorio"
                                                title="Visualizar Relatório">
@@ -272,6 +286,85 @@
 
             // Agora redireciona manualmente (deixa o Swal aparecer)
             window.location.href = url;
+        });
+    });
+
+    // Agregar event listener a todos los botones de generar relatorio vía API
+    document.querySelectorAll('.btnGenerarRelatorioAPI').forEach(function(btn) {
+        btn.addEventListener('click', function(event) {
+            event.preventDefault();
+            
+            const formularioId = this.getAttribute('data-formulario-id');
+            const usuarioId = this.getAttribute('data-usuario-id');
+            const btnOriginal = this;
+            
+            // Deshabilitar botón mientras procesa
+            btnOriginal.disabled = true;
+            const originalHTML = btnOriginal.innerHTML;
+            btnOriginal.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+
+            Swal.fire({
+                title: 'Generando relatorio vía API...',
+                text: 'Por favor, aguarde enquanto processamos seu relatório na API de Python.',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Enviar petición AJAX a la API
+            fetch('{{ route("relatorio.generar.api") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    formulario_id: formularioId,
+                    usuario_id: usuarioId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                btnOriginal.disabled = false;
+                btnOriginal.innerHTML = originalHTML;
+                
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: data.message || 'Relatorio generado exitosamente vía API de Python.',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        // Opcional: recargar la página o redirigir
+                        // window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        html: '<p>' + (data.error || 'Error al generar el relatorio') + '</p>' +
+                              (data.data ? '<pre style="text-align: left; font-size: 10px; max-height: 200px; overflow: auto;">' + 
+                               JSON.stringify(data.data, null, 2) + '</pre>' : ''),
+                        confirmButtonText: 'OK',
+                        width: '600px'
+                    });
+                }
+            })
+            .catch(error => {
+                btnOriginal.disabled = false;
+                btnOriginal.innerHTML = originalHTML;
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de conexión',
+                    text: 'No se pudo conectar con el servidor. Error: ' + error.message,
+                    confirmButtonText: 'OK'
+                });
+            });
         });
     });
 </script>

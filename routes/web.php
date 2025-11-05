@@ -114,6 +114,8 @@ Route::post('/respostas/salvar', [DadosController::class, 'salvarRespostas'])->n
 
 Route::post('/usuario-formulario/finalizar', [DadosController::class, 'finalizar'])->name('usuarioFormulario.finalizar');
 
+Route::post('/relatorio/generar-api', [DadosController::class, 'generarRelatorioAPI'])->name('relatorio.generar.api')->middleware('auth');
+
 
 Route::get('/meurelatorio/show', [DadosController::class, 'relatorioShow'])->name('relatorio.show');
 
