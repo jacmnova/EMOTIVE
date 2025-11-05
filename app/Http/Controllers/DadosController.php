@@ -367,6 +367,74 @@ class DadosController extends Controller
         $analiseHtml = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $analiseHtml);
         $analiseHtml = preg_replace('/###\s?(.*)/', '<h4>$1</h4>', $analiseHtml);
 
+        // Variables adicionales para el HTML
+        $dataResposta = $respostasUsuario->first()?->created_at?->format('d/m/Y') ?? now()->format('d/m/Y');
+        
+        // Generar gráfico radar para HTML
+        $imagemRadar = null;
+        $graficosDir = storage_path('app/public/graficos');
+        if (!file_exists($graficosDir)) {
+            mkdir($graficosDir, 0755, true);
+        }
+
+        if (count($pontuacoes) > 0) {
+            $labels = collect($pontuacoes)->pluck('tag');
+            $dataValores = collect($pontuacoes)->pluck('normalizada');
+            
+            $configRadar = [
+                'type' => 'radar',
+                'data' => [
+                    'labels' => $labels->toArray(),
+                    'datasets' => [[
+                        'label' => 'Pontuação',
+                        'data' => $dataValores->toArray(),
+                        'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
+                        'borderColor' => 'rgba(54, 162, 235, 1)',
+                        'pointBackgroundColor' => 'rgba(54, 162, 235, 1)',
+                        'pointBorderColor' => '#fff',
+                        'pointHoverBackgroundColor' => '#fff',
+                        'pointHoverBorderColor' => 'rgba(54, 162, 235, 1)'
+                    ]]
+                ],
+                'options' => [
+                    'responsive' => true,
+                    'plugins' => [
+                        'legend' => ['display' => false],
+                        'title' => ['display' => true, 'text' => 'Radar E.MO.TI.VE']
+                    ],
+                    'scales' => [
+                        'r' => [
+                            'angleLines' => ['display' => true],
+                            'min' => 0,
+                            'max' => 100,
+                            'ticks' => [
+                                'stepSize' => 20,
+                                'min' => 0,
+                                'max' => 100
+                            ]
+                        ]
+                    ]
+                ]
+            ];
+
+            $urlGraficoRadar = 'https://quickchart.io/chart?c=' . urlencode(json_encode($configRadar));
+            $imagemRadarPath = $graficosDir . '/radar_' . uniqid() . '.png';
+            
+            $context = stream_context_create([
+                'http' => [
+                    'method' => 'GET',
+                    'timeout' => 30,
+                    'ignore_errors' => true
+                ]
+            ]);
+            
+            $imagenData = @file_get_contents($urlGraficoRadar, false, $context);
+            if ($imagenData) {
+                file_put_contents($imagemRadarPath, $imagenData);
+                $imagemRadar = asset('storage/graficos/' . basename($imagemRadarPath));
+            }
+        }
+
         return view('participante.relatorio', compact(
             'formulario',
             'respostasUsuario',
@@ -376,7 +444,9 @@ class DadosController extends Controller
             'analiseTexto',
             'analiseHtml',
             'analiseData',
-            'eixos'
+            'eixos',
+            'dataResposta',
+            'imagemRadar'
         ));
     }
 
