@@ -26,51 +26,89 @@
             page-break-after: always;
         }
 
-        /* PORTADA */
+        /* PORTADA - Fondo oscuro con gradiente */
         .capa {
             width: 100%;
             height: 100vh;
             position: relative;
-            background: linear-gradient(180deg, #1a3a5a 0%, #008080 100%);
+            background: linear-gradient(180deg, #0a1a2e 0%, #1a3a5a 50%, #008080 100%);
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             color: white;
-            padding: 40px;
+            padding: 60px 40px 40px;
+            box-sizing: border-box;
         }
 
         .logo-fellipelli {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: normal;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
+            margin-bottom: 8px;
+            letter-spacing: 3px;
+            text-transform: lowercase;
         }
 
         .tagline-fellipelli {
-            font-size: 10px;
-            margin-bottom: 40px;
+            font-size: 11px;
+            margin-bottom: 80px;
             opacity: 0.9;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .logo-emotive-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .logo-emotive-icon {
+            width: 50px;
+            height: 50px;
+            border: 2px solid white;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .logo-emotive-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 80%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 2px,
+                white 2px,
+                white 4px
+            );
+            border-radius: 50%;
         }
 
         .logo-emotive {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: bold;
-            letter-spacing: 4px;
-            margin-bottom: 10px;
+            letter-spacing: 6px;
         }
 
         .tagline-emotive {
-            font-size: 14px;
-            margin-bottom: 60px;
+            font-size: 16px;
+            margin-bottom: 80px;
         }
 
+        /* Línea ECG prominente */
         .waveform {
             width: 100%;
-            height: 4px;
+            height: 6px;
             background: #00CED1;
             margin: 40px 0;
             position: relative;
+            border-radius: 3px;
         }
 
         .waveform::before {
@@ -78,70 +116,83 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            background: repeating-linear-gradient(
-                90deg,
-                transparent,
-                transparent 10px,
-                #00CED1 10px,
-                #00CED1 12px
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                transparent 15%,
+                #00CED1 15%,
+                #00CED1 20%,
+                transparent 20%,
+                transparent 35%,
+                #00CED1 35%,
+                #00CED1 40%,
+                transparent 40%,
+                transparent 55%,
+                #00CED1 55%,
+                #00CED1 65%,
+                transparent 65%,
+                transparent 75%,
+                #00CED1 75%,
+                #00CED1 85%,
+                transparent 85%
             );
         }
 
+        /* Caja blanca inferior derecha */
         .info-box {
             background: white;
             border-radius: 12px;
-            padding: 30px;
+            padding: 25px 30px;
             color: #333;
-            text-align: center;
-            max-width: 500px;
-            margin-top: 40px;
+            text-align: left;
+            width: 400px;
+            position: absolute;
+            bottom: 60px;
+            right: 60px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         .info-box .nome {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            color: #333;
         }
 
         .info-box .titulo {
-            font-size: 14px;
-            margin-bottom: 8px;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: #555;
         }
 
         .info-box .data {
-            font-size: 12px;
-            color: #666;
+            font-size: 11px;
+            color: #777;
         }
 
         /* ESTILOS GENERALES */
         h1 {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
             color: #333;
             margin-bottom: 20px;
             text-align: left;
+            text-transform: uppercase;
         }
 
         h2 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            color: #008080;
+            color: #42B8D4;
             margin-bottom: 15px;
             text-align: left;
         }
 
         h3 {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             color: #008080;
             margin-bottom: 12px;
-        }
-
-        h4 {
-            font-size: 14px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
+            text-transform: uppercase;
         }
 
         p {
@@ -150,25 +201,25 @@
         }
 
         .section {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         /* BADGES Y FAIXAS */
         .faixa-baixa {
             background-color: #4CAF50;
             color: white;
-            padding: 4px 12px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: 12px;
             font-size: 10px;
             font-weight: bold;
             display: inline-block;
         }
 
         .faixa-moderada {
-            background-color: #FFC107;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 4px;
+            background-color: #D4B87D;
+            color: #333;
+            padding: 4px 10px;
+            border-radius: 12px;
             font-size: 10px;
             font-weight: bold;
             display: inline-block;
@@ -177,105 +228,178 @@
         .faixa-alta {
             background-color: #F44336;
             color: white;
-            padding: 4px 12px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: 12px;
             font-size: 10px;
             font-weight: bold;
             display: inline-block;
         }
 
-        /* CAJAS DE RESULTADO */
-        .result-box {
-            background-color: #f5f5f5;
-            border-radius: 8px;
-            padding: 15px;
+        /* CAJAS DE RESULTADO - Estilo exacto de imágenes */
+        .dimension-box {
             margin-bottom: 20px;
-            border-left: 4px solid #FFC107;
         }
 
-        .result-box-header {
+        .dimension-header {
+            background-color: #6B5B4A;
+            color: white;
+            padding: 12px 15px;
+            border-radius: 6px 6px 0 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 12px;
         }
 
-        .result-box-score {
+        .dimension-header.exem { background-color: #6B5B4A; }
+        .dimension-header.deci { background-color: #C79F6B; }
+        .dimension-header.repr { background-color: #8C8C8C; }
+        .dimension-header.faps { background-color: #556B2F; }
+        .dimension-header.asmo { background-color: #191970; }
+        .dimension-header.extr { background-color: #6A5C8A; }
+
+        .dimension-content {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 0 0 6px 6px;
+        }
+
+        .dimension-score-box {
+            background-color: #F5F5EB;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dimension-score-value {
             font-size: 24px;
             font-weight: bold;
-            color: #FFC107;
-            background-color: #fff;
-            padding: 8px 16px;
-            border-radius: 6px;
+            color: #333;
+        }
+
+        /* FOOTER */
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9px;
+            color: #999;
+        }
+
+        .footer-logos {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .footer-logo-text {
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .footer-page {
+            text-align: right;
+            color: #999;
+        }
+
+        /* QUOTE BOXES */
+        .quote-box-teal {
+            background-color: #D9EDEE;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-style: italic;
+            color: #333;
+            text-align: center;
+        }
+
+        .quote-box-gray {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-style: italic;
+            color: #333;
+            text-align: center;
+            font-size: 13px;
         }
 
         /* EIXOS ANALÍTICOS */
-        .eixo-box {
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 25px;
+        .eixo-container {
+            margin-bottom: 30px;
             border-left: 5px solid #008080;
+            padding-left: 20px;
         }
 
-        .eixo-header {
-            font-size: 16px;
+        .eixo-title {
+            font-size: 18px;
             font-weight: bold;
             color: #008080;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
         }
 
-        .eixo-dimensions {
+        .eixo-data-table {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
             display: flex;
             justify-content: space-around;
-            margin: 15px 0;
-            background-color: #fff;
-            padding: 15px;
-            border-radius: 6px;
+            align-items: center;
         }
 
-        .dimension-item {
+        .eixo-dim-item {
             text-align: center;
             flex: 1;
         }
 
-        .dimension-label {
+        .eixo-dim-label {
             font-size: 10px;
             color: #666;
             margin-bottom: 8px;
         }
 
-        .dimension-bar {
-            height: 30px;
-            background-color: #FFC107;
+        .eixo-dim-badge {
+            background-color: #D4B87D;
+            color: #333;
+            padding: 6px 12px;
             border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+            font-size: 10px;
             font-weight: bold;
-            font-size: 11px;
-            margin-bottom: 8px;
+            display: inline-block;
         }
 
-        .dimension-total {
-            background-color: #FFC107;
+        .eixo-dim-badge.baixa {
+            background-color: #4CAF50;
             color: white;
-            padding: 10px 20px;
+        }
+
+        .eixo-total {
+            background-color: #333;
+            color: white;
+            padding: 12px 20px;
             border-radius: 6px;
             font-size: 20px;
             font-weight: bold;
             text-align: center;
-            margin: 10px auto;
-            display: inline-block;
         }
 
-        /* GRÁFICO DE RISCO */
-        .risk-bar {
+        /* RISCO BAR */
+        .risk-bar-container {
             width: 100%;
-            height: 40px;
+            height: 50px;
             background-color: #e0e0e0;
-            border-radius: 20px;
+            border-radius: 25px;
             position: relative;
             margin: 20px 0;
             display: flex;
@@ -286,11 +410,14 @@
             flex: 1;
             border-right: 2px solid #333;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             font-size: 10px;
             font-weight: bold;
             color: #333;
+            position: relative;
+            z-index: 2;
         }
 
         .risk-segment:last-child {
@@ -300,10 +427,77 @@
         .risk-indicator {
             position: absolute;
             height: 100%;
-            background-color: #FFC107;
-            border-radius: 20px;
+            background-color: #E6C25A;
+            border-radius: 25px;
             left: 0;
             z-index: 1;
+        }
+
+        /* RADAR */
+        .radar-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .radar-container img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* RESUMO POR FAIXA */
+        .resumo-faixa {
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .resumo-faixa.moderada {
+            background-color: #D4B87D;
+        }
+
+        .resumo-faixa.baixa {
+            background-color: #82C99A;
+        }
+
+        .resumo-faixa.alta {
+            background-color: #F44336;
+        }
+
+        /* ZONA BOX */
+        .zona-box {
+            background-color: #F5F5EB;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .zona-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+
+        /* PLANO DESENVOLVIMENTO */
+        .plano-zona {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .plano-bullet {
+            width: 10px;
+            height: 10px;
+            background-color: #FFC107;
+            border-radius: 50%;
+        }
+
+        .plano-zona-text {
+            color: #FFC107;
+            font-size: 16px;
+            font-weight: bold;
         }
 
         /* TABLA */
@@ -320,76 +514,10 @@
         }
 
         th {
-            background-color: #008080;
-            color: white;
-            font-weight: bold;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        /* QUOTE BOXES */
-        .quote-box-teal {
-            background-color: #B2DFDB;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            font-style: italic;
-            color: #333;
-            border-left: 4px solid #008080;
-        }
-
-        .quote-box-gray {
             background-color: #f5f5f5;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            font-style: italic;
-            color: #333;
-        }
-
-        /* FOOTER */
-        .footer {
-            position: fixed;
-            bottom: 20px;
-            left: 60px;
-            right: 60px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 9px;
-            color: #666;
-        }
-
-        .footer-logos {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .footer-logo-text {
-            font-size: 12px;
             font-weight: bold;
-            color: #333;
         }
 
-        .footer-page {
-            text-align: right;
-        }
-
-        /* RADAR CHART */
-        .radar-container {
-            text-align: center;
-            margin: 30px 0;
-        }
-
-        .radar-container img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        /* LISTAS */
         ul {
             margin-left: 20px;
             margin-bottom: 15px;
@@ -399,29 +527,9 @@
             margin-bottom: 8px;
         }
 
-        /* BULLET DORADO */
-        .bullet-gold {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: #FFC107;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-
-        /* ZONA DE ATENÇÃO */
-        .zona-box {
-            background-color: #fff3cd;
-            border-left: 4px solid #FFC107;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 15px 0;
-        }
-
-        .zona-title {
-            font-weight: bold;
-            color: #856404;
-            margin-bottom: 10px;
+        ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -430,9 +538,12 @@
 {{-- PÁGINA 1: PORTADA --}}
 <div class="capa page-break">
     <div class="logo-fellipelli">fellipelli</div>
-    <div class="tagline-fellipelli">desenvolvimento pessoal e organizacional</div>
+    <div class="tagline-fellipelli">desenvolvimento pessoal<br>e organizacional</div>
     
-    <div class="logo-emotive">E.MO.TI.VE</div>
+    <div class="logo-emotive-container">
+        <div class="logo-emotive-icon"></div>
+        <div class="logo-emotive">E.MO.TI.VE</div>
+    </div>
     <div class="tagline-emotive">Burnout e Bem-estar</div>
     
     <div class="waveform"></div>
@@ -450,12 +561,11 @@
     
     <div class="section">
         <h2>Ferramenta de Autoconhecimento e Prevenção de Riscos Psicossociais</h2>
-        <p>O E.MO.TI.VE® é uma ferramenta de autoconhecimento e prevenção de riscos psicossociais no trabalho, baseada em evidências científicas e nas normas regulamentadoras brasileiras. Este relatório apresenta uma análise detalhada das suas respostas, oferecendo insights sobre seu estado emocional, nível de engajamento e sustentabilidade ocupacional.</p>
-        
+        <p>(Baseada nas diretrizes da NR-1 e nos princípios da Psicologia Organizacional Positiva)</p>
         <p><strong>Mais do que medir</strong> — oferece uma jornada de autoconhecimento.</p>
         <p><strong>Mais do que um diagnóstico</strong> — fornece orientações práticas para o desenvolvimento pessoal e profissional.</p>
         
-        <div class="quote-box-teal">
+        <div class="quote-box-gray" style="border: 1px solid #42B8D4; background-color: #fafafa;">
             "Saúde emocional não é ausência de estresse, mas a capacidade de reconhecê-lo e se fortalecer diante dele."
         </div>
     </div>
@@ -464,28 +574,27 @@
         <h2>Finalidade do Instrumento</h2>
         <p>O E.MO.TI.VE® identifica e avalia seis dimensões psicossociais fundamentais relacionadas ao bem-estar e ao risco de burnout no ambiente de trabalho. Com base nas suas respostas, este relatório ajuda você a:</p>
         <ul>
-            <li>Compreender seu estado emocional e psicossocial atual</li>
-            <li>Identificar áreas de força e vulnerabilidade</li>
-            <li>Reconhecer sinais precoces de desequilíbrio</li>
-            <li>Receber orientações práticas para autocuidado e desenvolvimento</li>
+            <li>Reconhecer áreas de equilíbrio e vulnerabilidade emocional;</li>
+            <li>Fortalecer o autocuidado e a autorregulação emocional;</li>
+            <li>Promover relações saudáveis e ambientes de confiança;</li>
+            <li>Inspirar planos de ação pessoais e coletivos que reduzam o risco de burnout.</li>
         </ul>
     </div>
 
     <div class="section">
         <h2>Base Normativa e Científica</h2>
         <ol>
-            <li>Normativa brasileira: <strong>NR-1 (Portaria 6.730/2020)</strong> — regulamentação sobre riscos psicossociais no trabalho</li>
-            <li>Modelo científico: <strong>Modelo MBI (Maslach Burnout Inventory)</strong> — referência internacional para avaliação de burnout</li>
+            <li><strong>NR-1 (Portaria 6.730/2020)</strong> — que define a obrigatoriedade da gestão de riscos psicossociais nas organizações.</li>
+            <li><strong>Modelo MBI (Maslach Burnout Inventory)</strong> — referência mundial para compreender exaustão, cinismo e realização profissional.</li>
         </ol>
     </div>
 
     <div class="section">
         <h2>Ética, Confidencialidade e Responsabilidade Compartilhada</h2>
-        <p>Este instrumento é confidencial e não-clínico. Os dados coletados são utilizados exclusivamente para fins de autoconhecimento e desenvolvimento pessoal. A responsabilidade pelo bem-estar é compartilhada entre:</p>
         <ul>
-            <li>Você: autoconhecimento, autocuidado e ações práticas de melhoria</li>
-            <li>Organização: criação de ambientes saudáveis, suporte e recursos adequados</li>
-            <li>Profissionais de saúde: acompanhamento quando necessário</li>
+            <li>A empresa deve assegurar condições saudáveis e equilibradas de trabalho.</li>
+            <li>O participante pode adotar práticas de cuidado, comunicação e autorregulação.</li>
+            <li>O RH e a liderança devem utilizar as informações de forma ética, para orientar ações preventivas e programas de bem-estar.</li>
         </ul>
     </div>
 
@@ -499,60 +608,60 @@
     </div>
 </div>
 
-{{-- PÁGINA 3: ESTRUTURA DO MODELO --}}
+{{-- PÁGINA 2: ESTRUTURA DO MODELO --}}
 <div class="page-break">
     <h1>Estrutura do Modelo E.MO.TI.VE</h1>
     
-    <p style="margin-bottom: 30px;">O modelo E.MO.TI.VE avalia seis dimensões principais que formam um "retrato de equilíbrio psicossocial":</p>
+    <p style="margin-bottom: 30px;">O instrumento avalia seis dimensões principais que, juntas, formam o retrato do seu equilíbrio psicossocial:</p>
 
     <div class="section">
-        <h3 style="color: #8B4513;">EIXO 1: ENERGIA EMOCIONAL</h3>
-        <div style="margin-left: 20px; margin-bottom: 20px;">
-            <h4 style="color: #654321;">• Exaustão Emocional (ExEm)</h4>
-            <p><strong>Conceito:</strong> Desgaste intenso, sensação de não ter energia.</p>
-            <p><strong>Prático:</strong> Pode aparecer como irritabilidade, falta de motivação ou sintomas físicos.</p>
-            <p><strong>Didático:</strong> Se estiver alta, pense em revisar prazos, negociar demandas e buscar apoio.</p>
+        <h3 style="color: #333; margin-left: 0;">EIXO 1 ENERGIA EMOCIONAL</h3>
+        <div style="margin-left: 20px; margin-bottom: 20px; background-color: #f9f9f9; padding: 15px; border-radius: 6px;">
+            <h4 style="color: #6B5B4A; font-size: 13px; margin-bottom: 8px;">• Exaustão Emocional (ExEm)</h4>
+            <p style="margin-bottom: 5px;"><strong>Conceito:</strong> desgaste intenso, sensação de não ter energia.</p>
+            <p style="margin-bottom: 5px;"><strong>Prático:</strong> pode aparecer como irritabilidade, falta de motivação ou sintomas físicos.</p>
+            <p style="margin-bottom: 0;"><strong>Didático:</strong> Se está alto, pense em revisar prazos, negociar demandas e buscar apoio.</p>
         </div>
         
-        <div style="margin-left: 20px; margin-bottom: 30px;">
-            <h4 style="color: #DAA520;">• Realização Profissional (RePr)</h4>
-            <p><strong>Conceito:</strong> Sensação de competência e propósito no trabalho.</p>
-            <p><strong>Prático:</strong> Quando baixa, pode gerar insegurança, desvalorização e até desmotivação.</p>
-            <p><strong>Didático:</strong> Vale pedir feedbacks, investir em desenvolvimento e resgatar pequenas conquistas.</p>
+        <div style="margin-left: 20px; margin-bottom: 30px; background-color: #f9f9f9; padding: 15px; border-radius: 6px;">
+            <h4 style="color: #DAA520; font-size: 13px; margin-bottom: 8px;">• Realização Profissional (RePr)</h4>
+            <p style="margin-bottom: 5px;"><strong>Conceito:</strong> sensação de competência e propósito no trabalho.</p>
+            <p style="margin-bottom: 5px;"><strong>Prático:</strong> quando baixa, pode gerar insegurança, desvalorização e até desmotivação.</p>
+            <p style="margin-bottom: 0;"><strong>Didático:</strong> Aqui vale pedir feedbacks, investir em desenvolvimento e resgatar pequenas conquistas.</p>
         </div>
     </div>
 
     <div class="section">
-        <h3 style="color: #FF8C00;">EIXO 2: PROPÓSITO E RELAÇÕES</h3>
-        <div style="margin-left: 20px; margin-bottom: 20px;">
-            <h4 style="color: #FF8C00;">• Despersonalização / Cinismo (DeCi)</h4>
-            <p><strong>Conceito:</strong> Distanciamento emocional do trabalho e das pessoas.</p>
-            <p><strong>Prático:</strong> Tratar colegas com frieza, indiferença ou ironia.</p>
-            <p><strong>Didático:</strong> Se estiver alto, é importante reconectar com o propósito do que faz e retomar vínculos de confiança.</p>
+        <h3 style="color: #333; margin-left: 0;">EIXO 2 PROPÓSITO E RELAÇÕES</h3>
+        <div style="margin-left: 20px; margin-bottom: 20px; background-color: #f9f9f9; padding: 15px; border-radius: 6px;">
+            <h4 style="color: #FF8C00; font-size: 13px; margin-bottom: 8px;">• Despersonalização / Cinismo (DeCi)</h4>
+            <p style="margin-bottom: 5px;"><strong>Conceito:</strong> distanciamento afetivo do trabalho e das pessoas.</p>
+            <p style="margin-bottom: 5px;"><strong>Prático:</strong> tratar colegas com frieza, indiferença ou ironia.</p>
+            <p style="margin-bottom: 0;"><strong>Didático:</strong> Se esse ponto estiver alto, é importante reconectar-se ao propósito do que faz e retomar vínculos de confiança.</p>
         </div>
         
-        <div style="margin-left: 20px; margin-bottom: 30px;">
-            <h4 style="color: #556B2F;">• Fatores Psicossociais (FaPs)</h4>
-            <p><strong>Conceito:</strong> Condições organizacionais — clareza de papéis, suporte, comunicação.</p>
-            <p><strong>Prático:</strong> Pode aparecer como irritabilidade, falta de motivação ou sintomas físicos.</p>
-            <p><strong>Didático:</strong> Tente identificar onde a comunicação falha e proponha pequenas ações de melhoria.</p>
+        <div style="margin-left: 20px; margin-bottom: 30px; background-color: #f9f9f9; padding: 15px; border-radius: 6px;">
+            <h4 style="color: #4169E1; font-size: 13px; margin-bottom: 8px;">• Fatores Psicossociais (FaPs)</h4>
+            <p style="margin-bottom: 5px;"><strong>Conceito:</strong> condições organizacionais - clareza de papéis, apoio, comunicação.</p>
+            <p style="margin-bottom: 5px;"><strong>Prático:</strong> pode aparecer como irritabilidade, falta de motivação ou sintomas físicos.</p>
+            <p style="margin-bottom: 0;"><strong>Didático:</strong> Procure identificar onde a comunicação falha e proponha pequenas ações de melhoria.</p>
         </div>
     </div>
 
     <div class="section">
-        <h3 style="color: #4169E1;">EIXO 3: SUSTENTABILIDADE OCUPACIONAL</h3>
-        <div style="margin-left: 20px; margin-bottom: 20px;">
-            <h4 style="color: #191970;">• Assédio Moral (AsMo)</h4>
-            <p><strong>Conceito:</strong> Comportamentos abusivos, constrangedores ou humilhantes.</p>
-            <p><strong>Prático:</strong> Piadas ofensivas, isolamento, críticas públicas.</p>
-            <p><strong>Didático:</strong> Se identificar sinais, não ignore. Busque diálogo e, se necessário, canais formais de apoio.</p>
+        <h3 style="color: #333; margin-left: 0;">EIXO 3 SUSTENTABILIDADE OCUPACIONAL</h3>
+        <div style="margin-left: 20px; margin-bottom: 20px; background-color: #f9f9f9; padding: 15px; border-radius: 6px;">
+            <h4 style="color: #191970; font-size: 13px; margin-bottom: 8px;">• Assédio Moral (AsMo)</h4>
+            <p style="margin-bottom: 5px;"><strong>Conceito:</strong> comportamentos abusivos, constrangedores ou humilhantes.</p>
+            <p style="margin-bottom: 5px;"><strong>Prático:</strong> piadas ofensivas, isolamento, críticas públicas.</p>
+            <p style="margin-bottom: 0;"><strong>Didático:</strong> Se identificar sinais, não ignore. Busque diálogo e, se necessário, canais formais de apoio.</p>
         </div>
         
-        <div style="margin-left: 20px; margin-bottom: 30px;">
-            <h4 style="color: #483D8B;">• Excesso de Trabalho (ExTr)</h4>
-            <p><strong>Conceito:</strong> Quando a carga de tarefas excede os limites pessoais.</p>
-            <p><strong>Prático:</strong> Longas jornadas, sem pausas, sem equilíbrio com vida pessoal.</p>
-            <p><strong>Didático:</strong> É necessário revisar prioridades, delegar e resgatar tempo para descanso.</p>
+        <div style="margin-left: 20px; margin-bottom: 30px; background-color: #f9f9f9; padding: 15px; border-radius: 6px;">
+            <h4 style="color: #483D8B; font-size: 13px; margin-bottom: 8px;">• Excesso de Trabalho (ExTr)</h4>
+            <p style="margin-bottom: 5px;"><strong>Conceito:</strong> quando a carga de tarefas ultrapassa os limites pessoais.</p>
+            <p style="margin-bottom: 5px;"><strong>Prático:</strong> longas horas, sem pausas, sem equilíbrio com a vida pessoal.</p>
+            <p style="margin-bottom: 0;"><strong>Didático:</strong> É preciso revisar prioridades, delegar e resgatar tempo para descanso.</p>
         </div>
     </div>
 
@@ -575,34 +684,18 @@
     </div>
 </div>
 
-{{-- PÁGINA 4: SEU RESULTADO E.MO.TI.VE --}}
+{{-- PÁGINA 3: SEU RESULTADO E.MO.TI.VE --}}
 <div class="page-break">
     <h1>SEU RESULTADO E.MO.TI.VE</h1>
     
     <div class="section">
         <h2>Dados do respondente</h2>
-        <table>
-            <tr>
-                <th style="width: 30%;">Formulário</th>
-                <td>{{ $formulario->label }} – {{ $formulario->nome }}</td>
-            </tr>
-            <tr>
-                <th>Participante</th>
-                <td>{{ $user->name }} ({{ $user->email }})</td>
-            </tr>
-            <tr>
-                <th>Data</th>
-                <td>{{ $dataResposta }}</td>
-            </tr>
-            <tr>
-                <th>Respostas registradas</th>
-                <td>{{ $respostasUsuario->count() }} de {{ $formulario->perguntas->count() ?? 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>Dimensões avaliadas</th>
-                <td>{{ $variaveis->pluck('nome')->join(', ') }}</td>
-            </tr>
-        </table>
+        <p><strong>Formulário:</strong> {{ $formulario->label }} – {{ $formulario->nome }}</p>
+        <p><strong>Participante:</strong> {{ $user->name }}</p>
+        <p><strong>({{ $user->email }})</strong></p>
+        <p><strong>Data:</strong> {{ $dataResposta }}</p>
+        <p><strong>Respostas registradas:</strong> {{ $respostasUsuario->count() }} de {{ $formulario->perguntas->count() ?? 'N/A' }}</p>
+        <p><strong>Dimensões avaliadas:</strong> {{ $variaveis->pluck('nome')->join(', ') }}</p>
     </div>
 
     <div class="section">
@@ -625,7 +718,7 @@
         @endphp
 
         @if(count($grupoModerada) > 0)
-        <div style="background-color: #DAA520; color: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+        <div class="resumo-faixa moderada">
             <strong style="font-size: 14px;">Faixa Moderada</strong>
             <ul style="margin-top: 10px; margin-bottom: 0;">
                 @foreach($grupoModerada as $dim)
@@ -636,7 +729,7 @@
         @endif
 
         @if(count($grupoBaixa) > 0)
-        <div style="background-color: #4CAF50; color: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+        <div class="resumo-faixa baixa">
             <strong style="font-size: 14px;">Faixa Baixa</strong>
             <ul style="margin-top: 10px; margin-bottom: 0;">
                 @foreach($grupoBaixa as $dim)
@@ -647,7 +740,7 @@
         @endif
 
         @if(count($grupoAlta) > 0)
-        <div style="background-color: #F44336; color: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+        <div class="resumo-faixa alta">
             <strong style="font-size: 14px;">Faixa Alta</strong>
             <ul style="margin-top: 10px; margin-bottom: 0;">
                 @foreach($grupoAlta as $dim)
@@ -661,7 +754,11 @@
     <div class="section">
         <h2>Radar E.MO.TI.VE</h2>
         <div class="radar-container">
-            <img src="{{ public_path($imagemRadar) }}" alt="Radar E.MO.TI.VE" style="max-width: 100%; height: auto;">
+            @if($imagemRadar && file_exists($imagemRadar))
+                <img src="data:image/png;base64,{{ base64_encode(file_get_contents($imagemRadar)) }}" alt="Radar E.MO.TI.VE" style="max-width: 100%; height: auto;">
+            @else
+                <p style="text-align: center; color: #999;">Gráfico no disponible</p>
+            @endif
         </div>
     </div>
 
@@ -675,18 +772,16 @@
     </div>
 </div>
 
-{{-- PÁGINA 5: ESTADO EMOCIONAL E PSICOSSOCIAL --}}
+{{-- PÁGINA 4: ESTADO EMOCIONAL E PSICOSSOCIAL - COMO LER --}}
 <div class="page-break">
     <h1>ESTADO EMOCIONAL E PSICOSSOCIAL</h1>
     
     <div class="section">
         <h2>Como Ler Seus Resultados</h2>
-        <p>As dimensões são apresentadas em faixas de pontuação que representam níveis de atenção:</p>
-        <ul>
-            <li><strong>Faixa Baixa:</strong> equilíbrio emocional saudável, sem sinais de risco.</li>
-            <li><strong>Faixa Moderada:</strong> pontos de atenção que merecem acompanhamento.</li>
-            <li><strong>Faixa Alta:</strong> indica necessidade de reflexão e cuidado ativo.</li>
-        </ul>
+        <p>Cada dimensão é apresentada em faixas de pontuação, representando níveis de atenção:</p>
+        <p style="margin-left: 20px;">Faixa Baixa: equilíbrio emocional saudável, sem sinais de risco.</p>
+        <p style="margin-left: 20px;">• Faixa Moderada: pontos de atenção que merecem acompanhamento.</p>
+        <p style="margin-left: 20px;">Faixa Alta: indica necessidade de reflexão e cuidado ativo.</p>
         
         <div class="zona-box">
             <div class="zona-title">Importante:</div>
@@ -694,31 +789,29 @@
         </div>
     </div>
 
-    @foreach($pontuacoes as $ponto)
+    @foreach(array_slice($pontuacoes, 0, 2) as $ponto)
     <div class="section">
-        <h3>{{ $ponto['nome'] }} ({{ $ponto['tag'] }})</h3>
-        <div class="result-box">
-            <div class="result-box-header">
-                <span class="faixa-{{ strtolower($ponto['faixa']) }}">{{ $ponto['faixa'] }}</span>
-                <span class="result-box-score">{{ round($ponto['normalizada']) }}</span>
-            </div>
-            <p>
-                @php
-                    $variavel = $variaveis->firstWhere('tag', strtoupper($ponto['tag']));
-                    $texto = '';
-                    if ($variavel) {
-                        if ($ponto['faixa'] == 'Baixa') {
-                            $texto = $variavel->baixa ?? '';
-                        } elseif ($ponto['faixa'] == 'Moderada') {
-                            $texto = $variavel->moderada ?? '';
-                        } else {
-                            $texto = $variavel->alta ?? '';
-                        }
-                    }
-                @endphp
-                {{ $texto }}
-            </p>
+        <h3 style="color: #42B8D4;">{{ $ponto['nome'] }} ({{ $ponto['tag'] }})</h3>
+        <div class="dimension-score-box">
+            <span class="faixa-{{ strtolower($ponto['faixa']) }}">Faixa {{ $ponto['faixa'] }}</span>
+            <span class="dimension-score-value">{{ round($ponto['normalizada']) }}</span>
         </div>
+        <p>
+            @php
+                $variavel = $variaveis->firstWhere('tag', strtoupper($ponto['tag']));
+                $texto = '';
+                if ($variavel) {
+                    if ($ponto['faixa'] == 'Baixa') {
+                        $texto = $variavel->baixa ?? '';
+                    } elseif ($ponto['faixa'] == 'Moderada') {
+                        $texto = $variavel->moderada ?? '';
+                    } else {
+                        $texto = $variavel->alta ?? '';
+                    }
+                }
+            @endphp
+            {{ $texto }}
+        </p>
     </div>
     @endforeach
 
@@ -729,6 +822,46 @@
             <span style="font-size: 10px;">Burnout e Bem-estar</span>
         </div>
         <div class="footer-page">Todos os direitos reservados a Fellipelli Consultoria | Pág. 04</div>
+    </div>
+</div>
+
+{{-- PÁGINA 5: ESTADO EMOCIONAL E PSICOSSOCIAL - CONTINUAÇÃO --}}
+<div class="page-break">
+    <h1>ESTADO EMOCIONAL E PSICOSSOCIAL</h1>
+    
+    @foreach(array_slice($pontuacoes, 2, 4) as $ponto)
+    <div class="section">
+        <h3 style="color: #42B8D4;">{{ $ponto['nome'] }} ({{ $ponto['tag'] }})</h3>
+        <div class="dimension-score-box">
+            <span class="faixa-{{ strtolower($ponto['faixa']) }}">Faixa {{ $ponto['faixa'] }}</span>
+            <span class="dimension-score-value">{{ round($ponto['normalizada']) }}</span>
+        </div>
+        <p>
+            @php
+                $variavel = $variaveis->firstWhere('tag', strtoupper($ponto['tag']));
+                $texto = '';
+                if ($variavel) {
+                    if ($ponto['faixa'] == 'Baixa') {
+                        $texto = $variavel->baixa ?? '';
+                    } elseif ($ponto['faixa'] == 'Moderada') {
+                        $texto = $variavel->moderada ?? '';
+                    } else {
+                        $texto = $variavel->alta ?? '';
+                    }
+                }
+            @endphp
+            {{ $texto }}
+        </p>
+    </div>
+    @endforeach
+
+    <div class="footer">
+        <div class="footer-logos">
+            <span class="footer-logo-text">fellipelli</span>
+            <span class="footer-logo-text">E.MO.TI.VE</span>
+            <span style="font-size: 10px;">Burnout e Bem-estar</span>
+        </div>
+        <div class="footer-page">Todos os direitos reservados a Fellipelli Consultoria | Pág. 05</div>
     </div>
 </div>
 
@@ -746,39 +879,35 @@
 
     @foreach($eixosLista as $eixoInfo)
     @php
-        $eixo = $eixos[$eixoInfo['key']];
+        $eixo = $eixos[$eixoInfo['key']] ?? null;
+        if (!$eixo) continue;
         $interpretacao = $eixo['interpretacao_detalhada'] ?? [];
+        $faixaColor = $eixo['faixa'] == 'Baixa' ? '#4CAF50' : ($eixo['faixa'] == 'Moderada' ? '#D4B87D' : '#F44336');
     @endphp
-    <div class="section">
-        <h3 style="color: #008080; font-size: 18px;">{{ $eixoInfo['nome'] }}</h3>
+    <div class="eixo-container">
+        <h3 class="eixo-title">{{ $eixoInfo['nome'] }}</h3>
         <p style="margin-bottom: 15px;">{{ $eixoInfo['desc'] }}</p>
         
-        <div style="background-color: #f5f5f5; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-            <div style="display: flex; justify-content: space-around; align-items: center;">
-                <div style="text-align: center; flex: 1;">
-                    <div style="font-size: 10px; color: #666; margin-bottom: 8px;">{{ $eixoInfo['dims'][0] }}</div>
-                    <div class="dimension-bar" style="width: 80%; margin: 0 auto;">
-                        <span class="faixa-{{ strtolower($eixo['faixa']) }}">Faixa {{ $eixo['faixa'] }}</span>
-                    </div>
-                </div>
-                <div style="text-align: center; flex: 1;">
-                    <div style="font-size: 10px; color: #666; margin-bottom: 8px;">TOTAL</div>
-                    <div class="dimension-total">{{ round($eixo['valor']) }}</div>
-                </div>
-                <div style="text-align: center; flex: 1;">
-                    <div style="font-size: 10px; color: #666; margin-bottom: 8px;">{{ $eixoInfo['dims'][1] }}</div>
-                    <div class="dimension-bar" style="width: 80%; margin: 0 auto;">
-                        <span class="faixa-{{ strtolower($eixo['faixa']) }}">Faixa {{ $eixo['faixa'] }}</span>
-                    </div>
-                </div>
+        <div class="eixo-data-table">
+            <div class="eixo-dim-item">
+                <div class="eixo-dim-label">{{ $eixoInfo['dims'][0] }}</div>
+                <div class="eixo-dim-badge {{ strtolower($eixo['faixa']) }}">Faixa {{ $eixo['faixa'] }}</div>
+            </div>
+            <div class="eixo-dim-item">
+                <div class="eixo-dim-label">TOTAL</div>
+                <div class="eixo-total">{{ round($eixo['valor']) }}</div>
+            </div>
+            <div class="eixo-dim-item">
+                <div class="eixo-dim-label">{{ $eixoInfo['dims'][1] }}</div>
+                <div class="eixo-dim-badge {{ strtolower($eixo['faixa']) }}">Faixa {{ $eixo['faixa'] }}</div>
             </div>
         </div>
 
         @if(!empty($interpretacao))
-        <div style="margin-top: 15px;">
-            <p><strong>Interpretação:</strong> {{ $interpretacao['interpretacao'] ?? '' }}</p>
-            <p><strong>Significado Psicológico:</strong> {{ $interpretacao['significado'] ?? '' }}</p>
-            <p><strong>Orientações Práticas:</strong> {{ $interpretacao['orientacao'] ?? '' }}</p>
+        <div style="margin-top: 15px; padding: 15px; background-color: #fafafa; border-radius: 6px;">
+            <p style="margin-bottom: 8px;"><strong>Interpretação:</strong> {{ $interpretacao['interpretacao'] ?? '' }}</p>
+            <p style="margin-bottom: 8px;"><strong>Significado Psicológico:</strong> {{ $interpretacao['significado'] ?? '' }}</p>
+            <p style="margin-bottom: 0;"><strong>Orientações Práticas:</strong> {{ $interpretacao['orientacao'] ?? '' }}</p>
         </div>
         @endif
     </div>
@@ -809,24 +938,27 @@
     </div>
 
     @php
-        $iid = $eixos['iid'];
+        $iid = $eixos['iid'] ?? null;
+        if (!$iid) {
+            $iid = ['valor' => 0, 'zona' => 'Zona de equilíbrio emocional', 'descricao' => '', 'interpretacao' => '', 'acao' => '', 'nivel_risco' => 'Baixo'];
+        }
         $percentual = $iid['valor'];
-        $segmentoWidth = 25; // 25% por segmento
-        $indicatorWidth = min(100, ($percentual / 100) * 100);
+        $indicatorWidth = min(100, max(0, ($percentual / 100) * 100));
+        $riscoColor = $iid['nivel_risco'] == 'Baixo' ? '#4CAF50' : ($iid['nivel_risco'] == 'Médio' ? '#E6C25A' : ($iid['nivel_risco'] == 'Atenção' ? '#FF9800' : '#F44336'));
     @endphp
 
     <div class="section">
         <h3>Classificação do Risco</h3>
-        <div class="risk-bar">
-            <div class="risk-indicator" style="width: {{ $indicatorWidth }}%;"></div>
+        <div class="risk-bar-container">
+            <div class="risk-indicator" style="width: {{ $indicatorWidth }}%; background-color: {{ $riscoColor }};"></div>
             <div class="risk-segment">Baixo<br>(0-40)</div>
             <div class="risk-segment">Médio<br>(41-65)</div>
             <div class="risk-segment">Atenção<br>(66-89)</div>
             <div class="risk-segment">Alto<br>(90-100)</div>
         </div>
         
-        <div style="text-align: center; margin: 20px 0;">
-            <span style="font-size: 18px; color: #FFC107; font-weight: bold;">
+        <div style="text-align: center; margin: 25px 0;">
+            <span style="font-size: 18px; color: {{ $riscoColor }}; font-weight: bold;">
                 Pontuação = {{ round($iid['valor']) }} - {{ $iid['zona'] }}
             </span>
         </div>
@@ -852,22 +984,21 @@
     </div>
 </div>
 
-{{-- PÁGINA 8: SAÚDE EMOCIONAL - ANÁLISE GERAL --}}
+{{-- PÁGINA 8: SAÚDE EMOCIONAL - ANÁLISE GERAL (Parte 1) --}}
 <div class="page-break">
-    <h1 style="color: #8B4513; font-size: 22px;">SAÚDE EMOCIONAL</h1>
-    <h2 style="color: #008080; font-size: 16px; margin-bottom: 20px;">Análise Geral</h2>
+    <h1 style="color: #8B4513; font-size: 22px; text-transform: none;">SAÚDE EMOCIONAL</h1>
+    <h2 style="color: #42B8D4; font-size: 16px; margin-bottom: 20px;">Análise Geral</h2>
     
     <div class="section">
-        <p>Bem-vindo ao seu relatório de saúde emocional. Este documento foi criado para explorar seus resultados, destacar pontos fortes e oferecer orientações práticas para autocuidado e desenvolvimento pessoal.</p>
-        
-        <p>Com base nas suas respostas, identificamos padrões que refletem seu estado atual de bem-estar no trabalho. Lembre-se: esses resultados são um ponto de partida para reflexão e ação, não um diagnóstico definitivo.</p>
+        <p>Olá,</p>
+        <p>Primeiramente, é importante reconhecer que você está em um espaço de conscientização e crescimento, o que já é um passo significativo em direção ao equilíbrio emocional e bem-estar. Vamos explorar cada um dos seus resultados, destacando seus pontos fortes e oferecendo orientações práticas para o autocuidado e desenvolvimento pessoal.</p>
     </div>
 
     @php
         $dimensoesPrincipais = [
-            ['tag' => 'EXEM', 'nome' => 'Exaustão Emocional (ExEm)', 'cor' => '#8B4513'],
-            ['tag' => 'DECI', 'nome' => 'Despersonalização / Cinismo (DeCi)', 'cor' => '#FF8C00'],
-            ['tag' => 'REPR', 'nome' => 'Realização Profissional (RePr)', 'cor' => '#DAA520'],
+            ['tag' => 'EXEM', 'nome' => 'Exaustão Emocional (ExEm)', 'cor' => '#6B5B4A'],
+            ['tag' => 'DECI', 'nome' => 'Despersonalização / Cinismo (DeCi)', 'cor' => '#C79F6B'],
+            ['tag' => 'REPR', 'nome' => 'Realização Profissional (RePr)', 'cor' => '#8C8C8C'],
         ];
     @endphp
 
@@ -877,37 +1008,43 @@
         if (!$ponto) continue;
         $variavel = $variaveis->firstWhere('tag', $dimInfo['tag']);
     @endphp
-    <div class="section">
-        <div style="background-color: {{ $dimInfo['cor'] }}; color: white; padding: 12px; border-radius: 6px 6px 0 0; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: bold;">{{ $dimInfo['nome'] }}</span>
+    <div class="dimension-box">
+        <div class="dimension-header {{ strtolower($dimInfo['tag']) }}">
+            <span>{{ $dimInfo['nome'] }}</span>
             <span class="faixa-{{ strtolower($ponto['faixa']) }}">{{ $ponto['faixa'] }}</span>
         </div>
-        <div style="background-color: #f5f5f5; padding: 15px; border-radius: 0 0 6px 6px; margin-bottom: 20px;">
+        <div class="dimension-content">
             <p style="margin-bottom: 10px;">
-                @if($ponto['faixa'] == 'Baixa')
-                    Os resultados indicam um estado de {{ strtolower($ponto['nome']) }} em nível baixo, sugerindo boa gestão emocional e capacidade de recuperação.
-                @elseif($ponto['faixa'] == 'Moderada')
-                    Os resultados indicam um estado de {{ strtolower($ponto['nome']) }} em nível moderado, sugerindo atenção e monitoramento contínuo.
-                @else
-                    Os resultados indicam um estado de {{ strtolower($ponto['nome']) }} em nível alto, sugerindo necessidade de ações imediatas de cuidado.
-                @endif
+                @php
+                    $texto = '';
+                    if ($variavel) {
+                        if ($ponto['faixa'] == 'Baixa') {
+                            $texto = $variavel->baixa ?? '';
+                        } elseif ($ponto['faixa'] == 'Moderada') {
+                            $texto = $variavel->moderada ?? '';
+                        } else {
+                            $texto = $variavel->alta ?? '';
+                        }
+                    }
+                @endphp
+                {{ $texto }}
             </p>
             
             <p style="margin-bottom: 5px;"><strong>Ponto forte:</strong> 
                 @if($ponto['faixa'] == 'Baixa')
-                    Você demonstra boa capacidade de autorregulação e resiliência.
+                    Você está ciente de suas emoções e reconhece a necessidade de cuidar delas.
                 @elseif($ponto['faixa'] == 'Moderada')
-                    Você está consciente de suas necessidades e busca equilíbrio.
+                    Você está ciente de suas emoções e reconhece a necessidade de cuidar delas.
                 @else
-                    Você reconhece a importância do autocuidado e está aberto a mudanças.
+                    Você está ciente de suas emoções e reconhece a necessidade de cuidar delas.
                 @endif
             </p>
             
-            <p style="margin-bottom: 5px;"><strong>Orientação prática:</strong> 
+            <p style="margin-bottom: 0;"><strong>Orientação prática:</strong> 
                 @if($ponto['faixa'] == 'Baixa')
-                    Continue praticando hábitos saudáveis e compartilhando boas práticas com colegas.
+                    Continue praticando hábitos saudáveis, compartilhando boas práticas e inspirando colegas.
                 @elseif($ponto['faixa'] == 'Moderada')
-                    Priorize pausas regulares, estabeleça limites claros e busque apoio quando necessário.
+                    Priorize momentos de descanso e autocuidado. Atividades como meditação, exercícios físicos regulares e a prática de hobbies podem ajudar a recarregar suas energias emocionais.
                 @else
                     Considere buscar suporte profissional, revise suas demandas e implemente práticas de autocuidado imediatamente.
                 @endif
@@ -926,16 +1063,16 @@
     </div>
 </div>
 
-{{-- PÁGINA 9: SAÚDE EMOCIONAL - DIMENSÕES DETALHADAS --}}
+{{-- PÁGINA 9: SAÚDE EMOCIONAL - ANÁLISE GERAL (Parte 2) --}}
 <div class="page-break">
-    <h1 style="color: #8B4513; font-size: 22px;">SAÚDE EMOCIONAL</h1>
-    <h2 style="color: #008080; font-size: 16px; margin-bottom: 20px;">Análise Geral</h2>
+    <h1 style="color: #8B4513; font-size: 22px; text-transform: none;">SAÚDE EMOCIONAL</h1>
+    <h2 style="color: #42B8D4; font-size: 16px; margin-bottom: 20px;">Análise Geral</h2>
 
     @php
         $dimensoesSecundarias = [
             ['tag' => 'FAPS', 'nome' => 'Fatores Psicossociais (FaPs)', 'cor' => '#556B2F'],
             ['tag' => 'ASMO', 'nome' => 'Assédio Moral (AsMo)', 'cor' => '#191970'],
-            ['tag' => 'EXTR', 'nome' => 'Excesso de Trabalho (ExTr)', 'cor' => '#483D8B'],
+            ['tag' => 'EXTR', 'nome' => 'Excesso de Trabalho (ExTr)', 'cor' => '#6A5C8A'],
         ];
     @endphp
 
@@ -943,38 +1080,45 @@
     @php
         $ponto = collect($pontuacoes)->firstWhere('tag', $dimInfo['tag']);
         if (!$ponto) continue;
+        $variavel = $variaveis->firstWhere('tag', $dimInfo['tag']);
     @endphp
-    <div class="section">
-        <div style="background-color: {{ $dimInfo['cor'] }}; color: white; padding: 12px; border-radius: 6px 6px 0 0; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: bold;">{{ $dimInfo['nome'] }}</span>
+    <div class="dimension-box">
+        <div class="dimension-header {{ strtolower($dimInfo['tag']) }}">
+            <span>{{ $dimInfo['nome'] }}</span>
             <span class="faixa-{{ strtolower($ponto['faixa']) }}">{{ $ponto['faixa'] }}</span>
         </div>
-        <div style="background-color: #f5f5f5; padding: 15px; border-radius: 0 0 6px 6px; margin-bottom: 20px;">
+        <div class="dimension-content">
             <p style="margin-bottom: 10px;">
-                @if($ponto['faixa'] == 'Baixa')
-                    Os resultados indicam um estado de {{ strtolower($dimInfo['nome']) }} em nível baixo, sugerindo um ambiente de trabalho saudável e equilibrado.
-                @elseif($ponto['faixa'] == 'Moderada')
-                    Os resultados indicam um estado de {{ strtolower($dimInfo['nome']) }} em nível moderado, sugerindo atenção e monitoramento contínuo.
-                @else
-                    Os resultados indicam um estado de {{ strtolower($dimInfo['nome']) }} em nível alto, sugerindo necessidade de ações imediatas de cuidado.
-                @endif
+                @php
+                    $texto = '';
+                    if ($variavel) {
+                        if ($ponto['faixa'] == 'Baixa') {
+                            $texto = $variavel->baixa ?? '';
+                        } elseif ($ponto['faixa'] == 'Moderada') {
+                            $texto = $variavel->moderada ?? '';
+                        } else {
+                            $texto = $variavel->alta ?? '';
+                        }
+                    }
+                @endphp
+                {{ $texto }}
             </p>
             
             <p style="margin-bottom: 5px;"><strong>Ponto forte:</strong> 
                 @if($ponto['faixa'] == 'Baixa')
-                    Você trabalha em um ambiente que oferece suporte adequado e condições favoráveis.
+                    Um ambiente mais seguro emocionalmente.
                 @elseif($ponto['faixa'] == 'Moderada')
-                    Você reconhece os desafios e busca equilibrar as demandas.
+                    Você tem a resiliência necessária para enfrentar desafios.
                 @else
                     Você está consciente das situações que precisam de atenção e mudança.
                 @endif
             </p>
             
-            <p style="margin-bottom: 5px;"><strong>Orientação prática:</strong> 
+            <p style="margin-bottom: 0;"><strong>Orientação prática:</strong> 
                 @if($ponto['faixa'] == 'Baixa')
-                    Continue valorizando e protegendo esse equilíbrio. Compartilhe práticas positivas.
+                    Continue contribuindo para um ambiente de trabalho respeitoso e solidário, e esteja atento para apoiar colegas que possam precisar.
                 @elseif($ponto['faixa'] == 'Moderada')
-                    Monitore sinais de estresse, pratique pausas regulares e busque diálogo sobre ajustes necessários.
+                    Cultive um ambiente de suporte social, buscando apoio de colegas e compartilhe suas experiências. A comunicação aberta pode melhorar significativamente seu bem-estar psicológico.
                 @else
                     Busque apoio institucional, estabeleça limites claros e considere canais formais de suporte.
                 @endif
@@ -984,7 +1128,7 @@
     @endforeach
 
     <div class="section" style="margin-top: 30px;">
-        <p style="font-weight: bold; font-size: 13px;">Em conclusão, você está em um ponto de equilíbrio que, embora desafiador, oferece inúmeras oportunidades de crescimento. Ao continuar investindo em autocuidado e desenvolvimento pessoal, você poderá transformar essas vulnerabilidades em áreas de força. Você já possui os recursos internos necessários para prosperar e alcançar um estado de bem-estar mais pleno. Continue a jornada com confiança e cuidado consigo mesmo.</p>
+        <p style="font-weight: normal; font-size: 11px;">Em conclusão, você está em um ponto de equilíbrio que, embora desafiador, oferece inúmeras oportunidades de crescimento. Ao continuar investindo em autocuidado e desenvolvimento pessoal, você poderá transformar essas vulnerabilidades em áreas de força. Você já possui os recursos internos necessários para prosperar e alcançar um estado de bem-estar mais pleno. Continue a jornada com confiança e cuidado consigo mesmo.</p>
     </div>
 
     <div class="footer">
@@ -1002,18 +1146,18 @@
     <h1>PLANO DE DESENVOLVIMENTO PESSOAL</h1>
     
     @php
-        $nivelRisco = $iid['nivel_risco'];
-        $zona = $iid['zona'];
+        $nivelRisco = $iid['nivel_risco'] ?? 'Médio';
+        $zona = $iid['zona'] ?? 'Zona de atenção preventiva';
     @endphp
 
     <div class="section">
-        <h3 style="display: flex; align-items: center;">
-            <span class="bullet-gold"></span>
-            <span style="color: #FFC107; font-size: 16px;">{{ $zona }}</span>
-        </h3>
+        <div class="plano-zona">
+            <div class="plano-bullet"></div>
+            <div class="plano-zona-text">{{ $zona }}</div>
+        </div>
         
         <div style="margin-left: 20px;">
-            <h4 style="color: #008080; margin-bottom: 10px;">Objetivo:</h4>
+            <h3 style="color: #42B8D4; font-size: 16px; margin-bottom: 10px;">Objetivo:</h3>
             <p style="margin-bottom: 20px;">
                 @if($nivelRisco == 'Baixo')
                     Manter o equilíbrio emocional e continuar desenvolvendo práticas saudáveis de bem-estar.
@@ -1026,7 +1170,7 @@
                 @endif
             </p>
 
-            <h4 style="color: #008080; margin-bottom: 10px;">Ações sugeridas:</h4>
+            <h3 style="color: #42B8D4; font-size: 16px; margin-bottom: 10px;">Ações sugeridas:</h3>
             <ol style="margin-left: 20px; margin-bottom: 20px;">
                 @if($nivelRisco == 'Baixo')
                     <li>Manter hábitos saudáveis de sono, alimentação e exercício físico.</li>
@@ -1047,7 +1191,7 @@
                 @endif
             </ol>
 
-            <h4 style="color: #008080; margin-bottom: 10px;">Indicador de progresso:</h4>
+            <h3 style="color: #42B8D4; font-size: 16px; margin-bottom: 10px;">Indicador de progresso:</h3>
             <p style="margin-bottom: 20px;">
                 @if($nivelRisco == 'Baixo')
                     Manutenção de níveis baixos de estresse e alta satisfação profissional.
@@ -1081,27 +1225,29 @@
     <h1>CONCLUSÃO GERAL</h1>
     
     <div class="section">
-        <p>Este relatório foi criado para oferecer uma visão abrangente do seu estado emocional e psicossocial no trabalho. Os resultados apresentados refletem seu estado atual e oferecem um ponto de partida para reflexão e ação.</p>
+        <p>O autodesenvolvimento é um processo contínuo e intencional. Ele exige que você se comprometa com a prática diária de se conhecer melhor, de reconhecer seus limites e de investir em estratégias que fortaleçam seu bem-estar.</p>
         
-        <p>Lembre-se que o bem-estar é um processo contínuo, não um destino final. Cada ação que você toma para cuidar de si mesmo, por menor que seja, contribui para um estado de maior equilíbrio e satisfação.</p>
+        <p>A partir das reflexões e ações propostas neste relatório, você tem a oportunidade de transformar desafios em oportunidades de crescimento. Lembre-se: cada pequena ação conta, cada pausa que você faz, cada limite que você estabelece, cada conversa que você inicia — tudo isso contribui para um estado de maior equilíbrio e satisfação.</p>
         
-        <p>As dimensões avaliadas — Exaustão Emocional, Despersonalização/Cinismo, Realização Profissional, Fatores Psicossociais, Assédio Moral e Excesso de Trabalho — interagem constantemente, criando um perfil único de equilíbrio ou desequilíbrio.</p>
+        <div class="quote-box-teal" style="margin: 30px 0;">
+            "Cuidar de si é um ato de liderança silenciosa: quando você se equilibra, o ambiente ao seu redor também muda."
+        </div>
         
-        <p>Os três eixos analíticos — Energia Emocional, Propósito e Relações, e Sustentabilidade Ocupacional — fornecem uma visão integrada do seu estado de bem-estar. O Índice Integrado de Descarrilamento (IID) oferece uma medida geral do seu risco atual.</p>
+        <p>Você deu um passo importante: parar, olhar e compreender suas emoções. Esse gesto, simples e corajoso, é o primeiro movimento de quem busca crescer sem perder a essência.</p>
         
-        <p>Independentemente dos resultados, lembre-se que você tem capacidade de mudança e crescimento. O autocuidado não é egoísmo — é uma responsabilidade consigo mesmo e com aqueles que dependem de você.</p>
-    </div>
-
-    <div class="quote-box-teal" style="margin: 30px 0;">
-        "Cuidar de si é um ato de liderança silenciosa: quando você se equilibra, o ambiente ao seu redor também muda."
-    </div>
-
-    <div class="quote-box-gray" style="margin: 30px 0;">
-        "A mudança começa quando nos olhamos com gentileza."
+        <p>O equilíbrio emocional não é algo fixo, mas uma prática constante — como respirar fundo antes de seguir.</p>
+        
+        <p>Continue se observando, se respeitando e se cuidando.</p>
+        
+        <p>O seu bem-estar é a base para o seu melhor desempenho.</p>
+        
+        <div class="quote-box-gray" style="margin: 30px 0;">
+            "A mudança começa quando nos olhamos com gentileza."
+        </div>
     </div>
 
     <div class="section" style="margin-top: 40px;">
-        <h3 style="color: #008080;">Fellipelli Consultoria</h3>
+        <h3 style="color: #008080; font-size: 18px; margin-bottom: 5px;">Fellipelli Consultoria</h3>
         <p style="font-size: 12px; color: #666; margin-top: 5px;">Transformando autoconhecimento em desenvolvimento humano.</p>
     </div>
 
@@ -1117,4 +1263,3 @@
 
 </body>
 </html>
-

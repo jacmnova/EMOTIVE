@@ -42,6 +42,8 @@
         @include('participante.partials._radar')
         @include('participante.partials._dimensoes')
         @include('participante.partials._barras')
+        @include('participante.partials._eixos_analiticos')
+        @include('participante.partials._risco_descarrilamento')
         @include('participante.partials._recomenda')
         @include('participante.partials._graficos-dimensionais')
         @include('participante.partials._analise')
@@ -147,7 +149,7 @@
 <script>
     const pontuacoes = @json($pontuacoes);
     const labels = pontuacoes.map(p => `${p.tag}`);
-    const data = pontuacoes.map(p => p.valor);
+    const data = pontuacoes.map(p => p.normalizada || p.valor);
 
     function gerarCores(qtd, opacidade = 1) {
         const cores = [
@@ -210,7 +212,7 @@
 <script>
 
     const labelsRadar = pontuacoes.map(p => p.tag);
-    const dataRadar = pontuacoes.map(p => p.valor);
+    const dataRadar = pontuacoes.map(p => p.normalizada || p.valor);
 
     function gerarCoresRadar(qtd, opacidade = 1) {
         const cores = [
@@ -282,8 +284,13 @@
             scales: {
                 r: {
                     angleLines: { display: true },
-                    suggestedMin: 0,
-                    suggestedMax: Math.max(...dataRadar) + 5
+                    min: 0,
+                    max: 100,
+                    ticks: {
+                        stepSize: 20,
+                        min: 0,
+                        max: 100
+                    }
                 }
             }
         }

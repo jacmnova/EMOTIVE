@@ -665,8 +665,20 @@ class RelatorioController extends Controller
 
         $urlGraficoRadar = 'https://quickchart.io/chart?c=' . urlencode(json_encode($configRadar));
         $imagemRadarPath = $graficosDir . '/radar_' . uniqid() . '.png';
-        file_put_contents($imagemRadarPath, file_get_contents($urlGraficoRadar));
-        $imagemRadarPublicPath = 'storage/graficos/' . basename($imagemRadarPath);
+        
+        // Descargar imagen con contexto seguro (evita problemas de HTTPS)
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'GET',
+                'timeout' => 30,
+                'ignore_errors' => true
+            ]
+        ]);
+        
+        $imagenData = @file_get_contents($urlGraficoRadar, false, $context);
+        if ($imagenData) {
+            file_put_contents($imagemRadarPath, $imagenData);
+        }
 
         // ANALISE GERADA PELA IA
         $analise = Analise::where('user_id', $usuarioId)
@@ -675,7 +687,7 @@ class RelatorioController extends Controller
 
         $analiseTexto = $analise?->texto ?? 'Análise não disponível.';
 
-        // DADOS PARA A VIEW
+        // DADOS PARA A VIEW - usar ruta absoluta del sistema de archivos para PDF (evita problemas de HTTPS)
         $data = [
             'user' => $user,
             'formulario' => $formulario,
@@ -685,7 +697,7 @@ class RelatorioController extends Controller
             'eixos' => $eixos,
             'hoje' => now()->format('d/m/Y'),
             'dataResposta' => $respostasUsuario->first()?->created_at?->format('d/m/Y') ?? now()->format('d/m/Y'),
-            'imagemRadar' => $imagemRadarPublicPath,
+            'imagemRadar' => file_exists($imagemRadarPath) ? $imagemRadarPath : null,
             'analiseTexto' => $analiseTexto,
         ];
 
@@ -824,8 +836,11 @@ class RelatorioController extends Controller
             'analiseTexto' => $analiseTexto,
         ];
 
-        // Retorna la vista HTML
-        return view('relatorios.emotive', $data);
+        // Retorna la vista HTML del relatorio existente (participante.relatorio)
+        return redirect()->route('relatorio.show', [
+            'formulario_id' => $formularioId,
+            'usuario_id' => $usuarioId,
+        ]);
     }
 
     /**
