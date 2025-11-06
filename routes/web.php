@@ -52,7 +52,7 @@ Route::get('/faqs', function () {
 
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
+Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 
 // GESTAO
@@ -126,6 +126,7 @@ Route::resource('calculos', CalculosController::class);
 
 
 Route::get('/relatorio/pdf', [RelatorioController::class, 'gerarPDF'])->name('relatorio.pdf');
+Route::get('/relatorio/pdf/temp/{token}', [RelatorioController::class, 'relatorioPDFTemp'])->name('relatorio.pdf.temp');
 
 
 Route::get('/dashadmin', [DashboardController::class, 'index'])->name('dashboard.admin');

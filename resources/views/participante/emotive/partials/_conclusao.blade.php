@@ -1,14 +1,18 @@
-<div class="page-break" style="padding: 40px; max-width: 900px; margin: 0 auto;">
-    <h1 class="section-title" style="color: #008ca5; font-size: 2rem; margin-bottom: 30px;">CONCLUSÃO GERAL</h1>
+@if(isset($isPdf) && $isPdf)
+<div class="page-break" style="padding: 40px; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;page-break-after: always;page-break-inside: avoid;">
+@else
+<div style="padding: 40px; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;">
+@endif
+    <h1 class="section-title" style="color: #A4977F;font-size: 24px;font-style: normal;font-weight: 700;line-height: normal; margin-bottom: 30px;">CONCLUSÃO GERAL</h1>
     
     <!-- Autodesenvolvimento -->
     <div style="margin-bottom: 40px;">
-        <p style="text-align: justify; line-height: 1.8; margin-bottom: 20px; color: #555; font-size: 1.05rem;">
+        <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin-bottom: 20px;">
             O autodesenvolvimento é um processo contínuo e intencional. O E.MO.TI.VE oferece insights sobre fatores que influenciam seu equilíbrio emocional no trabalho, destacando áreas de força e vulnerabilidade. Ao construir uma rotina mais autoconhecedora, saudável e produtiva, você fortalece seu bem-estar e performance.
         </p>
         
-        <div class="quote-box" style="background-color: #e8f4f8; border-radius: 8px; padding: 20px; margin: 25px 0;">
-            <p style="margin: 0; font-style: italic; color: #333; font-size: 1.05rem; line-height: 1.8;">
+        <div style="background-color: #E8F4F8; border-radius: 8px; padding: 20px; margin: 30px 0;">
+            <p style="color: #2E9196;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin: 0;">
                 "Cuidar de si é um ato de liderança silenciosa: quando você se equilibra, o ambiente ao seu redor também muda."
             </p>
         </div>
@@ -16,34 +20,43 @@
     
     <!-- Passo Importante -->
     <div style="margin-bottom: 40px;">
-        <p style="text-align: justify; line-height: 1.8; margin-bottom: 20px; color: #555; font-size: 1.05rem;">
+        <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin-bottom: 20px;">
             Pausar, observar e compreender suas emoções é um passo importante para o crescimento. O equilíbrio emocional é uma prática contínua que requer atenção, respeito por si mesmo e cuidado ativo. Ao desenvolver essas habilidades, você constrói uma base sólida para melhor performance e bem-estar sustentável.
         </p>
         
-        <div class="quote-box" style="background-color: #f0f0f0; border-radius: 8px; padding: 20px; margin: 25px 0;">
-            <p style="margin: 0; font-style: italic; color: #333; font-size: 1.05rem; line-height: 1.8;">
+        <div style="background-color: #F5F5F5; border-radius: 8px; padding: 20px; margin: 30px 0;">
+            <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin: 0;">
                 "A mudança começa quando nos olhamos com gentileza."
             </p>
         </div>
     </div>
     
     <!-- Consultoria -->
-    <div style="margin-top: 60px; padding-top: 30px; border-top: 2px solid #008ca5;">
-        <h2 style="color: #008ca5; font-size: 1.5rem; margin-bottom: 10px;">Fellipelli Consultoria</h2>
-        <p style="color: #666; font-size: 1.05rem; margin: 0;">
+    <div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid #2E9196;">
+        <h2 class="section-subtitle" style="color: #2E9196;font-size: 16px;font-style: normal;font-weight: 400;line-height: normal; margin-bottom: 10px;">Fellipelli Consultoria</h2>
+        <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; margin: 0;">
             Transformando autoconhecimento em desenvolvimento humano.
         </p>
     </div>
     
     <!-- Footer -->
     <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <p style="font-size: 0.9rem; color: #666; margin: 0;"><strong>fellipelli</strong></p>
-            <p style="font-size: 0.85rem; color: #888; margin: 5px 0 0 0;">E.MO.TI.VE | Burnout e Bem-estar</p>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            @php
+                $imgPath = function($path) {
+                    if (isset($isPdf) && $isPdf) {
+                        $fullPath = public_path($path);
+                        return file_exists($fullPath) ? $fullPath : '';
+                    }
+                    return asset($path);
+                };
+            @endphp
+            <img src="{{ $imgPath('img/felipelli-logo.png') }}" alt="Fellipelli Consultoria" style="height: 30px;">
+            <img src="{{ $imgPath('img/emotive-logo.png') }}" alt="E.MO.TI.VE" style="height: 30px;">
         </div>
         <div style="text-align: right;">
-            <p style="font-size: 0.8rem; color: #999; margin: 0;">Todos os direitos reservados a Fellipelli Consultoria</p>
-            <p style="font-size: 0.8rem; color: #999; margin: 5px 0 0 0;">Pág. 11</p>
+            <p style="font-size: 8px; color: #999; margin: 0;">Todos os direitos reservados a Fellipelli Consultoria</p>
+            <p style="font-size: 8px; color: #999; margin: 5px 0 0 0;">Pág. 11</p>
         </div>
     </div>
 </div>

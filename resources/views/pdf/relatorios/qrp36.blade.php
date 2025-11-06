@@ -5,10 +5,12 @@
     <title>{{ $formulario->label }} | {{ $formulario->nome }}</title>
     <style>
         @page {
+            size: A4 portrait;
             margin: 0;
         }
 
         @page :not(:first) {
+            size: A4 portrait;
             margin: 100px 80px;
         }
 
@@ -16,10 +18,16 @@
             font-family: DejaVu Sans, sans-serif;
             font-size: 12px;
             color: #111;
+            width: 100%;
+            max-width: 100%;
         }
 
         .conteudo {
             padding: 20px;
+            max-width: 595.28pt; /* Ancho exacto de A4 en portrait */
+            width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
         }
 
         .page-break {
@@ -28,8 +36,10 @@
 
         .capa-imagem {
             width: 100%;
-            height: 100vh;
+            height: 842pt; /* Altura exacta de A4 en portrait */
+            max-height: 842pt;
             position: relative;
+            box-sizing: border-box;
         }
 
         .capa-imagem img {

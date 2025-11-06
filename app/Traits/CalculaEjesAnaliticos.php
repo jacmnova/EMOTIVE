@@ -19,9 +19,10 @@ trait CalculaEjesAnaliticos
             $pontosPorTag[$tag] = ['valor' => $valor, 'faixa' => $faixa];
         }
 
-        // EIXO 1: ENERGIA EMOCIONAL (Exaustão Emocional × Realização Profissional)
+        // EIXO 1: ENERGIA EMOCIONAL (Realização Profissional - Exaustão Emocional + 100) / 2
         $exaustao = $pontosPorTag['EXEM'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
         $realizacao = $pontosPorTag['REPR'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
+        $eixo1Total = max(0, min(100, ($realizacao['valor'] - $exaustao['valor'] + 100) / 2));
         $eixo1 = [
             'nome' => 'ENERGIA EMOCIONAL',
             'descricao' => 'Este eixo mostra o quanto sua energia emocional está sendo renovada ou drenada no trabalho. Ele representa o equilíbrio entre vitalidade e propósito.',
@@ -37,13 +38,14 @@ trait CalculaEjesAnaliticos
                 'valor' => $realizacao['valor'],
                 'faixa' => $realizacao['faixa']
             ],
-            'total' => round(($exaustao['valor'] + $realizacao['valor']) / 2, 0),
+            'total' => round($eixo1Total, 0),
             'interpretacao' => $this->interpretarEixo1($exaustao['faixa'], $realizacao['faixa'])
         ];
 
-        // EIXO 2: PROPÓSITO E RELAÇÕES (Despersonalização / Cinismo × Fatores Psicossociais)
+        // EIXO 2: PROPÓSITO E RELAÇÕES (Fatores Psicossociais - Cinismo + 100) / 2
         $cinismo = $pontosPorTag['DECI'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
         $fatores = $pontosPorTag['FAPS'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
+        $eixo2Total = max(0, min(100, ($fatores['valor'] - $cinismo['valor'] + 100) / 2));
         $eixo2 = [
             'nome' => 'PROPÓSITO E RELAÇÕES',
             'descricao' => 'Este eixo avalia o grau de conexão emocional e relacional com o ambiente de trabalho — ou seja, se o participante sente pertencimento, confiança e reciprocidade.',
@@ -59,13 +61,14 @@ trait CalculaEjesAnaliticos
                 'valor' => $fatores['valor'],
                 'faixa' => $fatores['faixa']
             ],
-            'total' => round(($cinismo['valor'] + $fatores['valor']) / 2, 0),
+            'total' => round($eixo2Total, 0),
             'interpretacao' => $this->interpretarEixo2($cinismo['faixa'], $fatores['faixa'])
         ];
 
-        // EIXO 3: SUSTENTABILIDADE OCUPACIONAL (Excesso de Trabalho × Assédio Moral)
+        // EIXO 3: SUSTENTABILIDADE OCUPACIONAL 100 - ((Excesso de Trabalho + Assédio Moral) / 2)
         $excesso = $pontosPorTag['EXTR'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
         $assedio = $pontosPorTag['ASMO'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
+        $eixo3Total = max(0, min(100, 100 - (($excesso['valor'] + $assedio['valor']) / 2)));
         $eixo3 = [
             'nome' => 'SUSTENTABILIDADE OCUPACIONAL',
             'descricao' => 'Este eixo reflete a relação entre o esforço exigido e o suporte ético e emocional oferecido pelo ambiente. Mostra se o trabalho é sustentável — isto é, se há equilíbrio entre pressão e respeito.',
@@ -81,7 +84,7 @@ trait CalculaEjesAnaliticos
                 'valor' => $assedio['valor'],
                 'faixa' => $assedio['faixa']
             ],
-            'total' => round(($excesso['valor'] + $assedio['valor']) / 2, 0),
+            'total' => round($eixo3Total, 0),
             'interpretacao' => $this->interpretarEixo3($excesso['faixa'], $assedio['faixa'])
         ];
 
@@ -93,14 +96,14 @@ trait CalculaEjesAnaliticos
     }
 
     /**
-     * Calcula o Índice Integrado de Descarrilamento (IID)
+     * Calcula o Índice Integrado de Descarrilamento (IID) / Índice Global de Saúde Emocional (IGSE)
      */
     protected function calcularIID($ejesAnaliticos): float
     {
         $total = $ejesAnaliticos['eixo1']['total'] + 
                  $ejesAnaliticos['eixo2']['total'] + 
                  $ejesAnaliticos['eixo3']['total'];
-        return round($total / 3, 0);
+        return round($total / 3, 2);
     }
 
     /**

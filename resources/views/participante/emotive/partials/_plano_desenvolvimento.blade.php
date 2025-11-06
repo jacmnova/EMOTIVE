@@ -1,53 +1,66 @@
-<div class="page-break" style="padding: 40px; max-width: 900px; margin: 0 auto;">
-    <h1 class="section-title" style="color: #008ca5; font-size: 2rem; margin-bottom: 30px;">PLANO DE DESENVOLVIMENTO PESSOAL</h1>
+@if(isset($isPdf) && $isPdf)
+<div class="page-break" style="padding: 40px; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;page-break-after: always;page-break-inside: avoid;">
+@else
+<div style="padding: 40px; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;">
+@endif
+    <h1 class="section-title" style="color: #A4977F;font-size: 24px;font-style: normal;font-weight: 700;line-height: normal; margin-bottom: 30px;">PLANO DE DESENVOLVIMENTO PESSOAL</h1>
     
     <!-- Zona de Risco -->
     <div style="margin-bottom: 40px;">
         <div style="display: flex; align-items: center; margin-bottom: 20px;">
             <div style="width: 12px; height: 12px; background: {{ $nivelRisco['cor_hex'] }}; border-radius: 50%; margin-right: 10px;"></div>
-            <h2 style="color: {{ $nivelRisco['cor_hex'] }}; font-size: 1.3rem; margin: 0;">{{ $nivelRisco['zona'] }}</h2>
+            <h2 class="section-subtitle" style="color: {{ $nivelRisco['cor_hex'] }};font-size: 16px;font-style: normal;font-weight: 400;line-height: normal; margin: 0;">{{ $nivelRisco['zona'] }}</h2>
         </div>
         
-        <div style="margin-bottom: 20px;">
-            <h3 style="color: #00a8b5; margin-bottom: 10px; font-size: 1.1rem;">Objetivo:</h3>
-            <p style="text-align: justify; line-height: 1.8; color: #555; margin-bottom: 20px;">
+        <div style="margin-bottom: 30px;">
+            <h3 style="color: #2E9196;font-size: 16px;font-style: normal;font-weight: 400;line-height: normal; margin-bottom: 15px;">Objetivo:</h3>
+            <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin: 0;">
                 {{ $planDesenvolvimento['objetivo'] }}
             </p>
         </div>
         
-        <div style="margin-bottom: 20px;">
-            <h3 style="color: #00a8b5; margin-bottom: 10px; font-size: 1.1rem;">Ações sugeridas:</h3>
-            <ol style="line-height: 2; padding-left: 25px; color: #555;">
+        <div style="margin-bottom: 30px;">
+            <h3 style="color: #2E9196;font-size: 16px;font-style: normal;font-weight: 400;line-height: normal; margin-bottom: 15px;">Ações sugeridas:</h3>
+            <ol style="line-height: 1.8; padding-left: 25px; margin: 0; list-style: decimal;">
                 @foreach($planDesenvolvimento['acoes'] as $acao)
-                    <li>{{ $acao }}</li>
+                    <li style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; margin-bottom: 8px; text-align: justify;">{{ $acao }}</li>
                 @endforeach
             </ol>
         </div>
         
         <div>
-            <h3 style="color: #00a8b5; margin-bottom: 10px; font-size: 1.1rem;">Indicador de progresso:</h3>
-            <p style="text-align: justify; line-height: 1.8; color: #555; margin: 0;">
+            <h3 style="color: #2E9196;font-size: 16px;font-style: normal;font-weight: 400;line-height: normal; margin-bottom: 15px;">Indicador de progresso:</h3>
+            <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin: 0;">
                 {{ $planDesenvolvimento['indicador'] }}
             </p>
         </div>
     </div>
     
     <!-- Citação -->
-    <div class="quote-box" style="background-color: #e8f4f8; border-radius: 8px; padding: 25px; margin: 40px 0; text-align: center;">
-        <p style="margin: 0; font-size: 1.1rem; font-style: italic; color: #333; line-height: 1.8;">
+    <div style="background-color: #E8F4F8; border-radius: 8px; padding: 20px; margin: 40px 0;">
+        <p style="color: #2E9196;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin: 0;">
             "O equilíbrio não é ausência de desafios, mas a capacidade de se manter inteiro diante deles."
         </p>
     </div>
     
     <!-- Footer -->
     <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <p style="font-size: 0.9rem; color: #666; margin: 0;"><strong>fellipelli</strong></p>
-            <p style="font-size: 0.85rem; color: #888; margin: 5px 0 0 0;">E.MO.TI.VE | Burnout e Bem-estar</p>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            @php
+                $imgPath = function($path) {
+                    if (isset($isPdf) && $isPdf) {
+                        $fullPath = public_path($path);
+                        return file_exists($fullPath) ? $fullPath : '';
+                    }
+                    return asset($path);
+                };
+            @endphp
+            <img src="{{ $imgPath('img/felipelli-logo.png') }}" alt="Fellipelli Consultoria" style="height: 30px;">
+            <img src="{{ $imgPath('img/emotive-logo.png') }}" alt="E.MO.TI.VE" style="height: 30px;">
         </div>
         <div style="text-align: right;">
-            <p style="font-size: 0.8rem; color: #999; margin: 0;">Todos os direitos reservados a Fellipelli Consultoria</p>
-            <p style="font-size: 0.8rem; color: #999; margin: 5px 0 0 0;">Pág. 10</p>
+            <p style="font-size: 8px; color: #999; margin: 0;">Todos os direitos reservados a Fellipelli Consultoria</p>
+            <p style="font-size: 8px; color: #999; margin: 5px 0 0 0;">Pág. 10</p>
         </div>
     </div>
 </div>

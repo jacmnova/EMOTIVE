@@ -291,11 +291,25 @@ class DadosController extends Controller
         $pontuacoes = [];
         foreach ($variaveis as $variavel) {
             $pontuacao = 0;
+            $totalRespostas = 0;
+            
+            // Verificar si la variable tiene preguntas asociadas
+            if ($variavel->perguntas->isEmpty()) {
+                continue; // Saltar variables sin preguntas
+            }
+            
+            // Calcular puntuación basada en las respuestas
             foreach ($variavel->perguntas as $pergunta) {
                 $resposta = $respostasUsuario->get($pergunta->id);
-                if ($resposta) {
-                    $pontuacao += $resposta->valor_resposta ?? 0;
+                if ($resposta && $resposta->valor_resposta !== null) {
+                    $pontuacao += $resposta->valor_resposta;
+                    $totalRespostas++;
                 }
+            }
+            
+            // Solo agregar si hay al menos una respuesta válida
+            if ($totalRespostas === 0) {
+                continue; // Saltar variables sin respuestas
             }
 
             $faixa = $this->classificarPontuacao($pontuacao, $variavel);

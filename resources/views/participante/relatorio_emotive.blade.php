@@ -48,11 +48,50 @@
 @stop
 
 @section('css')
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
 <style>
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+        
+        @page :not(:first) {
+            size: A4 portrait;
+            margin: 100px 80px;
+        }
+        
+        body {
+            width: 595.28pt; /* Ancho exacto de A4 en portrait */
+            max-width: 595.28pt;
+        }
+    }
+    
     .relatorio-emotive {
-        font-family: 'Montserrat', 'DejaVu Sans', sans-serif;
+        font-family: 'Quicksand', sans-serif;
         background: white;
         color: #333;
+        max-width: 595.28pt; /* Ancho exacto de A4 en portrait */
+        width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
+    }
+    
+    .relatorio-emotive,
+    .relatorio-emotive *,
+    .relatorio-emotive h1,
+    .relatorio-emotive h2,
+    .relatorio-emotive h3,
+    .relatorio-emotive h4,
+    .relatorio-emotive p,
+    .relatorio-emotive span,
+    .relatorio-emotive div,
+    .relatorio-emotive li,
+    .relatorio-emotive td,
+    .relatorio-emotive th {
+        font-family: 'Quicksand', sans-serif !important;
     }
     
     .page-break {
@@ -60,20 +99,28 @@
         margin-bottom: 50px;
         padding-bottom: 50px;
         border-bottom: 2px dashed #ddd;
+        max-width: 595.28pt; /* Ancho exacto de A4 en portrait */
+        width: 100%;
+        box-sizing: border-box;
+        font-family: 'Quicksand', sans-serif !important;
     }
     
     .section-title {
-        color: #008ca5;
-        font-weight: bold;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
+        color: #A4977F;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+        font-family: 'Quicksand', sans-serif !important;
     }
     
     .section-subtitle {
-        color: #00a8b5;
-        font-weight: 600;
-        font-size: 1.2rem;
-        margin-bottom: 0.8rem;
+        color: #2E9196;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+        font-family: 'Quicksand', sans-serif !important;
     }
     
     .highlight-box {
@@ -82,6 +129,7 @@
         padding: 15px;
         margin: 20px 0;
         border-radius: 4px;
+        font-family: 'Quicksand', sans-serif !important;
     }
     
     .quote-box {
@@ -90,6 +138,7 @@
         padding: 20px;
         margin: 20px 0;
         font-style: italic;
+        font-family: 'Quicksand', sans-serif !important;
     }
     
     .faixa-badge {
@@ -99,6 +148,7 @@
         font-weight: bold;
         font-size: 0.9rem;
         margin: 5px;
+        font-family: 'Quicksand', sans-serif !important;
     }
     
     .faixa-baixa {
