@@ -1,73 +1,50 @@
-name: Deploy to AWS EC2
+name: 🚀 Deploy to EC2
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+  workflow_dispatch: # Permite ejecutar manualmente
 
 jobs:
   deploy:
+    name: 🚀 Deploy to Production
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          extensions: mbstring, xml, curl, zip, gd, sqlite, mysql, pdo, intl
-          coverage: none
-
-      - name: Install Composer deps
-        run: composer install --no-dev --prefer-dist --optimize-autoloader
-
-      - name: Cache Node modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
-
-      - name: Install Node deps
-        run: npm ci
-
-      - name: Build assets
-        run: npm run build
-
-      - name: Prepare artifact
-        run: |
-          mkdir -p deploy
-          rsync -a \
-            --exclude='.git' \
-            --exclude='node_modules' \
-            --exclude='tests' \
-            --exclude='.github' \
-            --exclude='.env' \
-            ./ deploy/
-          cp -R vendor deploy/vendor
-          echo "Artifact size:" && du -sh deploy
-
-      - name: Setup SSH
+      - name: 📦 Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - name: Add host to known_hosts
-        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Rsync to server
+      - name: 🔐 Add server to known hosts
         run: |
-          rsync -az --delete \
-            deploy/ \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.REMOTE_PATH }}/
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Run deploy script on server
+      - name: 🚀 Deploy to server
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.REMOTE_PATH }} && chmod +x ./deploy.sh && ./deploy.sh"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
+            set -e
+            
+            echo "📁 Navegando al directorio de la aplicación..."
+            cd /var/www/laravel
+            
+            echo "🔄 Actualizando código desde Git..."
+            git fetch origin
+            git reset --hard origin/main
+            git clean -fd
+            
+            echo "📦 Ejecutando script de despliegue..."
+            chmod +x deploy.sh
+            ./deploy.sh
+            
+            echo "✅ Despliegue completado exitosamente"
+          ENDSSH
 
-
-
+      - name: ✅ Verificar despliegue
+        run: |
+          echo "🎉 Despliegue completado. Verifica en: https://emotive.g3nia.com"
