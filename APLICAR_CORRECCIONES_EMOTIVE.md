@@ -64,14 +64,41 @@ chown -R www-data:www-data storage bootstrap/cache
 ```
 
 ### 8. Reiniciar servicios (si es necesario)
+
+**Primero, identifica tu versión de PHP-FPM:**
 ```bash
-# Si usas PHP-FPM
+# Verificar versión de PHP
+php -v
+
+# Buscar el servicio PHP-FPM disponible
+systemctl list-units --type=service | grep php
+
+# O verificar procesos en ejecución
+ps aux | grep php-fpm
+```
+
+**Luego reinicia según tu versión:**
+```bash
+# Opción 1: Si es PHP 8.1
 sudo systemctl restart php8.1-fpm
-# o la versión que uses
+
+# Opción 2: Si es PHP 8.2
+sudo systemctl restart php8.2-fpm
+
+# Opción 3: Si es PHP 8.3
+sudo systemctl restart php8.3-fpm
+
+# Opción 4: Si usa otro nombre
+sudo service php-fpm restart
+
+# Opción 5: Si usas Nginx, reinicia Nginx (también reinicia PHP-FPM)
+sudo systemctl restart nginx
 
 # Si usas supervisor para queues
 sudo supervisorctl restart all
 ```
+
+**Nota**: En muchos casos, reiniciar Nginx es suficiente y no necesitas reiniciar PHP-FPM manualmente.
 
 ## Verificación
 

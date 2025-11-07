@@ -38,6 +38,21 @@ echo "🔐 Verificando permisos..."
 chmod -R 755 storage bootstrap/cache
 chown -R www-data:www-data storage bootstrap/cache  # Ajusta según tu usuario
 
+# 8. Reiniciar servicios (opcional, solo si es necesario)
+echo "🔄 Reiniciando servicios..."
+# Identificar versión de PHP-FPM
+PHP_VERSION=$(php -v | head -n 1 | cut -d ' ' -f 2 | cut -d '.' -f 1,2)
+if systemctl list-units --type=service | grep -q "php${PHP_VERSION}-fpm"; then
+    echo "   Reiniciando php${PHP_VERSION}-fpm..."
+    sudo systemctl restart php${PHP_VERSION}-fpm
+elif systemctl list-units --type=service | grep -q "php-fpm"; then
+    echo "   Reiniciando php-fpm..."
+    sudo systemctl restart php-fpm
+else
+    echo "   ⚠️  No se encontró servicio PHP-FPM, reiniciando Nginx..."
+    sudo systemctl restart nginx
+fi
+
 echo "✅ Correcciones aplicadas correctamente!"
 echo ""
 echo "📝 Próximos pasos:"
