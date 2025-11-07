@@ -144,7 +144,7 @@ En MySQL, ejecuta:
 
 ```sql
 CREATE DATABASE laravel_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'laravel_user'@'localhost' IDENTIFIED BY 'TU_PASSWORD_SEGURO_AQUI';
+CREATE USER 'laravel_user'@'localhost' IDENTIFIED BY 'Y%ejpE!)t9PX';
 GRANT ALL PRIVILEGES ON laravel_db.* TO 'laravel_user'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;

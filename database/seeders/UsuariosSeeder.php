@@ -17,7 +17,8 @@ class UsuariosSeeder extends Seeder
     {
         DB::table('users')->truncate();
 
-        // Contraseña para todas las cuentas: admin123
+        // ⚠️ CONTRASEÑA PARA TODAS LAS CUENTAS: admin123
+        // Todos los usuarios creados por este seeder tendrán la contraseña: admin123
         $password = Hash::make('admin123');
 
         $perfis = [

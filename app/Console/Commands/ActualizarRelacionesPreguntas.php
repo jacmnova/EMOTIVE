@@ -48,12 +48,37 @@ class ActualizarRelacionesPreguntas extends Command
 
                 $variavelId = $variaveis[$tag]->id;
                 
-                foreach ($preguntas as $perguntaId) {
-                    DB::table('pergunta_variavel')->insert([
-                        'pergunta_id' => $perguntaId,
-                        'variavel_id' => $variavelId,
-                    ]);
-                    $total++;
+                foreach ($preguntas as $numeroPergunta) {
+                    // Buscar la pregunta por numero_da_pergunta
+                    $pergunta = \App\Models\Pergunta::where('formulario_id', 1)
+                        ->where('numero_da_pergunta', $numeroPergunta)
+                        ->first();
+                    
+                    if (!$pergunta) {
+                        $this->warn("Pregunta #{$numeroPergunta} no encontrada para {$tag}. Intentando por ID...");
+                        // Fallback: intentar por ID si numero_da_pergunta no funciona
+                        $pergunta = \App\Models\Pergunta::where('formulario_id', 1)
+                            ->where('id', $numeroPergunta)
+                            ->first();
+                        if (!$pergunta) {
+                            $this->error("Pregunta #{$numeroPergunta} no encontrada ni por numero_da_pergunta ni por ID");
+                            continue;
+                        }
+                    }
+                    
+                    // Evitar duplicados
+                    $existe = DB::table('pergunta_variavel')
+                        ->where('pergunta_id', $pergunta->id)
+                        ->where('variavel_id', $variavelId)
+                        ->exists();
+                    
+                    if (!$existe) {
+                        DB::table('pergunta_variavel')->insert([
+                            'pergunta_id' => $pergunta->id,
+                            'variavel_id' => $variavelId,
+                        ]);
+                        $total++;
+                    }
                 }
 
                 $this->info("  {$tag}: {$variaveis[$tag]->nome} - " . count($preguntas) . " preguntas");
