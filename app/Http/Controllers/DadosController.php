@@ -284,14 +284,28 @@ class DadosController extends Controller
                 return redirect()->back()->with('msgError', 'Usuario no encontrado.');
             }
 
-            $formulario = Formulario::with('perguntas.variaveis')->find($formularioId);
+            $formulario = Formulario::with('perguntas')->find($formularioId);
             if (!$formulario) {
                 \Log::error('Formulario no encontrado en relatorioShow', ['formulario_id' => $formularioId]);
                 return redirect()->back()->with('msgError', 'Formulario no encontrado.');
             }
 
+            // Validar que el formulario tenga preguntas
+            if ($formulario->perguntas->isEmpty()) {
+                \Log::error('Formulario sin preguntas en relatorioShow', ['formulario_id' => $formularioId]);
+                return redirect()->back()->with('msgError', 'El formulario no tiene preguntas asociadas.');
+            }
+
+            $perguntaIds = $formulario->perguntas->pluck('id')->toArray();
+            
+            // Validar que haya IDs de preguntas
+            if (empty($perguntaIds)) {
+                \Log::error('No se pudieron obtener IDs de preguntas', ['formulario_id' => $formularioId]);
+                return redirect()->back()->with('msgError', 'Error al cargar las preguntas del formulario.');
+            }
+
         $respostasUsuario = Resposta::where('user_id', $user->id)
-            ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
+            ->whereIn('pergunta_id', $perguntaIds)
             ->get()
             ->keyBy('pergunta_id');
 
@@ -301,6 +315,12 @@ class DadosController extends Controller
         }])
             ->where('formulario_id', $formulario->id)
             ->get();
+
+        // Validar que haya variables
+        if ($variaveis->isEmpty()) {
+            \Log::error('Formulario sin variables en relatorioShow', ['formulario_id' => $formularioId]);
+            return redirect()->back()->with('msgError', 'El formulario no tiene variables asociadas.');
+        }
 
         \Log::info('Iniciando cálculo de puntuaciones', [
             'formulario_id' => $formularioId,
@@ -351,18 +371,26 @@ class DadosController extends Controller
                 continue; // Saltar variables sin respuestas
             }
 
-            $faixa = $this->classificarPontuacao($pontuacao, $variavel);
+            // Validar que la variable tenga los campos necesarios
+            $b = is_numeric($variavel->B) ? (float)$variavel->B : 0;
+            $m = is_numeric($variavel->M) ? (float)$variavel->M : 0;
+            $a = is_numeric($variavel->A) ? (float)$variavel->A : ($m + max(0, ($m - $b)));
+            
+            // Asegurar que la puntuación sea numérica
+            $pontuacaoNumerica = is_numeric($pontuacao) ? (float)$pontuacao : 0;
+            
+            $faixa = $this->classificarPontuacao($pontuacaoNumerica, $variavel);
             switch ($faixa) {
                 case 'Baixa':
-                    $recomendacao = $variavel->r_baixa;
+                    $recomendacao = $variavel->r_baixa ?? 'Sem dados.';
                     $badge = 'info';
                     break;
                 case 'Moderada':
-                    $recomendacao = $variavel->r_moderada;
+                    $recomendacao = $variavel->r_moderada ?? 'Sem dados.';
                     $badge = 'warning';
                     break;
                 case 'Alta':
-                    $recomendacao = $variavel->r_alta;
+                    $recomendacao = $variavel->r_alta ?? 'Sem dados.';
                     $badge = 'danger';
                     break;
                 default:
@@ -371,14 +399,10 @@ class DadosController extends Controller
                     break;
             }
 
-            $b = $variavel->B ?? 0;
-            $m = $variavel->M ?? 0;
-            $a = $variavel->A ?? ($m + ($m - $b));
-
             $pontuacoes[] = [
-                'tag' => strtoupper($variavel->tag),
-                'nome' => $variavel->nome,
-                'valor' => $pontuacao,
+                'tag' => strtoupper($variavel->tag ?? ''),
+                'nome' => $variavel->nome ?? 'Sin nombre',
+                'valor' => $pontuacaoNumerica,
                 'faixa' => $faixa,
                 'recomendacao' => $recomendacao,
                 'badge' => $badge,
@@ -486,7 +510,11 @@ class DadosController extends Controller
         }
         
         // Calcular promedio de índices (sin porcentaje) para mostrar en la puntuación
-        $promedioIndices = ($indices['EE'] + $indices['PR'] + $indices['SO']) / 3;
+        // Asegurar que los índices sean numéricos antes de calcular
+        $ee = is_numeric($indices['EE']) ? (float)$indices['EE'] : 0;
+        $pr = is_numeric($indices['PR']) ? (float)$indices['PR'] : 0;
+        $so = is_numeric($indices['SO']) ? (float)$indices['SO'] : 0;
+        $promedioIndices = ($ee + $pr + $so) / 3;
 
         // Usar la nueva vista E.MO.TI.VE si existe, sino la antigua
         if (view()->exists('participante.relatorio_emotive')) {
@@ -580,9 +608,16 @@ class DadosController extends Controller
 
     private function classificarPontuacao($valor, $variavel): string
     {
-        if ($valor <= $variavel->B) {
+        // Validar que el valor sea numérico
+        $valorNumerico = is_numeric($valor) ? (float)$valor : 0;
+        
+        // Validar que la variable tenga los campos necesarios
+        $b = is_numeric($variavel->B) ? (float)$variavel->B : 0;
+        $m = is_numeric($variavel->M) ? (float)$variavel->M : ($b + 1);
+        
+        if ($valorNumerico <= $b) {
             return 'Baixa';
-        } elseif ($valor <= $variavel->M) {
+        } elseif ($valorNumerico <= $m) {
             return 'Moderada';
         } else {
             return 'Alta';
