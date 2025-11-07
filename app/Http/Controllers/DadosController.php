@@ -269,16 +269,26 @@ class DadosController extends Controller
 
     public function relatorioShow(Request $request)
     {
-        $validated = $request->validate([
-            'formulario_id' => ['required', 'integer', 'exists:formularios,id'],
-            'usuario_id' => ['required', 'integer', 'exists:users,id'],
-        ]);
+        try {
+            $validated = $request->validate([
+                'formulario_id' => ['required', 'integer', 'exists:formularios,id'],
+                'usuario_id' => ['required', 'integer', 'exists:users,id'],
+            ]);
 
-        $formularioId = $validated['formulario_id'];
-        $usuarioId = $validated['usuario_id'];
+            $formularioId = $validated['formulario_id'];
+            $usuarioId = $validated['usuario_id'];
 
-        $user = User::find($usuarioId);
-        $formulario = Formulario::with('perguntas.variaveis')->findOrFail($formularioId);
+            $user = User::find($usuarioId);
+            if (!$user) {
+                \Log::error('Usuario no encontrado en relatorioShow', ['usuario_id' => $usuarioId]);
+                return redirect()->back()->with('msgError', 'Usuario no encontrado.');
+            }
+
+            $formulario = Formulario::with('perguntas.variaveis')->find($formularioId);
+            if (!$formulario) {
+                \Log::error('Formulario no encontrado en relatorioShow', ['formulario_id' => $formularioId]);
+                return redirect()->back()->with('msgError', 'Formulario no encontrado.');
+            }
 
         $respostasUsuario = Resposta::where('user_id', $user->id)
             ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
@@ -427,6 +437,20 @@ class DadosController extends Controller
         // === CALCULAR ÍNDICES EE, PR, SO DIRECTAMENTE DESDE RESPOSTAS ===
         $indices = $this->calcularIndicesDesdeRespostas($respostasUsuario, $formulario->id);
         
+        // Validar que los índices se calcularon correctamente
+        if (!isset($indices['EE']) || !isset($indices['PR']) || !isset($indices['SO'])) {
+            \Log::error('Error calculando índices', [
+                'indices' => $indices,
+                'formulario_id' => $formularioId,
+                'usuario_id' => $usuarioId
+            ]);
+            $indices = [
+                'EE' => $indices['EE'] ?? 0,
+                'PR' => $indices['PR'] ?? 0,
+                'SO' => $indices['SO'] ?? 0
+            ];
+        }
+        
         // === CALCULAR EJES ANALÍTICOS Y IID ===
         // Preparar pontuacoes para o cálculo (garantir formato correto)
         $pontuacoesParaCalculo = [];
@@ -437,10 +461,29 @@ class DadosController extends Controller
                 'faixa' => $ponto['faixa']
             ];
         }
-        $ejesAnaliticos = $this->calcularEjesAnaliticos($pontuacoesParaCalculo, $indices);
-        $iid = $this->calcularIID($ejesAnaliticos);
-        $nivelRisco = $this->determinarNivelRisco($iid);
-        $planDesenvolvimento = $this->getPlanDesenvolvimento($nivelRisco);
+        
+        try {
+            $ejesAnaliticos = $this->calcularEjesAnaliticos($pontuacoesParaCalculo, $indices);
+            $iid = $this->calcularIID($ejesAnaliticos);
+            $nivelRisco = $this->determinarNivelRisco($iid);
+            $planDesenvolvimento = $this->getPlanDesenvolvimento($nivelRisco);
+        } catch (\Exception $e) {
+            \Log::error('Error calculando ejes analíticos o IID', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'formulario_id' => $formularioId,
+                'usuario_id' => $usuarioId
+            ]);
+            // Valores por defecto en caso de error
+            $ejesAnaliticos = [
+                'eixo1' => ['total' => 0],
+                'eixo2' => ['total' => 0],
+                'eixo3' => ['total' => 0]
+            ];
+            $iid = 0;
+            $nivelRisco = $this->determinarNivelRisco(0);
+            $planDesenvolvimento = $this->getPlanDesenvolvimento($nivelRisco);
+        }
         
         // Calcular promedio de índices (sin porcentaje) para mostrar en la puntuación
         $promedioIndices = ($indices['EE'] + $indices['PR'] + $indices['SO']) / 3;
@@ -476,8 +519,25 @@ class DadosController extends Controller
             'ejesAnaliticos',
             'iid',
             'nivelRisco',
-            'planDesenvolvimento'
+            'planDesenvolvimento',
+            'promedioIndices'
         ));
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Error de validación en relatorioShow', [
+                'errors' => $e->errors(),
+                'request' => $request->all()
+            ]);
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Error general en relatorioShow', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'request' => $request->all()
+            ]);
+            return redirect()->back()->with('msgError', 'Ocurrió un error al generar el relatório. Por favor, intente nuevamente.');
+        }
     }
 
 
