@@ -26,7 +26,10 @@ class AnaliseController extends Controller
         }
 
         $formulario = \App\Models\Formulario::with('perguntas.variaveis')->findOrFail($formularioId);
-        $variaveis = \App\Models\Variavel::with('perguntas')->where('formulario_id', $formulario->id)->get();
+        // Cargar variables con preguntas, asegurando que se carguen todos los campos de las preguntas
+        $variaveis = \App\Models\Variavel::with(['perguntas' => function($query) {
+            $query->select('perguntas.id', 'perguntas.formulario_id', 'perguntas.numero_da_pergunta', 'perguntas.pergunta');
+        }])->where('formulario_id', $formulario->id)->get();
         $respostasUsuario = \App\Models\Resposta::where('user_id', $usuarioId)
             ->whereIn('pergunta_id', $formulario->perguntas->pluck('id'))
             ->get()
@@ -37,8 +40,9 @@ class AnaliseController extends Controller
             $pontuacao = 0;
             foreach ($variavel->perguntas as $pergunta) {
                 $resposta = $respostasUsuario->get($pergunta->id);
-                if ($resposta) {
-                    $pontuacao += $resposta->valor_resposta ?? 0;
+                $valorResposta = $this->obterValorRespostaComInversao($resposta, $pergunta);
+                if ($valorResposta !== null) {
+                    $pontuacao += $valorResposta;
                 }
             }
             $pontuacoes[] = [
@@ -162,5 +166,45 @@ Aqui estão os resultados por dimensão:\n";
         }
 
         return redirect()->back()->with('analiseTexto', $analiseTexto);
+    }
+
+    /**
+     * Obtiene el valor de respuesta aplicando inversión si la pregunta lo requiere
+     * Las preguntas que requieren inversión son las que tienen estos IDs: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
+     * Inversión: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
+     */
+    private function obterValorRespostaComInversao($resposta, $pergunta): ?int
+    {
+        if (!$resposta || $resposta->valor_resposta === null) {
+            return null;
+        }
+
+        $valor = $resposta->valor_resposta;
+        
+        // Asegurar que la pregunta existe
+        if (!$pergunta) {
+            \Log::warning('Pregunta es null en obterValorRespostaComInversao');
+            return $valor;
+        }
+        
+        // Usar el ID de la pregunta para identificar cuáles requieren inversión
+        $perguntaId = (int)$pergunta->id;
+        
+        // Lista de IDs de preguntas que requieren inversión
+        $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
+        
+        // Verificar si esta pregunta requiere inversión (usando el ID)
+        if (in_array($perguntaId, $perguntasComInversao, true)) {
+            // Invertir el valor: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
+            $valorInvertido = 6 - $valor;
+            \Log::info('✅ APLICANDO INVERSIÓN', [
+                'pergunta_id' => $perguntaId,
+                'valor_original' => $valor,
+                'valor_invertido' => $valorInvertido
+            ]);
+            return $valorInvertido;
+        }
+        
+        return $valor;
     }
 }

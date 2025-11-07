@@ -8,6 +8,7 @@ use App\Models\Cliente;
 use App\Models\Resposta;
 use App\Models\Variavel;
 use App\Models\Formulario;
+use App\Models\Pergunta;
 use Illuminate\Http\Request;
 use App\Models\ClienteFormulario;
 use App\Models\UsuarioFormulario;
@@ -284,9 +285,18 @@ class DadosController extends Controller
             ->get()
             ->keyBy('pergunta_id');
 
-        $variaveis = Variavel::with('perguntas')
+        // Cargar variables con preguntas, asegurando que se carguen todos los campos de las preguntas
+        $variaveis = Variavel::with(['perguntas' => function($query) {
+            $query->select('perguntas.id', 'perguntas.formulario_id', 'perguntas.numero_da_pergunta', 'perguntas.pergunta');
+        }])
             ->where('formulario_id', $formulario->id)
             ->get();
+
+        \Log::info('Iniciando cálculo de puntuaciones', [
+            'formulario_id' => $formularioId,
+            'usuario_id' => $usuarioId,
+            'total_variaveis' => $variaveis->count()
+        ]);
 
         $pontuacoes = [];
         foreach ($variaveis as $variavel) {
@@ -301,9 +311,28 @@ class DadosController extends Controller
             // Calcular puntuación basada en las respuestas
             foreach ($variavel->perguntas as $pergunta) {
                 $resposta = $respostasUsuario->get($pergunta->id);
-                if ($resposta && $resposta->valor_resposta !== null) {
-                    $pontuacao += $resposta->valor_resposta;
+                
+                // Log para debug
+                \Log::info('Procesando pregunta', [
+                    'pergunta_id' => $pergunta->id,
+                    'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'NO DISPONIBLE',
+                    'tiene_resposta' => $resposta ? 'SI' : 'NO',
+                    'valor_resposta' => $resposta ? $resposta->valor_resposta : 'N/A'
+                ]);
+                
+                $valorResposta = $this->obterValorRespostaComInversao($resposta, $pergunta);
+                if ($valorResposta !== null) {
+                    $valorOriginal = $resposta->valor_resposta;
+                    $pontuacao += $valorResposta;
                     $totalRespostas++;
+                    
+                    \Log::info('Sumando valor a puntuación', [
+                        'variavel' => $variavel->tag,
+                        'pergunta_id' => $pergunta->id,
+                        'valor_original' => $valorOriginal,
+                        'valor_usado' => $valorResposta,
+                        'pontuacao_parcial' => $pontuacao
+                    ]);
                 }
             }
             
@@ -347,7 +376,20 @@ class DadosController extends Controller
                 'm' => $m,
                 'a' => $a,
             ];
+            
+            \Log::info('Puntuación calculada para variable', [
+                'variavel_tag' => $variavel->tag,
+                'variavel_nome' => $variavel->nome,
+                'pontuacao_final' => $pontuacao,
+                'total_respostas' => $totalRespostas,
+                'faixa' => $faixa
+            ]);
         }
+        
+        \Log::info('✅ CÁLCULO COMPLETADO - Puntuaciones finales', [
+            'total_pontuacoes' => count($pontuacoes),
+            'pontuacoes' => $pontuacoes
+        ]);
 
         $analise = Analise::where('user_id', $usuarioId)
             ->where('formulario_id', $formularioId)
@@ -382,6 +424,9 @@ class DadosController extends Controller
         $analiseHtml = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $analiseHtml);
         $analiseHtml = preg_replace('/###\s?(.*)/', '<h4>$1</h4>', $analiseHtml);
 
+        // === CALCULAR ÍNDICES EE, PR, SO DIRECTAMENTE DESDE RESPOSTAS ===
+        $indices = $this->calcularIndicesDesdeRespostas($respostasUsuario, $formulario->id);
+        
         // === CALCULAR EJES ANALÍTICOS Y IID ===
         // Preparar pontuacoes para o cálculo (garantir formato correto)
         $pontuacoesParaCalculo = [];
@@ -392,10 +437,13 @@ class DadosController extends Controller
                 'faixa' => $ponto['faixa']
             ];
         }
-        $ejesAnaliticos = $this->calcularEjesAnaliticos($pontuacoesParaCalculo);
+        $ejesAnaliticos = $this->calcularEjesAnaliticos($pontuacoesParaCalculo, $indices);
         $iid = $this->calcularIID($ejesAnaliticos);
         $nivelRisco = $this->determinarNivelRisco($iid);
         $planDesenvolvimento = $this->getPlanDesenvolvimento($nivelRisco);
+        
+        // Calcular promedio de índices (sin porcentaje) para mostrar en la puntuación
+        $promedioIndices = ($indices['EE'] + $indices['PR'] + $indices['SO']) / 3;
 
         // Usar la nueva vista E.MO.TI.VE si existe, sino la antigua
         if (view()->exists('participante.relatorio_emotive')) {
@@ -411,7 +459,8 @@ class DadosController extends Controller
                 'ejesAnaliticos',
                 'iid',
                 'nivelRisco',
-                'planDesenvolvimento'
+                'planDesenvolvimento',
+                'promedioIndices'
             ));
         }
         
@@ -478,6 +527,58 @@ class DadosController extends Controller
         } else {
             return 'Alta';
         }
+    }
+
+    /**
+     * Obtiene el valor de respuesta aplicando inversión si la pregunta lo requiere
+     * Las preguntas que requieren inversión son las que tienen estos IDs: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
+     * Inversión: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
+     */
+    private function obterValorRespostaComInversao($resposta, $pergunta): ?int
+    {
+        if (!$resposta || $resposta->valor_resposta === null) {
+            return null;
+        }
+
+        $valor = $resposta->valor_resposta;
+        
+        // Asegurar que la pregunta tenga el campo numero_da_pergunta cargado
+        if (!$pergunta) {
+            \Log::warning('Pregunta es null en obterValorRespostaComInversao');
+            return $valor;
+        }
+        
+        // Usar el ID de la pregunta para identificar cuáles requieren inversión
+        // Las preguntas que requieren inversión son las que tienen estos IDs: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
+        $perguntaId = (int)$pergunta->id;
+        
+        // Log detallado para debug
+        \Log::info('Verificando inversión', [
+            'pergunta_id' => $perguntaId,
+            'valor_resposta' => $valor
+        ]);
+        
+        // Lista de IDs de preguntas que requieren inversión
+        $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
+        
+        // Verificar si esta pregunta requiere inversión (usando el ID, no numero_da_pergunta)
+        if (in_array($perguntaId, $perguntasComInversao, true)) {
+            // Invertir el valor: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
+            $valorInvertido = 6 - $valor;
+            \Log::info('✅ APLICANDO INVERSIÓN', [
+                'pergunta_id' => $perguntaId,
+                'valor_original' => $valor,
+                'valor_invertido' => $valorInvertido
+            ]);
+            return $valorInvertido;
+        }
+        
+        \Log::debug('No se aplica inversión', [
+            'pergunta_id' => $perguntaId,
+            'valor' => $valor
+        ]);
+        
+        return $valor;
     }
 
 

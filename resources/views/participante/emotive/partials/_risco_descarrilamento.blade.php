@@ -89,7 +89,7 @@
         <!-- Pontuação y recomendaciones -->
         <div style="margin-bottom: 30px;">
             <p style="color: #FFC107;font-size: 12px;font-style: normal;font-weight: 700;line-height: normal; margin-bottom: 15px;">
-                Pontuação= {{ round($iid) }} - {{ $nivelRisco['zona'] }}.
+                Pontuação= {{ round($promedioIndices ?? (($ejesAnaliticos['eixo1']['total'] + $ejesAnaliticos['eixo2']['total'] + $ejesAnaliticos['eixo3']['total']) / 3)) }} - {{ $nivelRisco['zona'] }}.
             </p>
             
             @php

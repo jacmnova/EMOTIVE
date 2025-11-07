@@ -64,7 +64,10 @@ class RelatorioController extends Controller
             ->get()
             ->keyBy('pergunta_id');
 
-        $variaveis = Variavel::with('perguntas')
+        // Cargar variables con preguntas, asegurando que se carguen todos los campos de las preguntas
+        $variaveis = Variavel::with(['perguntas' => function($query) {
+            $query->select('perguntas.id', 'perguntas.formulario_id', 'perguntas.numero_da_pergunta', 'perguntas.pergunta');
+        }])
             ->where('formulario_id', $formulario->id)
             ->get();
 
@@ -79,8 +82,9 @@ class RelatorioController extends Controller
             
             foreach ($variavel->perguntas as $pergunta) {
                 $resposta = $respostasUsuario->get($pergunta->id);
-                if ($resposta && $resposta->valor_resposta !== null) {
-                    $pontuacao += $resposta->valor_resposta;
+                $valorResposta = $this->obterValorRespostaComInversao($resposta, $pergunta);
+                if ($valorResposta !== null) {
+                    $pontuacao += $valorResposta;
                     $totalRespostas++;
                 }
             }
@@ -129,6 +133,9 @@ class RelatorioController extends Controller
         $analiseHtml = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $analiseHtml);
         $analiseHtml = preg_replace('/###\s?(.*)/', '<h4>$1</h4>', $analiseHtml);
 
+        // === CALCULAR ÍNDICES EE, PR, SO DIRECTAMENTE DESDE RESPOSTAS ===
+        $indices = $this->calcularIndicesDesdeRespostas($respostasUsuario, $formulario->id);
+        
         $pontuacoesParaCalculo = [];
         foreach ($pontuacoes as $ponto) {
             $pontuacoesParaCalculo[] = [
@@ -137,10 +144,13 @@ class RelatorioController extends Controller
                 'faixa' => $ponto['faixa']
             ];
         }
-        $ejesAnaliticos = $this->calcularEjesAnaliticos($pontuacoesParaCalculo);
+        $ejesAnaliticos = $this->calcularEjesAnaliticos($pontuacoesParaCalculo, $indices);
         $iid = $this->calcularIID($ejesAnaliticos);
         $nivelRisco = $this->determinarNivelRisco($iid);
         $planDesenvolvimento = $this->getPlanDesenvolvimento($nivelRisco);
+        
+        // Calcular promedio de índices (sin porcentaje) para mostrar en la puntuación
+        $promedioIndices = ($indices['EE'] + $indices['PR'] + $indices['SO']) / 3;
 
         return view('participante.relatorio_emotive', compact(
             'formulario',
@@ -153,6 +163,7 @@ class RelatorioController extends Controller
             'analiseData',
             'ejesAnaliticos',
             'iid',
+            'promedioIndices',
             'nivelRisco',
             'planDesenvolvimento'
         ));
@@ -193,8 +204,9 @@ class RelatorioController extends Controller
             // Calcular puntuación basada en las respuestas
             foreach ($variavel->perguntas as $pergunta) {
                 $resposta = $respostasUsuario->get($pergunta->id);
-                if ($resposta && $resposta->valor_resposta !== null) {
-                    $pontuacao += $resposta->valor_resposta;
+                $valorResposta = $this->obterValorRespostaComInversao($resposta, $pergunta);
+                if ($valorResposta !== null) {
+                    $pontuacao += $valorResposta;
                     $totalRespostas++;
                 }
             }
@@ -420,7 +432,9 @@ class RelatorioController extends Controller
         }
         
         // GRÁFICO DE RISCO DE DESCARRILAMENTO (IID) - Barra horizontal
-        $ejesAnaliticos = $this->calcularEjesAnaliticos($pontuacoes);
+        // === CALCULAR ÍNDICES EE, PR, SO DIRECTAMENTE DESDE RESPOSTAS ===
+        $indices = $this->calcularIndicesDesdeRespostas($respostasUsuario, $formulario->id);
+        $ejesAnaliticos = $this->calcularEjesAnaliticos($pontuacoes, $indices);
         $iid = $this->calcularIID($ejesAnaliticos);
         $nivelRisco = $this->determinarNivelRisco($iid);
         
@@ -559,10 +573,15 @@ class RelatorioController extends Controller
                     ->where('formulario_id', $formularioId)
                     ->first();
                 $analiseTexto = $analise?->texto ?? 'Análise não disponível.';
-                $ejesAnaliticos = $this->calcularEjesAnaliticos($pontuacoes);
+                // === CALCULAR ÍNDICES EE, PR, SO DIRECTAMENTE DESDE RESPOSTAS ===
+                $indices = $this->calcularIndicesDesdeRespostas($respostasUsuario, $formulario->id);
+                $ejesAnaliticos = $this->calcularEjesAnaliticos($pontuacoes, $indices);
                 $iid = $this->calcularIID($ejesAnaliticos);
                 $nivelRisco = $this->determinarNivelRisco($iid);
                 $planDesenvolvimento = $this->getPlanDesenvolvimento($nivelRisco);
+                
+                // Calcular promedio de índices (sin porcentaje) para mostrar en la puntuación
+                $promedioIndices = ($indices['EE'] + $indices['PR'] + $indices['SO']) / 3;
                 
                 $data = [
                     'user' => $user,
@@ -577,6 +596,7 @@ class RelatorioController extends Controller
                     'analiseTexto' => $analiseTexto,
                     'ejesAnaliticos' => $ejesAnaliticos,
                     'iid' => $iid,
+                    'promedioIndices' => $promedioIndices,
                     'nivelRisco' => $nivelRisco,
                     'planDesenvolvimento' => $planDesenvolvimento,
                     'isPdf' => true,
@@ -612,6 +632,46 @@ class RelatorioController extends Controller
                 return redirect()->back()->with('msgError', $errorMessage);
             }
         }
+    }
+
+    /**
+     * Obtiene el valor de respuesta aplicando inversión si la pregunta lo requiere
+     * Las preguntas que requieren inversión son las que tienen estos IDs: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
+     * Inversión: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
+     */
+    private function obterValorRespostaComInversao($resposta, $pergunta): ?int
+    {
+        if (!$resposta || $resposta->valor_resposta === null) {
+            return null;
+        }
+
+        $valor = $resposta->valor_resposta;
+        
+        // Asegurar que la pregunta existe
+        if (!$pergunta) {
+            \Log::warning('Pregunta es null en obterValorRespostaComInversao');
+            return $valor;
+        }
+        
+        // Usar el ID de la pregunta para identificar cuáles requieren inversión
+        $perguntaId = (int)$pergunta->id;
+        
+        // Lista de IDs de preguntas que requieren inversión
+        $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
+        
+        // Verificar si esta pregunta requiere inversión (usando el ID)
+        if (in_array($perguntaId, $perguntasComInversao, true)) {
+            // Invertir el valor: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
+            $valorInvertido = 6 - $valor;
+            \Log::info('✅ APLICANDO INVERSIÓN', [
+                'pergunta_id' => $perguntaId,
+                'valor_original' => $valor,
+                'valor_invertido' => $valorInvertido
+            ]);
+            return $valorInvertido;
+        }
+        
+        return $valor;
     }
 
 }

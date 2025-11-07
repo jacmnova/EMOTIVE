@@ -263,24 +263,28 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    document.getElementById('btnGerarRelatorio').addEventListener('click', function(event) {
-        event.preventDefault(); // impede redirecionamento imediato
+    // Verificar si el elemento existe antes de agregar el event listener
+    const btnGerarRelatorio = document.getElementById('btnGerarRelatorio');
+    if (btnGerarRelatorio) {
+        btnGerarRelatorio.addEventListener('click', function(event) {
+            event.preventDefault(); // impede redirecionamento imediato
 
-        const url = this.href;
+            const url = this.href;
 
-        Swal.fire({
-            title: 'Gerando análise...',
-            text: 'Por favor, aguarde enquanto processamos seu relatório.',
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
+            Swal.fire({
+                title: 'Gerando análise...',
+                text: 'Por favor, aguarde enquanto processamos seu relatório.',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Agora redireciona manualmente (deixa o Swal aparecer)
+            window.location.href = url;
         });
-
-        // Agora redireciona manualmente (deixa o Swal aparecer)
-        window.location.href = url;
-    });
+    }
 </script>
 
 

@@ -5,9 +5,49 @@ namespace App\Traits;
 trait CalculaEjesAnaliticos
 {
     /**
+     * Calcula os índices EE, PR y SO directamente desde las respuestas según el CSV
+     */
+    protected function calcularIndicesDesdeRespostas($respostasUsuario, $formularioId): array
+    {
+        // Preguntas que requieren inversión
+        $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
+        
+        // Agrupaciones según el CSV
+        $indices = [
+            'EE' => [28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99],
+            'PR' => [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 48, 49, 50, 51, 52, 53, 54, 55, 56, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87],
+            'SO' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77],
+        ];
+        
+        $resultados = [];
+        
+        foreach ($indices as $indice => $preguntas) {
+            $pontuacao = 0;
+            
+            foreach ($preguntas as $perguntaId) {
+                $resposta = $respostasUsuario->get($perguntaId);
+                
+                if (!$resposta || $resposta->valor_resposta === null) {
+                    continue;
+                }
+                
+                $valorOriginal = $resposta->valor_resposta;
+                $necesitaInversion = in_array($perguntaId, $perguntasComInversao, true);
+                $valorUsado = $necesitaInversion ? (6 - $valorOriginal) : $valorOriginal;
+                
+                $pontuacao += $valorUsado;
+            }
+            
+            $resultados[$indice] = $pontuacao;
+        }
+        
+        return $resultados;
+    }
+
+    /**
      * Calcula os eixos analíticos do modelo E.MO.TI.VE
      */
-    protected function calcularEjesAnaliticos($pontuacoes): array
+    protected function calcularEjesAnaliticos($pontuacoes, $indices = null): array
     {
         // Mapear pontuações por tag
         $pontosPorTag = [];
@@ -19,10 +59,27 @@ trait CalculaEjesAnaliticos
             $pontosPorTag[$tag] = ['valor' => $valor, 'faixa' => $faixa];
         }
 
-        // EIXO 1: ENERGIA EMOCIONAL (Realização Profissional - Exaustão Emocional + 100) / 2
+        // Obtener valores de dimensiones para las interpretaciones
         $exaustao = $pontosPorTag['EXEM'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
         $realizacao = $pontosPorTag['REPR'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
-        $eixo1Total = max(0, min(100, ($realizacao['valor'] - $exaustao['valor'] + 100) / 2));
+        $cinismo = $pontosPorTag['DECI'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
+        $fatores = $pontosPorTag['FAPS'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
+        $excesso = $pontosPorTag['EXTR'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
+        $assedio = $pontosPorTag['ASMO'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
+        
+        // Si se proporcionan índices calculados directamente, usarlos
+        // Si no, calcular usando las fórmulas originales como fallback
+        if ($indices && isset($indices['EE']) && isset($indices['PR']) && isset($indices['SO'])) {
+            $eixo1Total = $indices['EE'];
+            $eixo2Total = $indices['PR'];
+            $eixo3Total = $indices['SO'];
+        } else {
+            // Fallback a fórmulas originales si no hay índices directos
+            $eixo1Total = max(0, min(100, ($realizacao['valor'] - $exaustao['valor'] + 100) / 2));
+            $eixo2Total = max(0, min(100, ($fatores['valor'] - $cinismo['valor'] + 100) / 2));
+            $eixo3Total = max(0, min(100, 100 - (($excesso['valor'] + $assedio['valor']) / 2)));
+        }
+        
         $eixo1 = [
             'nome' => 'ENERGIA EMOCIONAL',
             'descricao' => 'Este eixo mostra o quanto sua energia emocional está sendo renovada ou drenada no trabalho. Ele representa o equilíbrio entre vitalidade e propósito.',
@@ -42,10 +99,7 @@ trait CalculaEjesAnaliticos
             'interpretacao' => $this->interpretarEixo1($exaustao['faixa'], $realizacao['faixa'])
         ];
 
-        // EIXO 2: PROPÓSITO E RELAÇÕES (Fatores Psicossociais - Cinismo + 100) / 2
-        $cinismo = $pontosPorTag['DECI'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
-        $fatores = $pontosPorTag['FAPS'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
-        $eixo2Total = max(0, min(100, ($fatores['valor'] - $cinismo['valor'] + 100) / 2));
+        // EIXO 2: PROPÓSITO E RELAÇÕES
         $eixo2 = [
             'nome' => 'PROPÓSITO E RELAÇÕES',
             'descricao' => 'Este eixo avalia o grau de conexão emocional e relacional com o ambiente de trabalho — ou seja, se o participante sente pertencimento, confiança e reciprocidade.',
@@ -65,10 +119,8 @@ trait CalculaEjesAnaliticos
             'interpretacao' => $this->interpretarEixo2($cinismo['faixa'], $fatores['faixa'])
         ];
 
-        // EIXO 3: SUSTENTABILIDADE OCUPACIONAL 100 - ((Excesso de Trabalho + Assédio Moral) / 2)
-        $excesso = $pontosPorTag['EXTR'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
-        $assedio = $pontosPorTag['ASMO'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
-        $eixo3Total = max(0, min(100, 100 - (($excesso['valor'] + $assedio['valor']) / 2)));
+        // EIXO 3: SUSTENTABILIDADE OCUPACIONAL
+        $eixo3Total = isset($indices['SO']) ? $indices['SO'] : $eixo3Total;
         $eixo3 = [
             'nome' => 'SUSTENTABILIDADE OCUPACIONAL',
             'descricao' => 'Este eixo reflete a relação entre o esforço exigido e o suporte ético e emocional oferecido pelo ambiente. Mostra se o trabalho é sustentável — isto é, se há equilíbrio entre pressão e respeito.',
@@ -97,13 +149,37 @@ trait CalculaEjesAnaliticos
 
     /**
      * Calcula o Índice Integrado de Descarrilamento (IID) / Índice Global de Saúde Emocional (IGSE)
+     * 
+     * El IID se calcula como: (Promedio de EE, PR, SO) / (Promedio de máximos) * 100
+     * 
+     * Máximos según CSV:
+     * - EE: 276
+     * - PR: 234
+     * - SO: 186
+     * Promedio de máximos: (276 + 234 + 186) / 3 = 232
      */
     protected function calcularIID($ejesAnaliticos): float
     {
-        $total = $ejesAnaliticos['eixo1']['total'] + 
-                 $ejesAnaliticos['eixo2']['total'] + 
-                 $ejesAnaliticos['eixo3']['total'];
-        return round($total / 3, 2);
+        // Valores de los índices EE, PR, SO
+        $ee = $ejesAnaliticos['eixo1']['total'];
+        $pr = $ejesAnaliticos['eixo2']['total'];
+        $so = $ejesAnaliticos['eixo3']['total'];
+        
+        // Promedio de EE, PR, SO
+        $promedioIndices = ($ee + $pr + $so) / 3;
+        
+        // Máximos según el CSV
+        $maxEE = 276;
+        $maxPR = 234;
+        $maxSO = 186;
+        
+        // Promedio de máximos
+        $promedioMaximos = ($maxEE + $maxPR + $maxSO) / 3; // = 232
+        
+        // IID como porcentaje: (promedio índices / promedio máximos) * 100
+        $iid = ($promedioIndices / $promedioMaximos) * 100;
+        
+        return round($iid, 2);
     }
 
     /**

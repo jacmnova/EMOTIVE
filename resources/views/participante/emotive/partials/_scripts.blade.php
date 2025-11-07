@@ -4,6 +4,8 @@
     // Ordenar las dimensiones según la imagen (empezando desde arriba-derecha en sentido horario)
     const ordemDimensoes = ['EXEM', 'REPR', 'DECI', 'FAPS', 'EXTR', 'ASMO'];
     const pontuacoesOrdenadas = [];
+
+    console.log(pontuacoes, 'puntos');
     
     ordemDimensoes.forEach(tag => {
         const ponto = pontuacoes.find(p => p.tag === tag);
