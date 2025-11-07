@@ -48,22 +48,16 @@ class ActualizarRelacionesPreguntas extends Command
 
                 $variavelId = $variaveis[$tag]->id;
                 
-                foreach ($preguntas as $numeroPergunta) {
-                    // Buscar la pregunta por numero_da_pergunta
+                foreach ($preguntas as $perguntaId) {
+                    // IMPORTANTE: Los números en $dimensiones_csv son IDs de la base de datos, no numero_da_pergunta
+                    // Buscar la pregunta directamente por ID
                     $pergunta = \App\Models\Pergunta::where('formulario_id', 1)
-                        ->where('numero_da_pergunta', $numeroPergunta)
+                        ->where('id', $perguntaId)
                         ->first();
                     
                     if (!$pergunta) {
-                        $this->warn("Pregunta #{$numeroPergunta} no encontrada para {$tag}. Intentando por ID...");
-                        // Fallback: intentar por ID si numero_da_pergunta no funciona
-                        $pergunta = \App\Models\Pergunta::where('formulario_id', 1)
-                            ->where('id', $numeroPergunta)
-                            ->first();
-                        if (!$pergunta) {
-                            $this->error("Pregunta #{$numeroPergunta} no encontrada ni por numero_da_pergunta ni por ID");
-                            continue;
-                        }
+                        $this->error("Pregunta con ID {$perguntaId} no encontrada para {$tag}");
+                        continue;
                     }
                     
                     // Evitar duplicados

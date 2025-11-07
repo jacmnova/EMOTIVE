@@ -310,11 +310,24 @@ class DadosController extends Controller
             ->keyBy('pergunta_id');
 
         // Cargar variables con preguntas, asegurando que se carguen todos los campos de las preguntas
+        // IMPORTANTE: Cargar el campo 'id' es crítico para la inversión
         $variaveis = Variavel::with(['perguntas' => function($query) {
             $query->select('perguntas.id', 'perguntas.formulario_id', 'perguntas.numero_da_pergunta', 'perguntas.pergunta');
         }])
             ->where('formulario_id', $formulario->id)
             ->get();
+        
+        // Verificar que las preguntas tengan el campo 'id' cargado
+        foreach ($variaveis as $variavel) {
+            foreach ($variavel->perguntas as $pergunta) {
+                if (!isset($pergunta->id)) {
+                    \Log::error('Pregunta sin ID cargado', [
+                        'variavel' => $variavel->tag,
+                        'pergunta_numero' => $pergunta->numero_da_pergunta ?? 'N/A'
+                    ]);
+                }
+            }
+        }
 
         // Validar que haya variables
         if ($variaveis->isEmpty()) {
