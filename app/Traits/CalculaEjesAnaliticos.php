@@ -38,6 +38,23 @@ trait CalculaEjesAnaliticos
             $preguntasProcesadas = [];
             $preguntasIdsUnicas = []; // Para evitar contar preguntas duplicadas
             
+            // Para SO, necesitamos contar 31 preguntas según CSV MAX
+            // El CSV MAX tiene una pregunta duplicada (#62 y #76 son la misma)
+            // Para que SO tenga 31 preguntas, necesitamos contar esa pregunta dos veces
+            $esSO = ($indice === 'SO');
+            $preguntaDuplicadaSO = null; // ID de la pregunta que debe contarse dos veces en SO
+            
+            if ($esSO) {
+                // Buscar la pregunta duplicada: "Recebo novas demandas antes de conseguir concluir"
+                $preguntaDuplicada = \App\Models\Pergunta::where('formulario_id', $formularioId)
+                    ->where('pergunta', 'like', '%Recebo novas demandas antes de conseguir concluir%')
+                    ->first();
+                
+                if ($preguntaDuplicada) {
+                    $preguntaDuplicadaSO = $preguntaDuplicada->id;
+                }
+            }
+            
             // Para cada dimensión que pertenece a este eje
             foreach ($tagsDimensiones as $tagDimension) {
                 $variavel = $variaveis->get($tagDimension);
@@ -52,11 +69,18 @@ trait CalculaEjesAnaliticos
                 
                 // Procesar todas las preguntas de esta dimensión (igual que el radar)
                 foreach ($variavel->perguntas as $pergunta) {
+                    // Para SO, contar la pregunta duplicada dos veces
+                    $contarDosVeces = ($esSO && $preguntaDuplicadaSO && $pergunta->id == $preguntaDuplicadaSO);
+                    
                     // Evitar contar preguntas duplicadas si están en múltiples dimensiones
-                    if (in_array($pergunta->id, $preguntasIdsUnicas)) {
+                    // EXCEPTO si es la pregunta duplicada de SO que debe contarse dos veces
+                    if (!$contarDosVeces && in_array($pergunta->id, $preguntasIdsUnicas)) {
                         continue; // Ya se procesó esta pregunta
                     }
-                    $preguntasIdsUnicas[] = $pergunta->id;
+                    
+                    if (!$contarDosVeces) {
+                        $preguntasIdsUnicas[] = $pergunta->id;
+                    }
                     
                     // Buscar la respuesta (igual que el radar)
                     $resposta = $respostasUsuario->get($pergunta->id);
@@ -88,15 +112,30 @@ trait CalculaEjesAnaliticos
                     $necesitaInversion = \App\Helpers\PerguntasInvertidasHelper::precisaInversao($pergunta);
                     $valorUsado = $necesitaInversion ? (6 - $valorOriginal) : $valorOriginal;
                     
-                    $pontuacao += $valorUsado;
-                    $preguntasProcesadas[] = [
-                        'pergunta_id' => $pergunta->id,
-                        'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
-                        'tag_dimension' => $tagDimension,
-                        'valor_original' => $valorOriginal,
-                        'invertida' => $necesitaInversion,
-                        'valor_usado' => $valorUsado
-                    ];
+                    // Para SO, si es la pregunta duplicada, contarla dos veces
+                    if ($contarDosVeces) {
+                        $pontuacao += $valorUsado; // Primera vez
+                        $pontuacao += $valorUsado; // Segunda vez (duplicada)
+                        $preguntasProcesadas[] = [
+                            'pergunta_id' => $pergunta->id,
+                            'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
+                            'tag_dimension' => $tagDimension,
+                            'valor_original' => $valorOriginal,
+                            'invertida' => $necesitaInversion,
+                            'valor_usado' => $valorUsado,
+                            'contada_dos_veces' => true
+                        ];
+                    } else {
+                        $pontuacao += $valorUsado;
+                        $preguntasProcesadas[] = [
+                            'pergunta_id' => $pergunta->id,
+                            'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
+                            'tag_dimension' => $tagDimension,
+                            'valor_original' => $valorOriginal,
+                            'invertida' => $necesitaInversion,
+                            'valor_usado' => $valorUsado
+                        ];
+                    }
                 }
             }
             
