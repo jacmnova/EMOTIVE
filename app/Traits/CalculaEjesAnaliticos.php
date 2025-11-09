@@ -17,9 +17,9 @@ trait CalculaEjesAnaliticos
         // PR = DECI ∪ FAPS (unión de preguntas de Cinismo y Fatores Psicossociais)
         // SO = EXTR ∪ ASMO (unión de preguntas de Excesso de Trabalho y Assédio Moral)
         $indices = [
-            'EE' => [28, 29, 30, 33, 34, 37, 38, 39, 40, 41, 43, 44, 45, 47, 55, 56, 61, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99], // 19 preguntas (EXEM ∪ REPR)
-            'PR' => [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 48, 49, 50, 51, 52, 53, 54, 55, 56, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87], // 12 preguntas (DECI ∪ FAPS)
-            'SO' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77], // 14 preguntas (EXTR ∪ ASMO)
+            'EE' => [28, 29, 30, 33, 34, 37, 38, 39, 40, 41, 43, 44, 45, 47, 55, 56, 61, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99], // 29 preguntas (EXEM ∪ REPR)
+            'PR' => [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 48, 49, 50, 51, 52, 53, 54, 55, 56, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87], // 40 preguntas (DECI ∪ FAPS)
+            'SO' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77], // 31 preguntas (EXTR ∪ ASMO)
         ];
         
         // Cargar todas las preguntas indexadas por numero_da_pergunta
@@ -33,6 +33,8 @@ trait CalculaEjesAnaliticos
             $pontuacao = 0;
             $preguntasProcesadas = 0;
             $preguntasFaltantes = [];
+            $preguntasSinRespuesta = [];
+            $detallesCalculo = []; // Para debugging
             
             foreach ($numeroPerguntas as $numeroPergunta) {
                 // Buscar la pregunta por numero_da_pergunta
@@ -51,6 +53,7 @@ trait CalculaEjesAnaliticos
                 $resposta = $respostasUsuario->get($pergunta->id);
                 
                 if (!$resposta || $resposta->valor_resposta === null) {
+                    $preguntasSinRespuesta[] = $numeroPergunta;
                     \Log::debug('Respuesta no encontrada o nula', [
                         'indice' => $indice,
                         'pergunta_id' => $pergunta->id,
@@ -61,6 +64,16 @@ trait CalculaEjesAnaliticos
                 
                 $valorOriginal = (int)$resposta->valor_resposta;
                 
+                // Validar que el valor esté en el rango correcto (0-6)
+                if ($valorOriginal < 0 || $valorOriginal > 6) {
+                    \Log::warning('Valor de respuesta fuera de rango', [
+                        'indice' => $indice,
+                        'numero_da_pergunta' => $numeroPergunta,
+                        'valor_original' => $valorOriginal
+                    ]);
+                    continue;
+                }
+                
                 // Verificar si requiere inversión usando helper por texto
                 $necesitaInversion = \App\Helpers\PerguntasInvertidasHelper::precisaInversao($pergunta);
                 
@@ -68,15 +81,13 @@ trait CalculaEjesAnaliticos
                 // En preguntas invertidas: 0 es el valor más alto, 6 es el valor más bajo
                 $valorUsado = $necesitaInversion ? (6 - $valorOriginal) : $valorOriginal;
                 
-                \Log::debug('Calculando índice', [
-                    'indice' => $indice,
-                    'pergunta_id' => $pergunta->id,
-                    'numero_da_pergunta' => $numeroPergunta,
+                // Guardar detalles para debugging
+                $detallesCalculo[] = [
+                    'numero' => $numeroPergunta,
                     'valor_original' => $valorOriginal,
-                    'necesita_inversion' => $necesitaInversion,
-                    'valor_usado' => $valorUsado,
-                    'pontuacao_parcial' => $pontuacao
-                ]);
+                    'invertida' => $necesitaInversion,
+                    'valor_usado' => $valorUsado
+                ];
                 
                 $pontuacao += $valorUsado;
                 $preguntasProcesadas++;
@@ -88,8 +99,22 @@ trait CalculaEjesAnaliticos
                 'preguntas_procesadas' => $preguntasProcesadas,
                 'preguntas_faltantes' => count($preguntasFaltantes),
                 'preguntas_faltantes_lista' => $preguntasFaltantes,
-                'pontuacao_total' => $pontuacao
+                'preguntas_sin_respuesta' => count($preguntasSinRespuesta),
+                'preguntas_sin_respuesta_lista' => $preguntasSinRespuesta,
+                'pontuacao_total' => $pontuacao,
+                'maximo_teorico' => count($numeroPerguntas) * 6
             ]);
+            
+            // Validar que se procesaron todas las preguntas esperadas
+            if ($preguntasProcesadas < count($numeroPerguntas)) {
+                \Log::warning('No se procesaron todas las preguntas esperadas', [
+                    'indice' => $indice,
+                    'esperadas' => count($numeroPerguntas),
+                    'procesadas' => $preguntasProcesadas,
+                    'faltantes' => count($preguntasFaltantes),
+                    'sin_respuesta' => count($preguntasSinRespuesta)
+                ]);
+            }
             
             $resultados[$indice] = $pontuacao;
         }
