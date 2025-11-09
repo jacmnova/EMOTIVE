@@ -457,10 +457,10 @@ class DadosController extends Controller
             // Asegurar que la puntuación sea numérica
             $pontuacaoNumerica = is_numeric($pontuacao) ? (float)$pontuacao : 0;
             
-            // Calcular porcentaje para el gráfico radar (0-100)
-            // El máximo posible es: número de preguntas × 6 (score máximo)
+            // Calcular máximo posible y máximo del gráfico
+            // Si el máximo posible > 100, el gráfico usa máximo 200, sino 100
             $maximoPosible = $totalRespostas * 6;
-            $porcentaje = $maximoPosible > 0 ? round(($pontuacaoNumerica / $maximoPosible) * 100, 2) : 0;
+            $maximoGrafico = $maximoPosible > 100 ? 200 : 100;
             
             $faixa = $this->classificarPontuacao($pontuacaoNumerica, $variavel);
             switch ($faixa) {
@@ -498,8 +498,8 @@ class DadosController extends Controller
             $pontuacoes[] = [
                 'tag' => $tagFinal,
                 'nome' => $variavel->nome ?? 'Sin nombre',
-                'valor' => $pontuacaoNumerica, // Valor absoluto para mostrar en texto
-                'porcentaje' => $porcentaje, // Porcentaje para el gráfico radar (0-100)
+                'valor' => $pontuacaoNumerica, // Valor absoluto
+                'maximo_grafico' => $maximoGrafico, // Máximo del gráfico (100 o 200)
                 'faixa' => $faixa,
                 'recomendacao' => $recomendacao,
                 'badge' => $badge,

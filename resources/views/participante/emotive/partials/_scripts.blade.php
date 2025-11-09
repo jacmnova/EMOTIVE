@@ -22,8 +22,13 @@
     });
     
     const labelsRadar = pontuacoesOrdenadas.map(p => p.tag);
-    // Usar porcentaje para el gráfico radar (0-100) en lugar del valor absoluto
-    const dataRadar = pontuacoesOrdenadas.map(p => p.porcentaje !== undefined ? p.porcentaje : p.valor);
+    // Usar valores absolutos para el gráfico radar
+    const dataRadar = pontuacoesOrdenadas.map(p => p.valor);
+    
+    // Calcular el máximo del gráfico: usar el máximo más alto de todas las dimensiones
+    // Si algún máximo_grafico es 200, usar 200 para todo el gráfico; sino 100
+    const maximosGrafico = pontuacoesOrdenadas.map(p => p.maximo_grafico || 100);
+    const maximoGrafico = Math.max(...maximosGrafico);
     
     // Cores específicas para cada dimensão según la imagen
     const coresPorTag = {
@@ -118,7 +123,7 @@
                         enabled: true,
                         callbacks: {
                             label: function(context) {
-                                return context.dataset.label + ': ' + context.parsed.r.toFixed(1) + '%';
+                                return context.dataset.label + ': ' + context.parsed.r.toFixed(0) + ' pontos';
                             }
                         }
                     }
@@ -126,10 +131,10 @@
                 scales: {
                     r: {
                         beginAtZero: true,
-                        max: 100, // Máximo fijo en 100
+                        max: maximoGrafico, // Máximo dinámico (100 o 200)
                         min: 0,
                         ticks: {
-                            stepSize: 20, // 4 anillos internos (20, 40, 60, 80) + perímetro (100) = 5 niveles
+                            stepSize: maximoGrafico === 200 ? 40 : 20, // Si máximo es 200, stepSize 40; si es 100, stepSize 20
                             font: {
                                 size: 10,
                                 family: 'Quicksand'
@@ -168,6 +173,8 @@
                     
                     labelsRadar.forEach((tag, index) => {
                         const value = dataRadar[index];
+                        const ponto = pontuacoesOrdenadas[index];
+                        const maxGrafico = ponto?.maximo_grafico || maximoGrafico;
                         const color = coresPorTag[tag] || '#808080';
                         
                         if (meta.data[index]) {
