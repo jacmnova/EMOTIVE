@@ -7,73 +7,55 @@ use Illuminate\Support\Facades\DB;
 
 class ActualizarValoresFaps extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'emotive:actualizar-faps';
+    protected $signature = 'emotive:actualizar-rangos';
+    protected $description = 'Actualiza los valores B, M, A para TODAS las dimensiones según el CSV del emulador';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Actualiza los valores B, M, A para Fatores Psicossociais (FaPs) en todos los formularios según el Excel';
-
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
-        $this->info('🔄 Actualizando valores de FaPs en todos los formularios...');
+        $this->info('🔄 Actualizando valores B, M, A según CSV del Emulador...');
+        $this->info('');
         
-        // Valores correctos según el Excel:
-        // Faixa Baixa: 0 hasta 20 → B = 20
-        // Faixa Média: hasta 40 → M = 40
-        // Faixa Alta: arriba hasta 60 → A = 60
-        $nuevoB = 20;
-        $nuevoM = 40;
-        $nuevoA = 60;
+        // Valores según el CSV (líneas 2-5)
+        $valoresCsv = [
+            'ExEm' => ['B' => 52, 'M' => 104, 'A' => 105],
+            'RePr' => ['B' => 52, 'M' => 104, 'A' => 105],
+            'DeCi' => ['B' => 58, 'M' => 116, 'A' => 117],
+            'FaPs' => ['B' => 20, 'M' => 40, 'A' => 41],
+            'AsMo' => ['B' => 30, 'M' => 60, 'A' => 61],
+            'ExTr' => ['B' => 32, 'M' => 64, 'A' => 65],
+        ];
         
-        // Actualizar todos los registros de FaPs sin importar el formulario_id
-        $actualizados = DB::table('variaveis')
-            ->where('tag', 'FaPs')
-            ->orWhere('tag', 'FAPS')
-            ->orWhere('tag', 'faps')
-            ->update([
-                'B' => $nuevoB,
-                'M' => $nuevoM,
-                'A' => $nuevoA,
-                'updated_at' => now()
-            ]);
+        $totalActualizados = 0;
         
-        if ($actualizados > 0) {
-            $this->info("✅ Se actualizaron {$actualizados} registro(s) de FaPs");
-            $this->info("   - B (Faixa Baixa): {$nuevoB}");
-            $this->info("   - M (Faixa Média): {$nuevoM}");
-            $this->info("   - A (Faixa Alta): {$nuevoA}");
+        foreach ($valoresCsv as $tag => $valores) {
+            $this->info("📝 Actualizando {$tag}...");
             
-            // Mostrar los registros actualizados
-            $registros = DB::table('variaveis')
-                ->where('tag', 'FaPs')
-                ->orWhere('tag', 'FAPS')
-                ->orWhere('tag', 'faps')
-                ->select('id', 'formulario_id', 'nome', 'tag', 'B', 'M', 'A')
-                ->get();
+            // Actualizar registros (sin importar formulario_id)
+            $actualizados = DB::table('variaveis')
+                ->where(function($query) use ($tag) {
+                    $query->where('tag', $tag)
+                          ->orWhere('tag', strtoupper($tag))
+                          ->orWhere('tag', strtolower($tag));
+                })
+                ->update([
+                    'B' => $valores['B'],
+                    'M' => $valores['M'],
+                    'A' => $valores['A'],
+                    'updated_at' => now()
+                ]);
             
-            $this->info("\n📋 Registros actualizados:");
-            foreach ($registros as $registro) {
-                $this->line("   - ID: {$registro->id} | Formulario: {$registro->formulario_id} | {$registro->nome} ({$registro->tag})");
-                $this->line("     B={$registro->B}, M={$registro->M}, A={$registro->A}");
+            if ($actualizados > 0) {
+                $this->info("   ✅ {$actualizados} registro(s) actualizado(s)");
+                $this->line("      B={$valores['B']}, M={$valores['M']}, A={$valores['A']}");
+                $totalActualizados += $actualizados;
+            } else {
+                $this->warn("   ⚠️  No se encontraron registros para {$tag}");
             }
-        } else {
-            $this->warn('⚠️  No se encontraron registros de FaPs para actualizar');
         }
         
-        $this->info("\n✨ Proceso completado!");
+        $this->info('');
+        $this->info("✨ Proceso completado! Total: {$totalActualizados} registro(s) actualizado(s)");
         
         return 0;
     }
 }
-

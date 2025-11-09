@@ -1,0 +1,78 @@
+# Comandos Rápidos para Producción - Actualizar Rangos
+
+## 🔄 Actualización Rápida (Recomendado)
+
+```bash
+# 1. Conectarse al servidor
+ssh usuario@servidor
+cd /ruta/proyecto
+
+# 2. Actualizar código
+git pull origin main
+
+# 3. Instalar dependencias (si hay cambios)
+composer install --no-dev --optimize-autoloader
+
+# 4. Ejecutar actualización de rangos
+php artisan emotive:actualizar-todos-rangos
+
+# 5. Limpiar cache
+php artisan cache:clear && php artisan config:clear
+```
+
+## 📋 Comandos Individuales
+
+### Ver estado actual
+```bash
+php artisan emotive:calcular-rangos-generales 1
+```
+
+### Actualizar todos los formularios
+```bash
+php artisan emotive:actualizar-todos-rangos
+```
+
+### Actualizar solo formulario específico
+```bash
+php artisan emotive:calcular-rangos-generales 1
+```
+
+### Verificar con CSV
+```bash
+php artisan emotive:comparar-csv
+```
+
+### Verificar cálculo FAPS
+```bash
+php artisan emotive:verificar-faps-csv
+```
+
+## 🗄️ Backup Manual
+
+```bash
+# Opción 1: Usando mysqldump
+mysqldump -u usuario -p nombre_bd variaveis > backup_variaveis.sql
+
+# Opción 2: Exportar desde tinker
+php artisan tinker
+DB::table('variaveis')->get()->toJson();
+# Copiar resultado y guardar
+```
+
+## 🔙 Rollback
+
+```bash
+# Restaurar desde backup
+mysql -u usuario -p nombre_bd < backup_variaveis.sql
+
+# O ejecutar seeder original
+php artisan db:seed --class=VarBurnOutSeeder
+```
+
+## ⚠️ Verificación Post-Implementación
+
+1. Generar relatorio de prueba
+2. Verificar que FAPS score 36 → Faixa Moderada
+3. Revisar logs: tail -f storage/logs/laravel.log
+4. Probar con usuario real
+

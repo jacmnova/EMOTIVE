@@ -76,10 +76,16 @@ class ActualizarRelacionesPreguntas extends Command
                 }
 
                 $this->info("  {$tag}: {$variaveis[$tag]->nome} - " . count($preguntas) . " preguntas");
+                
+                // Actualizar rangos automáticamente después de actualizar relaciones
+                $variavel = $variaveis[$tag];
+                $variavel->load('perguntas', 'formulario');
+                \App\Traits\CalculaRangosVariavel::actualizarRangosAutomaticamente($variavel);
             }
 
             DB::commit();
             $this->info("\n✅ Relaciones actualizadas correctamente. Total: {$total} relaciones.");
+            $this->info("✅ Rangos B, M, A actualizados automáticamente para todas las variables.");
 
         } catch (\Exception $e) {
             DB::rollBack();
