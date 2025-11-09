@@ -32,7 +32,11 @@
             
             foreach ($variaveis as $registro) {
                 foreach ($pontuacoes as $pontos) {
-                    if (mb_strtoupper($registro->tag, 'UTF-8') === $pontos['tag']) {
+                    // Comparar tags en mayúsculas para evitar problemas de case
+                    $tagRegistro = mb_strtoupper(trim($registro->tag ?? ''), 'UTF-8');
+                    $tagPontos = mb_strtoupper(trim($pontos['tag'] ?? ''), 'UTF-8');
+                    
+                    if ($tagRegistro === $tagPontos) {
                         if ($pontos['faixa'] === 'Alta') {
                             $grupoAlta[] = $registro->nome . ' (' . $registro->tag . ')';
                         } elseif ($pontos['faixa'] === 'Moderada') {
