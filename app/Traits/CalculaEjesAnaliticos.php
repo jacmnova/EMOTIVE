@@ -58,17 +58,18 @@ trait CalculaEjesAnaliticos
                     // Buscar la respuesta (igual que el radar)
                     $resposta = $respostasUsuario->get($pergunta->id);
                     
+                    // Si no hay respuesta, contar como 0 (no saltar la pregunta)
                     if (!$resposta || $resposta->valor_resposta === null) {
-                        \Log::debug('Respuesta no encontrada o nula para eje', [
+                        \Log::debug('Respuesta no encontrada o nula para eje, contando como 0', [
                             'indice' => $indice,
                             'pergunta_id' => $pergunta->id,
                             'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
                             'tag_dimension' => $tagDimension
                         ]);
-                        continue;
+                        $valorOriginal = 0; // Contar como 0 si no hay respuesta
+                    } else {
+                        $valorOriginal = (int)$resposta->valor_resposta;
                     }
-                    
-                    $valorOriginal = (int)$resposta->valor_resposta;
                     
                     // Validar rango (0-6)
                     if ($valorOriginal < 0 || $valorOriginal > 6) {
