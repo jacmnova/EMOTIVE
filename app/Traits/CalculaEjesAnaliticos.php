@@ -105,6 +105,8 @@ trait CalculaEjesAnaliticos
                 'pontuacao_total' => $pontuacao
             ]);
             
+            // Guardar el resultado (suma de todas las preguntas del eje)
+            // Este valor se usa directamente, sin convertir a porcentaje
             $resultados[$indice] = $pontuacao;
         }
         
@@ -220,14 +222,22 @@ trait CalculaEjesAnaliticos
      * 
      * El IID se calcula como: (Promedio de EE, PR, SO) / (Promedio de máximos) * 100
      * 
-     * Máximos según CSV ALE (línea 5):
-     * - EE: 276
-     * - PR: 234
-     * - SO: 186
+     * Máximos según CSV MAX (línea 5):
+     * - EE: 276 (valor de referencia del Excel)
+     * - PR: 234 (valor de referencia del Excel)
+     * - SO: 186 (valor de referencia del Excel)
      * Promedio de máximos: (276 + 234 + 186) / 3 = 232
      * 
-     * NOTA: Estos máximos son valores de referencia del CSV, no los máximos teóricos
-     * de la suma simple (19×6=114, 12×6=72, 14×6=84).
+     * NOTA IMPORTANTE: Estos máximos son valores de referencia del CSV MAX/Excel,
+     * NO son los máximos teóricos (número de preguntas × 6).
+     * El Excel usa estos valores específicos para el cálculo del IID.
+     * 
+     * El cálculo de EE, PR, SO se hace sumando las preguntas de sus dimensiones:
+     * - EE = EXEM ∪ REPR (suma de todas las preguntas únicas)
+     * - PR = DECI ∪ FAPS (suma de todas las preguntas únicas)
+     * - SO = EXTR ∪ ASMO (suma de todas las preguntas únicas)
+     * 
+     * Cada pregunta se suma con su valor (0-6) aplicando inversión si corresponde.
      */
     protected function calcularIID($ejesAnaliticos): float
     {
