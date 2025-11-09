@@ -11,11 +11,12 @@ trait CalculaEjesAnaliticos
     {
         // Usar helper para identificar preguntas invertidas por texto
         
-        // Agrupaciones según el CSV (usando numero_da_pergunta)
+        // Agrupaciones según el CSV ALE (usando numero_da_pergunta)
+        // Extraídas del archivo: EMULADOR - EMOTIVE ALE - perguntas_completas_99 (1).csv
         $indices = [
-            'EE' => [28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99],
-            'PR' => [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 48, 49, 50, 51, 52, 53, 54, 55, 56, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87],
-            'SO' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77],
+            'EE' => [28, 29, 30, 33, 34, 37, 38, 39, 40, 41, 43, 44, 45, 47, 55, 56, 61, 95, 99], // 19 preguntas
+            'PR' => [28, 29, 30, 33, 34, 55, 56, 80, 82, 83, 84, 85], // 12 preguntas
+            'SO' => [62, 63, 64, 65, 66, 68, 69, 70, 72, 73, 74, 75, 76, 77], // 14 preguntas
         ];
         
         // Cargar todas las preguntas indexadas por numero_da_pergunta
@@ -201,11 +202,11 @@ trait CalculaEjesAnaliticos
      * 
      * El IID se calcula como: (Promedio de EE, PR, SO) / (Promedio de máximos) * 100
      * 
-     * Máximos según CSV:
-     * - EE: 276
-     * - PR: 234
-     * - SO: 186
-     * Promedio de máximos: (276 + 234 + 186) / 3 = 232
+     * Máximos según CSV ALE:
+     * - EE: 19 preguntas × 6 = 114
+     * - PR: 12 preguntas × 6 = 72
+     * - SO: 14 preguntas × 6 = 84
+     * Promedio de máximos: (114 + 72 + 84) / 3 = 90
      */
     protected function calcularIID($ejesAnaliticos): float
     {
@@ -217,13 +218,13 @@ trait CalculaEjesAnaliticos
         // Promedio de EE, PR, SO
         $promedioIndices = ($ee + $pr + $so) / 3;
         
-        // Máximos según el CSV
-        $maxEE = 276;
-        $maxPR = 234;
-        $maxSO = 186;
+        // Máximos según el CSV ALE
+        $maxEE = 114; // 19 preguntas × 6
+        $maxPR = 72;  // 12 preguntas × 6
+        $maxSO = 84;  // 14 preguntas × 6
         
         // Promedio de máximos
-        $promedioMaximos = ($maxEE + $maxPR + $maxSO) / 3; // = 232
+        $promedioMaximos = ($maxEE + $maxPR + $maxSO) / 3; // = 90
         
         // IID como porcentaje: (promedio índices / promedio máximos) * 100
         $iid = ($promedioIndices / $promedioMaximos) * 100;
