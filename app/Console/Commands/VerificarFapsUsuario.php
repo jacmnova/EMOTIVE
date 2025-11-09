@@ -60,7 +60,7 @@ class VerificarFapsUsuario extends Command
             
             // Calcular score
             $pontuacao = 0;
-            $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
+            $perguntasComInversao = [4, 6, 9, 21, 25, 31, 35, 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
             
             foreach ($variavelFaps->perguntas as $pergunta) {
                 $resposta = $respostasUsuario->get($pergunta->id);

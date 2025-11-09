@@ -25,7 +25,7 @@ class DiagnosticoCalculos extends Command
         }
         
         // Preguntas que requieren inversión
-        $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
+        $perguntasComInversao = [4, 6, 9, 21, 25, 31, 35, 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
         
         // Cargar variables
         $variaveis = Variavel::with(['perguntas' => function($query) {

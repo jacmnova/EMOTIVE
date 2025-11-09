@@ -718,7 +718,7 @@ class DadosController extends Controller
      * EXEM, REPR, DECI, FAPS, EXTR, ASMO
      * 
      * Las preguntas que requieren inversión son las que tienen estos numero_da_pergunta: 
-     * 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
+     * 4, 6, 9, 21, 25, 31, 35, 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
      * 
      * Lógica de inversión (igual para todas las dimensiones):
      * - Preguntas invertidas: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
@@ -751,7 +751,8 @@ class DadosController extends Controller
         ]);
         
         // Lista de numero_da_pergunta de preguntas que requieren inversión (según el CSV)
-        $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
+        // Actualizada: incluye preguntas #4, #6, #9, #21, #25, #31, #35 que deben dar 0 cuando están en 6
+        $perguntasComInversao = [4, 6, 9, 21, 25, 31, 35, 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
         
         // Verificar si esta pregunta requiere inversión (usando numero_da_pergunta)
         if (in_array($numeroPergunta, $perguntasComInversao, true)) {

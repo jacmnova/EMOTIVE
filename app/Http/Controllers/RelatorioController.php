@@ -669,11 +669,12 @@ class RelatorioController extends Controller
         }
         
         // Usar numero_da_pergunta para identificar cuáles requieren inversión
-        // Las preguntas que requieren inversión son las que tienen estos numero_da_pergunta: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
+        // Las preguntas que requieren inversión son las que tienen estos numero_da_pergunta: 4, 6, 9, 21, 25, 31, 35, 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
         $numeroPergunta = (int)($pergunta->numero_da_pergunta ?? 0);
         
         // Lista de numero_da_pergunta de preguntas que requieren inversión (según el CSV)
-        $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
+        // Actualizada: incluye preguntas #4, #6, #9, #21, #25, #31, #35 que deben dar 0 cuando están en 6
+        $perguntasComInversao = [4, 6, 9, 21, 25, 31, 35, 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
         
         // Verificar si esta pregunta requiere inversión (usando numero_da_pergunta)
         if (in_array($numeroPergunta, $perguntasComInversao, true)) {
