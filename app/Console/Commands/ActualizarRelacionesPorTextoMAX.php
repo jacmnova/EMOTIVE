@@ -71,22 +71,23 @@ class ActualizarRelacionesPorTextoMAX extends Command
             $mapeoCSV[$textoPergunta] = [];
             
             // Ver a qué dimensiones pertenece según CSV MAX
-            // IMPORTANTE: Usar las columnas correctas del CSV MAX
-            // Col 14: Exaustão Emocional (EXEM)
-            // Col 17: Realização Profissional (REPR) 
-            // Col 18: Cinismo (DECI)
-            // Col 20: Fatores Psicossociais (FAPS)
-            // Col 15: Excesso de Trabalho (EXTR)
-            // Col 16: Assédio Moral (ASMO)
-            // Col 19: EE (Energia Emocional) - para verificar
-            // Col 20: PR (Propósito e Relações) - para verificar
-            // Col 21: SO (Sustentabilidade Ocupacional) - para verificar
-            $exem = isset($data[14]) && $data[14] !== '' && $data[14] !== '0' ? (float)str_replace(',', '.', $data[14]) : 0;
-            $repr = isset($data[17]) && $data[17] !== '' && $data[17] !== '0' ? (float)str_replace(',', '.', $data[17]) : 0;
-            $deci = isset($data[18]) && $data[18] !== '' && $data[18] !== '0' ? (float)str_replace(',', '.', $data[18]) : 0;
-            $faps = isset($data[20]) && $data[20] !== '' && $data[20] !== '0' ? (float)str_replace(',', '.', $data[20]) : 0;
-            $extr = isset($data[15]) && $data[15] !== '' && $data[15] !== '0' ? (float)str_replace(',', '.', $data[15]) : 0;
-            $asmo = isset($data[16]) && $data[16] !== '' && $data[16] !== '0' ? (float)str_replace(',', '.', $data[16]) : 0;
+            // IMPORTANTE: Usar las columnas correctas del CSV MAX (verificadas en línea 12)
+            // Col 13: Exaustão Emocional (EXEM) - VERIFICAR
+            // Col 14: Realização Profissional (REPR)
+            // Col 15: Cinismo (DECI)
+            // Col 16: Fatores Psicossociais (FAPS)
+            // Col 17: Excesso de Trabalho (EXTR)
+            // Col 18: Assédio Moral (ASMO)
+            // Col 19: EE (Energia Emocional)
+            // Col 20: PR (Propósito e Relações)
+            // Col 21: SO (Sustentabilidade Ocupacional)
+            // NOTA: Necesito verificar la columna exacta de EXEM
+            $exem = isset($data[13]) && $data[13] !== '' && $data[13] !== '0' ? (float)str_replace(',', '.', $data[13]) : 0;
+            $repr = isset($data[14]) && $data[14] !== '' && $data[14] !== '0' ? (float)str_replace(',', '.', $data[14]) : 0;
+            $deci = isset($data[15]) && $data[15] !== '' && $data[15] !== '0' ? (float)str_replace(',', '.', $data[15]) : 0;
+            $faps = isset($data[16]) && $data[16] !== '' && $data[16] !== '0' ? (float)str_replace(',', '.', $data[16]) : 0;
+            $extr = isset($data[17]) && $data[17] !== '' && $data[17] !== '0' ? (float)str_replace(',', '.', $data[17]) : 0;
+            $asmo = isset($data[18]) && $data[18] !== '' && $data[18] !== '0' ? (float)str_replace(',', '.', $data[18]) : 0;
             
             // Asociar a dimensiones según CSV MAX (solo usar columnas de dimensiones, no de ejes)
             // Los ejes (EE, PR, SO) son la unión de dimensiones, no se usan directamente
@@ -165,10 +166,19 @@ class ActualizarRelacionesPorTextoMAX extends Command
                     foreach ($preguntasBD as $pBD) {
                         $textoBD = trim($pBD->pergunta ?? '');
                         
-                        // Comparación flexible
-                        if (stripos($textoBD, $textoCSV) !== false || 
-                            stripos($textoCSV, $textoBD) !== false ||
-                            $textoBD === $textoCSV) {
+                        // Comparación más flexible: normalizar textos
+                        $textoCSVNormalizado = mb_strtolower(trim($textoCSV));
+                        $textoBDNormalizado = mb_strtolower(trim($textoBD));
+                        
+                        // Comparar primeros 50 caracteres (más robusto)
+                        $textoCSVCorto = mb_substr($textoCSVNormalizado, 0, 50);
+                        $textoBDCorto = mb_substr($textoBDNormalizado, 0, 50);
+                        
+                        // Comparación flexible: contiene o es igual
+                        if ($textoBDNormalizado === $textoCSVNormalizado ||
+                            stripos($textoBDNormalizado, $textoCSVCorto) !== false ||
+                            stripos($textoCSVNormalizado, $textoBDCorto) !== false ||
+                            similar_text($textoCSVCorto, $textoBDCorto) / max(strlen($textoCSVCorto), strlen($textoBDCorto)) > 0.8) {
                             $perguntaEncontrada = $pBD;
                             break;
                         }

@@ -22,10 +22,13 @@ trait CalculaEjesAnaliticos
             ->keyBy('tag');
         
         // Mapeo de ejes a dimensiones
+        // IMPORTANTE: Según el CSV MAX, los ejes NO son simplemente la unión de dimensiones
+        // Cada eje tiene sus propias preguntas específicas según el CSV MAX
+        // Por ahora mantenemos la lógica de unión, pero esto puede necesitar ajuste
         $mapeoEjes = [
-            'EE' => ['ExEm', 'RePr'], // EE = EXEM ∪ REPR
-            'PR' => ['DeCi', 'FaPs'], // PR = DECI ∪ FAPS
-            'SO' => ['ExTr', 'AsMo'], // SO = EXTR ∪ ASMO
+            'EE' => ['ExEm', 'RePr'], // EE = EXEM ∪ REPR (según CSV MAX: 46 preguntas)
+            'PR' => ['DeCi', 'FaPs'], // PR = DECI ∪ FAPS (según CSV MAX: 39 preguntas)
+            'SO' => ['ExTr', 'AsMo'], // SO = EXTR ∪ ASMO (según CSV MAX: 31 preguntas, pero actualmente hay 39)
         ];
         
         $resultados = [];
