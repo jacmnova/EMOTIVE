@@ -16,10 +16,12 @@ class ActualizarRelacionesPorTexto extends Command
     {
         $this->info('Actualizando relaciones pregunta-variable usando texto del CSV...');
 
-        $csvPath = '/Users/novadesck/Downloads/EMULADOR - EMOTIVE ID II - perguntas_completas_99 MAX.csv';
+        // Buscar el CSV en la raíz del proyecto
+        $csvPath = base_path('EMULADOR - EMOTIVE ID II - perguntas_completas_99 MAX.csv');
         
         if (!file_exists($csvPath)) {
             $this->error("CSV no encontrado en: {$csvPath}");
+            $this->info("Buscando en la raíz del proyecto...");
             return 1;
         }
 
