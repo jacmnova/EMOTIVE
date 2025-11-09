@@ -104,6 +104,12 @@ class DadosController extends Controller
     public function questionariosUsuario()
     {
         $user = Auth::user();
+        
+        // Validar que el usuario esté autenticado
+        if (!$user) {
+            return redirect()->route('login')->with('msgError', 'Debes iniciar sesión para acceder a esta página.');
+        }
+        
         $questionarios = UsuarioFormulario::with(['formulario.perguntas', 'formulario.etapas', 'midia'])
             ->where('usuario_id', $user->id)
             ->get();
@@ -451,6 +457,11 @@ class DadosController extends Controller
             // Asegurar que la puntuación sea numérica
             $pontuacaoNumerica = is_numeric($pontuacao) ? (float)$pontuacao : 0;
             
+            // Calcular porcentaje para el gráfico radar (0-100)
+            // El máximo posible es: número de preguntas × 6 (score máximo)
+            $maximoPosible = $totalRespostas * 6;
+            $porcentaje = $maximoPosible > 0 ? round(($pontuacaoNumerica / $maximoPosible) * 100, 2) : 0;
+            
             $faixa = $this->classificarPontuacao($pontuacaoNumerica, $variavel);
             switch ($faixa) {
                 case 'Baixa':
@@ -487,7 +498,8 @@ class DadosController extends Controller
             $pontuacoes[] = [
                 'tag' => $tagFinal,
                 'nome' => $variavel->nome ?? 'Sin nombre',
-                'valor' => $pontuacaoNumerica,
+                'valor' => $pontuacaoNumerica, // Valor absoluto para mostrar en texto
+                'porcentaje' => $porcentaje, // Porcentaje para el gráfico radar (0-100)
                 'faixa' => $faixa,
                 'recomendacao' => $recomendacao,
                 'badge' => $badge,
@@ -756,7 +768,7 @@ class DadosController extends Controller
         
         \Log::debug('No se aplica inversión', [
             'pergunta_id' => $pergunta->id,
-            'numero_da_pergunta' => $numeroPergunta,
+            'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
             'valor' => $valor
         ]);
         

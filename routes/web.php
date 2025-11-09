@@ -104,7 +104,7 @@ Route::resource('usuario_formulario', UsuarioFormularioController::class);
 
 
 
-Route::get('/meus-questionarios', [DadosController::class, 'questionariosUsuario'])->name('questionarios.usuario');
+Route::get('/meus-questionarios', [DadosController::class, 'questionariosUsuario'])->name('questionarios.usuario')->middleware('auth');
 
 
 

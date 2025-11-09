@@ -222,6 +222,11 @@ class RelatorioController extends Controller
                 continue; // Saltar variables sin respuestas
             }
             
+            // Calcular porcentaje para el gráfico radar (0-100)
+            // El máximo posible es: número de preguntas × 6 (score máximo)
+            $maximoPosible = $totalRespostas * 6;
+            $porcentaje = $maximoPosible > 0 ? round(($pontuacao / $maximoPosible) * 100, 2) : 0;
+            
             // Classificar faixa
             $faixa = $this->classificarPontuacao($pontuacao, $variavel);
             
@@ -243,7 +248,8 @@ class RelatorioController extends Controller
                 'nome' => $variavel->nome,
                 'tag' => strtoupper($variavel->tag),
                 'pontuacao' => $pontuacao,
-                'valor' => $pontuacao,
+                'valor' => $pontuacao, // Valor absoluto para mostrar en texto
+                'porcentaje' => $porcentaje, // Porcentaje para el gráfico radar (0-100)
                 'faixa' => $faixa,
                 'recomendacao' => $recomendacao,
             ];

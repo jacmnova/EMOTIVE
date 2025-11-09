@@ -22,7 +22,8 @@
     });
     
     const labelsRadar = pontuacoesOrdenadas.map(p => p.tag);
-    const dataRadar = pontuacoesOrdenadas.map(p => p.valor);
+    // Usar porcentaje para el gráfico radar (0-100) en lugar del valor absoluto
+    const dataRadar = pontuacoesOrdenadas.map(p => p.porcentaje !== undefined ? p.porcentaje : p.valor);
     
     // Cores específicas para cada dimensão según la imagen
     const coresPorTag = {
@@ -117,7 +118,7 @@
                         enabled: true,
                         callbacks: {
                             label: function(context) {
-                                return context.dataset.label + ': ' + context.parsed.r + ' pontos';
+                                return context.dataset.label + ': ' + context.parsed.r.toFixed(1) + '%';
                             }
                         }
                     }
