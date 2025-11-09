@@ -1,0 +1,111 @@
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,Faixa Baixa (0 até),52,52,58,20,32,30,92,78,62,"92,8",Baixo,40%,,,,,,,
+,,,,,,,,,,,,Faixa Média (até),104,104,116,40,64,60,184,170,154,"150,8",Medio,65%,,,,,,,
+,,,,,,,,,,,,Faixa Alta (acima até Máx),105,105,117,41,65,61,185,171,155,"206,48",Atenção,89%,,,,,,,
+,,,,,,,,,,,,MAX,156,156,174,60,96,90,276,234,186,207,Alto,100%,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,232,100%,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,FAIXAS - Classificação,Alto,Alto,Alto,Alto,Alto,Alto,Alto,Alto,Alto,Alto,EXEM,REPR,DECI,FAPS,EXTR,ASMO,EE,PR,SO
+,,,,,,,,,,,,SCORE,156,156,174,60,96,90,276,234,186,100%,26,26,29,10,16,15,46,39,31
+,,,,,,,,,,,,,,,,,,,,,232,232,DIMENSÕES,,,,,,EIXOS,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+ID_Quest II,ID_Quest,Pergunta,Pos00,Pos01,Pos02,Pos03,Pos04,Pos05,Pos06,Fator,User_Choice,Score,EXEM,REPR,DECI,FAPS,EXTR,ASMO,EE,PR,SO,IID,Exaustão Emocional,Realização Profissional,Cinismo,Fatores Psicossociais,Excesso de Trabalho,Assédio Moral,Energia Emocional (EE),Propósito e Relações (PR),Sustentabilidade Ocupacional (SO)
+#001,#062,Recebo novas demandas antes de conseguir concluir as anteriores.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
+#002,#001,Já me senti coagido(a) ou intimidado(a) a cumprir tarefas que não condizem com meu cargo ou que envolviam situações desconfortáveis.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,0,6,0,0,6,2,,,,,,1,,,1
+#003,#036,Me sinto sem energia para enfrentar mais um dia de trabalho.,0,1,2,3,4,5,6,0,6,6,6,0,0,0,0,0,6,0,0,2,1,,,,,,1,,
+#004,#088,Tenho orgulho do que realizo profissionalmente.,6,5,4,3,2,1,0,6,0,6,0,6,0,0,0,0,6,0,0,2,,1,,,,,1,,
+#005,#037,Tenho dificuldades para me recuperar emocionalmente após o expediente.,0,1,2,3,4,5,6,0,6,6,6,0,0,0,0,0,6,0,0,2,1,,,,,,1,,
+#006,#078,Tenho clareza sobre minhas funções e responsabilidades.,6,5,4,3,2,1,0,6,0,6,0,0,0,6,0,0,0,6,0,2,,,,1,,,,1,
+#007,#002,"Já fui alvo de piadas, ironias ou críticas frequentes e desrespeitosas no ambiente de trabalho.",0,1,2,3,4,5,6,0,6,6,0,0,0,0,0,6,0,0,6,2,,,,,,1,,,1
+#008,#003,Sinto medo ou insegurança ao expressar minha opinião no ambiente de trabalho.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,0,6,0,0,6,2,,,,,,1,,,1
+#009,#079,Sinto que sou ouvido(a) e respeitado(a) no ambiente de trabalho.,6,5,4,3,2,1,0,6,0,6,0,0,0,6,0,0,0,6,0,2,,,,1,,,,1,
+#010,#063,Tenho dificuldade em tirar férias ou pausas regulares sem sentir culpa ou receio.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
+#011,#016,Costumo me sentir indiferente em relação às demandas do meu trabalho.,0,1,2,3,4,5,6,0,6,6,0,0,6,0,0,0,0,6,0,2,,,1,,,,,1,
+#012,#064,O volume de trabalho atual está além da minha capacidade de entrega.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
+#013,#065,"Frequentemente, trabalho além do meu horário regular para dar conta das demandas.",0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
+#014,#004,Sinto que sou tratado(a) de maneira injusta ou desrespeitosa por colegas ou líderes.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,0,6,0,0,6,2,,,,,,1,,,1
+#015,#017,Tenho notado um distanciamento emocional das pessoas com quem trabalho.,0,1,2,3,4,5,6,0,6,6,0,0,6,0,0,0,0,6,0,2,,,1,,,,,1,
+#016,#005,Já presenciei situações de humilhação ou constrangimento direcionadas a outros colegas.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,0,6,0,0,6,2,,,,,,1,,,1
+#017,#066,O tempo disponível para realizar minhas funções é insuficiente para executá-las com qualidade.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
+#018,#080,Sinto que as exigências do trabalho ultrapassam minha capacidade.,0,1,2,3,4,5,6,0,6,6,0,0,0,6,0,0,0,6,0,2,,,,1,,,,1,
+#019,#067,Tenho pouca autonomia para decidir o ritmo ou a organização das minhas tarefas.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
+#020,#006,"Já fui excluído(a) de reuniões ou decisões importantes, sem justificativa.",0,1,2,3,4,5,6,0,6,6,0,0,0,0,0,6,0,0,6,2,,,,,,1,,,1
+#021,#081,Tenho apoio suficiente da liderança ou colegas quando enfrento dificuldades.,6,5,4,3,2,1,0,6,0,6,0,0,0,6,0,0,0,6,0,2,,,,1,,,,1,
+#022,#089,Sinto que estou realizando menos do que sou capaz no meu trabalho.,0,1,2,3,4,5,6,0,6,6,0,6,0,0,0,0,6,0,0,2,,1,,,,,1,,
+#023,#068,O tempo que tenho para cumprir minhas responsabilidades é limitado e não permite realiza-las com excelência.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
+#024,#069,As metas e prazos estabelecidos são frequentemente inalcançáveis ou excessivamente pressionantes.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
+#025,#090,Sinto que meu trabalho é importante e significativo.,6,5,4,3,2,1,0,6,0,6,0,6,0,0,0,0,6,0,0,2,,1,,,,,1,,
+#026,#018,Sinto-me pouco envolvido(a) emocionalmente com as atividades que executo.,0,1,2,3,4,5,6,0,6,6,0,0,6,0,0,0,0,6,0,2,,,1,,,,,1,
+#027,#070,Tenho que sacrificar compromissos pessoais ou horas de descanso em função do trabalho.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
+#028,#091,Tenho dúvidas sobre minha competência para executar minhas tarefas.,0,1,2,3,4,5,6,0,6,6,0,6,0,0,0,0,6,0,0,2,,1,,,,,1,,
+#029,#038,Sinto-me esgotado(a) física e emocionalmente no final do dia de trabalho.,0,1,2,3,4,5,6,0,6,6,6,0,0,0,0,0,6,0,0,2,1,,,,,,1,,
+#030,#007,Já testemunhei ou sofri algum tipo de assédio moral ou pressão excessiva.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,0,6,0,0,6,2,,,,,,1,,,1
+#031,#082,As metas e prazos estabelecidos são realistas.,6,5,4,3,2,1,0,6,0,6,0,0,0,6,0,0,0,6,0,2,,,,1,,,,1,
+#032,#071,Tenho que lidar com cobranças excessivas sem suporte adequado.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
+#033,#008,Sinto que recebo tratamento desigual em relação aos demais colegas que exercem a mesma função.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,0,6,0,0,6,2,,,,,,1,,,1
+#034,#009,Já recebi ameaças veladas ou explícitas em função de desempenho ou opinião.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,0,6,0,0,6,2,,,,,,1,,,1
+#035,#083,Consigo manter equilíbrio entre vida pessoal e profissional.,6,5,4,3,2,1,0,6,0,6,0,0,0,6,0,0,0,6,0,2,,,,1,,,,1,
+#036,#072,Já me senti pressionado(a) a sacrificar minha saúde física ou mental em função do trabalho.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
+#037,#039,Estou me sentindo mentalmente exausto(a) devido às exigências do meu trabalho.,0,1,2,3,4,5,6,0,6,6,6,0,0,0,0,0,6,0,0,2,1,,,,,,1,,
+#038,#040,Termino o dia mental e fisicamente esgotado(a).,0,1,2,3,4,5,6,0,6,6,6,0,0,0,0,0,6,0,0,2,1,,,,,,1,,
+#039,#041,Sinto-me cansado(a) quando acordo de manhã e tenho que enfrentar outro dia de trabalho.,0,1,2,3,4,5,6,0,6,6,6,0,0,0,0,0,6,0,0,2,1,,,,,,1,,
+#040,#042,Trabalhar o dia todo é um grande esforço para mim.,0,1,2,3,4,5,6,0,6,6,6,0,0,0,0,0,6,0,0,2,1,,,,,,1,,
+#041,#092,Consigo resolver de forma eficiente os problemas que surgem no meu trabalho.,6,5,4,3,2,1,0,6,0,6,0,6,0,0,0,0,6,0,0,2,,1,,,,,1,,
+#042,#043,Sinto-me completamente esgotado(a) pelo meu trabalho.,0,1,2,3,4,5,6,0,6,6,6,0,0,0,0,0,6,0,0,2,1,,,,,,1,,
+#043,#093,Sinto que contribuo bastante com minha organização através do meu trabalho.,6,5,4,3,2,1,0,6,0,6,0,6,0,0,0,0,6,0,0,2,,1,,,,,1,,
+#044,#019,Sinto-me menos interessado(a) pelo trabalho desde que comecei nesta atividade.,0,1,2,3,4,5,6,0,6,6,0,0,6,0,0,0,0,6,0,2,,,1,,,,,1,
+#045,#020,Estou menos entusiasmado(a) com meu trabalho.,0,1,2,3,4,5,6,0,6,6,0,0,6,0,0,0,0,6,0,2,,,1,,,,,1,
+#046,#094,"Na minha opinião, sou bom(a) no meu trabalho.",6,5,4,3,2,1,0,6,0,6,0,6,0,0,0,0,6,0,0,2,,1,,,,,1,,
+#047,#095,Sinto-me entusiasmado(a) quando realizo algo significativo no trabalho.,6,5,4,3,2,1,0,6,0,6,0,6,0,0,0,0,6,0,0,2,,1,,,,,1,,
+#048,#096,Consigo fazer várias coisas importantes neste trabalho.,6,5,4,3,2,1,0,6,0,6,0,6,0,0,0,0,6,0,0,2,,1,,,,,1,,
+#049,#021,Só quero fazer meu trabalho e não ser incomodado(a).,0,1,2,3,4,5,6,0,6,6,0,0,6,0,0,0,0,6,0,2,,,1,,,,,1,
+#050,#022,Sou cético(a) sobre o quanto meu trabalho contribui para a empresa.,0,1,2,3,4,5,6,0,6,6,0,0,6,0,0,0,0,6,0,2,,,1,,,,,1,
+#051,#023,Duvido do significado de meu trabalho.,0,1,2,3,4,5,6,0,6,6,0,0,6,0,0,0,0,6,0,2,,,1,,,,,1,
+#052,#097,"Em meu trabalho, sinto-me confiante sobre minha eficiência ao fazer as coisas.",6,5,4,3,2,1,0,6,0,6,0,6,0,0,0,0,6,0,0,2,,1,,,,,1,,
+#053,#028,Sinto-me mentalmente esgotado(a) pelas demandas do meu trabalho.,0,1,2,3,4,5,6,0,6,6,0,6,6,0,0,0,6,6,0,4,,1,1,,,,1,1,
+#054,#029,Sinto-me exausto(a) ao final do dia.,0,1,2,3,4,5,6,0,6,6,0,6,6,0,0,0,6,6,0,4,,1,1,,,,1,1,
+#055,#056,Sinto-me muito cansado(a) quando acordo de manhã e tenho que enfrentar outro dia de trabalho.,0,1,2,3,4,5,6,0,6,6,6,6,6,0,0,0,6,6,0,4,1,1,1,,,,1,1,
+#056,#048,Consigo facilmente entender como os receptores de meus serviços se sentem sobre as coisas.,6,5,4,3,2,1,0,6,0,6,6,0,6,0,0,0,6,6,0,4,1,,1,,,,1,1,
+#057,#057,Percebo que trato alguns dos receptores de meus serviços como se fossem objetos impessoais.,0,1,2,3,4,5,6,0,6,6,6,6,0,0,0,0,6,0,0,2,1,1,,,,,1,,
+#058,#030,Trabalhar com pessoas o dia todo é um grande esforço para mim.,0,1,2,3,4,5,6,0,6,6,0,6,6,0,0,0,6,6,0,4,,1,1,,,,1,1,
+#059,#049,Consigo lidar de forma eficiente com os problemas dos receptores de meus serviços.,6,5,4,3,2,1,0,6,0,6,6,0,6,0,0,0,6,6,0,4,1,,1,,,,1,1,
+#060,#031,Sinto-me totalmente exaurido(a) pelas exigências do meu trabalho.,0,1,2,3,4,5,6,0,6,6,0,6,6,0,0,0,6,6,0,4,,1,1,,,,1,1,
+#061,#050,Sinto que influencio de forma positiva as vidas das pessoas através de meu trabalho.,6,5,4,3,2,1,0,6,0,6,6,0,6,0,0,0,6,6,0,4,1,,1,,,,1,1,
+#062,#058,Tornei-me mais indiferente com relação às pessoas desde que assumi este trabalho.,0,1,2,3,4,5,6,0,6,6,6,6,0,0,0,0,6,0,0,2,1,1,,,,,1,,
+#063,#059,Sinto que este trabalho está me deixando muito menos emocional.,0,1,2,3,4,5,6,0,6,6,6,6,0,0,0,0,6,0,0,2,1,1,,,,,1,,
+#064,#051,Sinto-me cheio(a) de energia.,6,5,4,3,2,1,0,6,0,6,6,0,6,0,0,0,6,6,0,4,1,,1,,,,1,1,
+#065,#032,Sinto-me frustrado(a) com meu emprego.,0,1,2,3,4,5,6,0,6,6,0,6,6,0,0,0,6,6,0,4,,1,1,,,,1,1,
+#066,#033,Sinto que estou trabalhando muito duro neste trabalho.,0,1,2,3,4,5,6,0,6,6,0,6,6,0,0,0,6,6,0,4,,1,1,,,,1,1,
+#067,#060,Tenho certa dificuldade em me importar com todos os usuários que se beneficiam do meu trabalho.,0,1,2,3,4,5,6,0,6,6,6,6,0,0,0,0,6,0,0,2,1,1,,,,,1,,
+#068,#034,Trabalhar diretamente com pessoas coloca muita pressão sobre mim.,0,1,2,3,4,5,6,0,6,6,0,6,6,0,0,0,6,6,0,4,,1,1,,,,1,1,
+#069,#052,Crio um ambiente acolhedor e tranquilo para as pessoas que atendo.,6,5,4,3,2,1,0,6,0,6,6,0,6,0,0,0,6,6,0,4,1,,1,,,,1,1,
+#070,#053,Ganho ânimo e motivação ao interagir diretamente com as pessoas que se beneficiam do meu trabalho.,6,5,4,3,2,1,0,6,0,6,6,0,6,0,0,0,6,6,0,4,1,,1,,,,1,1,
+#071,#054,Consegui fazer várias coisas importantes neste trabalho.,6,5,4,3,2,1,0,6,0,6,6,0,6,0,0,0,6,6,0,4,1,,1,,,,1,1,
+#072,#035,Sinto que não tenho mais um pingo de criatividade ou imaginação.,0,1,2,3,4,5,6,0,6,6,0,6,6,0,0,0,6,6,0,4,,1,1,,,,1,1,
+#073,#055,"Em meu trabalho, lido com problemas emocionais de forma muito calma.",6,5,4,3,2,1,0,6,0,6,6,0,6,0,0,0,6,6,0,4,1,,1,,,,1,1,
+#074,#061,Sinto que os usuários dos meus serviços às vezes projetam em mim a responsabilidade por seus problemas.,0,1,2,3,4,5,6,0,6,6,6,6,0,0,0,0,6,0,0,2,1,1,,,,,1,,
+#075,#044,Sinto-me esgotado(a) ao final do dia.,0,1,2,3,4,5,6,0,6,6,6,0,0,0,0,0,6,0,0,2,1,,,,,,1,,
+#076,#045,Sinto-me sobrecarregado(a) com o volume de trabalho.,0,1,2,3,4,5,6,0,6,6,6,0,0,0,0,0,6,0,0,2,1,,,,,,1,,
+#077,#046,Não tenho energia para enfrentar o dia seguinte.,0,1,2,3,4,5,6,0,6,6,6,0,0,0,0,0,6,0,0,2,1,,,,,,1,,
+#078,#047,Tenho dificuldade para me recuperar emocionalmente.,0,1,2,3,4,5,6,0,6,6,6,0,0,0,0,0,6,0,0,2,1,,,,,,1,,
+#079,#024,Sinto-me emocionalmente distante do que faço.,0,1,2,3,4,5,6,0,6,6,0,0,6,0,0,0,0,6,0,2,,,1,,,,,1,
+#080,#025,Torno-me indiferente às demandas que recebo.,0,1,2,3,4,5,6,0,6,6,0,0,6,0,0,0,0,6,0,2,,,1,,,,,1,
+#081,#026,Percebo que trato as pessoas de forma impessoal.,0,1,2,3,4,5,6,0,6,6,0,0,6,0,0,0,0,6,0,2,,,1,,,,,1,
+#082,#027,Meu envolvimento emocional com o trabalho é baixo.,0,1,2,3,4,5,6,0,6,6,0,0,6,0,0,0,0,6,0,2,,,1,,,,,1,
+#083,#098,Tenho a sensação de que realizo pouco no meu trabalho.,0,1,2,3,4,5,6,0,6,6,0,6,0,0,0,0,6,0,0,2,,1,,,,,1,,
+#084,#099,Sinto dúvidas em relação à minha competência.,0,1,2,3,4,5,6,0,6,6,0,6,0,0,0,0,6,0,0,2,,1,,,,,1,,
+#085,#084,Cobro demais de mim mesmo(a) o tempo todo.,0,1,2,3,4,5,6,0,6,6,0,0,0,6,0,0,0,6,0,2,,,,1,,,,1,
+#086,#085,Sinto que estou sacrificando minha saúde em função do trabalho.,0,1,2,3,4,5,6,0,6,6,0,0,0,6,0,0,0,6,0,2,,,,1,,,,1,
+#087,#086,Percebo que tenho pouca autonomia para tomar decisões.,0,1,2,3,4,5,6,0,6,6,0,0,0,6,0,0,0,6,0,2,,,,1,,,,1,
+#088,#087,Já vivenciei situações de assédio ou pressão excessiva.,0,1,2,3,4,5,6,0,6,6,0,0,0,6,0,0,0,6,0,2,,,,1,,,,1,
+#089,#010,Sou alvo de piadas ou críticas desrespeitosas.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,0,6,0,0,6,2,,,,,,1,,,1
+#090,#011,Sinto que sou tratado(a) de maneira injusta.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,0,6,0,0,6,2,,,,,,1,,,1
+#091,#012,Já testemunhei colegas sendo humilhados.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,0,6,0,0,6,2,,,,,,1,,,1
+#092,#013,Tenho medo de me expressar no ambiente de trabalho.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,0,6,0,0,6,2,,,,,,1,,,1
+#093,#014,Sinto-me excluído(a) de decisões importantes.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,0,6,0,0,6,2,,,,,,1,,,1
+#094,#015,Já recebi ameaças veladas ou explícitas.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,0,6,0,0,6,2,,,,,,1,,,1
+#095,#073,Costumo fazer horas extras com frequência.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
+#096,#074,Sinto que as metas definidas são inalcançáveis.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
+#097,#075,Tenho dificuldade para tirar férias ou fazer pausas regulares.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
+#098,#076,Recebo novas demandas antes de conseguir concluir as anteriores.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
+#099,#077,Percebo que minha vida pessoal tem sido comprometida pelo trabalho.,0,1,2,3,4,5,6,0,6,6,0,0,0,0,6,0,0,0,6,2,,,,,1,,,,1
