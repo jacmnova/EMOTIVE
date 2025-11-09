@@ -170,7 +170,7 @@ Aqui estão os resultados por dimensão:\n";
 
     /**
      * Obtiene el valor de respuesta aplicando inversión si la pregunta lo requiere
-     * Las preguntas que requieren inversión son las que tienen estos IDs: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
+     * Las preguntas invertidas se identifican por su TEXTO para evitar problemas con IDs
      * Inversión: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
      */
     private function obterValorRespostaComInversao($resposta, $pergunta): ?int
@@ -187,21 +187,16 @@ Aqui estão os resultados por dimensão:\n";
             return $valor;
         }
         
-        // Usar el ID de la pregunta (ID de la base de datos) para identificar cuáles requieren inversión
-        // SOLO estas preguntas son invertidas: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
-        $perguntaId = (int)$pergunta->id;
+        // Verificar si esta pregunta requiere inversión (usando helper por texto)
+        $necesitaInversion = \App\Helpers\PerguntasInvertidasHelper::precisaInversao($pergunta);
         
-        // Lista de IDs de preguntas que requieren inversión
-        $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
-        
-        // Verificar si esta pregunta requiere inversión (usando el ID de la base de datos)
-        if (in_array($perguntaId, $perguntasComInversao, true)) {
+        if ($necesitaInversion) {
             // Invertir el valor: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
             // En preguntas invertidas: 0 es el valor más alto, 6 es el valor más bajo
             $valorInvertido = 6 - $valor;
             \Log::info('✅ APLICANDO INVERSIÓN', [
-                'pergunta_id' => $perguntaId,
-                'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
+                'pergunta_id' => $pergunta->id,
+                'texto_pergunta' => substr(trim($pergunta->pergunta ?? ''), 0, 50) . '...',
                 'valor_original' => $valor,
                 'valor_invertido' => $valorInvertido
             ]);

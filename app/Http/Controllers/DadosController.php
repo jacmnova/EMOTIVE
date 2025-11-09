@@ -717,8 +717,7 @@ class DadosController extends Controller
      * IMPORTANTE: Esta lógica se aplica uniformemente para TODAS las dimensiones:
      * EXEM, REPR, DECI, FAPS, EXTR, ASMO
      * 
-     * Las preguntas que requieren inversión son las que tienen estos numero_da_pergunta: 
-     * 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
+     * Las preguntas invertidas se identifican por su TEXTO para evitar problemas con IDs
      * 
      * Lógica de inversión (igual para todas las dimensiones):
      * - Preguntas invertidas: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
@@ -733,35 +732,22 @@ class DadosController extends Controller
 
         $valor = $resposta->valor_resposta;
         
-        // Asegurar que la pregunta tenga el campo numero_da_pergunta cargado
+        // Asegurar que la pregunta existe
         if (!$pergunta) {
             \Log::warning('Pregunta es null en obterValorRespostaComInversao');
             return $valor;
         }
         
-        // Usar numero_da_pergunta para identificar cuáles requieren inversión
-        // Las preguntas que requieren inversión son las que tienen estos numero_da_pergunta: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
-        $numeroPergunta = (int)($pergunta->numero_da_pergunta ?? 0);
+        // Verificar si esta pregunta requiere inversión (usando helper por texto)
+        $necesitaInversion = \App\Helpers\PerguntasInvertidasHelper::precisaInversao($pergunta);
         
-        // Log detallado para debug
-        \Log::info('Verificando inversión', [
-            'pergunta_id' => $pergunta->id,
-            'numero_da_pergunta' => $numeroPergunta,
-            'valor_resposta' => $valor
-        ]);
-        
-        // Lista de numero_da_pergunta de preguntas que requieren inversión
-        // SOLO estas preguntas son invertidas: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
-        $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
-        
-        // Verificar si esta pregunta requiere inversión (usando numero_da_pergunta)
-        if (in_array($numeroPergunta, $perguntasComInversao, true)) {
+        if ($necesitaInversion) {
             // Invertir el valor: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
             // En preguntas invertidas: 0 es el valor más alto, 6 es el valor más bajo
             $valorInvertido = 6 - $valor;
             \Log::info('✅ APLICANDO INVERSIÓN', [
                 'pergunta_id' => $pergunta->id,
-                'numero_da_pergunta' => $numeroPergunta,
+                'texto_pergunta' => substr(trim($pergunta->pergunta ?? ''), 0, 50) . '...',
                 'valor_original' => $valor,
                 'valor_invertido' => $valorInvertido
             ]);

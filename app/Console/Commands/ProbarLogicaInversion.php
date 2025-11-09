@@ -41,9 +41,7 @@ class ProbarLogicaInversion extends Command
             return 1;
         }
         
-        // Lista de preguntas invertidas
-        // SOLO estas preguntas son invertidas: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
-        $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
+        // Usar helper para identificar preguntas invertidas por texto
         
         $this->info('📋 CASOS DE PRUEBA:');
         $this->info('');
@@ -79,7 +77,7 @@ class ProbarLogicaInversion extends Command
             
             foreach ($variavel->perguntas as $pergunta) {
                 $numeroPergunta = (int)($pergunta->numero_da_pergunta ?? 0);
-                $necesitaInversion = in_array($numeroPergunta, $perguntasComInversao, true);
+                $necesitaInversion = \App\Helpers\PerguntasInvertidasHelper::precisaInversao($pergunta);
                 
                 if ($necesitaInversion) {
                     $preguntasInvertidas[] = $numeroPergunta;

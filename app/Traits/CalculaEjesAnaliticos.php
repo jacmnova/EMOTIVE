@@ -9,9 +9,7 @@ trait CalculaEjesAnaliticos
      */
     protected function calcularIndicesDesdeRespostas($respostasUsuario, $formularioId): array
     {
-        // Preguntas que requieren inversión (por numero_da_pergunta)
-        // SOLO estas preguntas son invertidas: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
-        $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
+        // Usar helper para identificar preguntas invertidas por texto
         
         // Agrupaciones según el CSV (usando numero_da_pergunta)
         $indices = [
@@ -58,8 +56,10 @@ trait CalculaEjesAnaliticos
                 }
                 
                 $valorOriginal = (int)$resposta->valor_resposta;
-                // Verificar si requiere inversión usando numero_da_pergunta
-                $necesitaInversion = in_array($numeroPergunta, $perguntasComInversao, true);
+                
+                // Verificar si requiere inversión usando helper por texto
+                $necesitaInversion = \App\Helpers\PerguntasInvertidasHelper::precisaInversao($pergunta);
+                
                 // Invertir el valor: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
                 // En preguntas invertidas: 0 es el valor más alto, 6 es el valor más bajo
                 $valorUsado = $necesitaInversion ? (6 - $valorOriginal) : $valorOriginal;
