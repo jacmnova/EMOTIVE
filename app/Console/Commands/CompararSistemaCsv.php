@@ -90,7 +90,7 @@ class CompararSistemaCsv extends Command
                 ->keyBy('pergunta_id');
             
             // Preguntas que requieren inversión
-            $perguntasComInversao = [4, 6, 9, 21, 25, 31, 35, 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
+            $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
             
             // Calcular FAPS manualmente
             $preguntasFaps = [78, 79, 80, 81, 82, 83, 84, 85, 86, 87];

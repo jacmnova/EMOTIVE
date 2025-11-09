@@ -170,7 +170,7 @@ Aqui estão os resultados por dimensão:\n";
 
     /**
      * Obtiene el valor de respuesta aplicando inversión si la pregunta lo requiere
-     * Las preguntas que requieren inversión son las que tienen estos IDs: 4, 6, 9, 21, 25, 31, 35, 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
+     * Las preguntas que requieren inversión son las que tienen estos IDs: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
      * Inversión: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
      */
     private function obterValorRespostaComInversao($resposta, $pergunta): ?int
@@ -188,12 +188,11 @@ Aqui estão os resultados por dimensão:\n";
         }
         
         // Usar el ID de la pregunta (ID de la base de datos) para identificar cuáles requieren inversión
-        // Las preguntas que requieren inversión son las que tienen estos IDs: 4, 6, 9, 21, 25, 31, 35, 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
+        // SOLO estas preguntas son invertidas: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
         $perguntaId = (int)$pergunta->id;
         
-        // Lista de IDs de preguntas que requieren inversión (según el CSV)
-        // Actualizada: incluye preguntas #4, #6, #9, #21, #25, #31, #35 que deben dar 0 cuando están en 6
-        $perguntasComInversao = [4, 6, 9, 21, 25, 31, 35, 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
+        // Lista de IDs de preguntas que requieren inversión
+        $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
         
         // Verificar si esta pregunta requiere inversión (usando el ID de la base de datos)
         if (in_array($perguntaId, $perguntasComInversao, true)) {
