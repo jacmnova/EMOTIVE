@@ -304,10 +304,28 @@ class DadosController extends Controller
                 return redirect()->back()->with('msgError', 'Error al cargar las preguntas del formulario.');
             }
 
+        // Obtener respuestas del usuario - VERIFICAR QUE SE OBTENGAN CORRECTAMENTE
         $respostasUsuario = Resposta::where('user_id', $user->id)
             ->whereIn('pergunta_id', $perguntaIds)
             ->get()
             ->keyBy('pergunta_id');
+
+        // Log para verificar respuestas obtenidas
+        \Log::info('🔍 RESPUESTAS OBTENIDAS PARA CÁLCULOS', [
+            'usuario_id' => $user->id,
+            'formulario_id' => $formularioId,
+            'total_perguntas_formulario' => count($perguntaIds),
+            'total_respostas_encontradas' => $respostasUsuario->count(),
+            'respostas_con_valor' => $respostasUsuario->filter(function($r) {
+                return $r->valor_resposta !== null;
+            })->count(),
+            'primeras_5_respostas' => $respostasUsuario->take(5)->map(function($r) {
+                return [
+                    'pergunta_id' => $r->pergunta_id,
+                    'valor_resposta' => $r->valor_resposta
+                ];
+            })->values()->toArray()
+        ]);
 
         // Cargar variables con preguntas, asegurando que se carguen todos los campos de las preguntas
         // IMPORTANTE: Cargar el campo 'id' es crítico para la inversión
@@ -352,16 +370,40 @@ class DadosController extends Controller
             }
             
             // Calcular puntuación basada en las respuestas
+            $preguntasProcesadas = [];
+            $preguntasSinResposta = [];
+            
             foreach ($variavel->perguntas as $pergunta) {
+                // IMPORTANTE: Verificar que la respuesta se obtenga correctamente
                 $resposta = $respostasUsuario->get($pergunta->id);
                 
-                // Log para debug
-                \Log::info('Procesando pregunta', [
-                    'pergunta_id' => $pergunta->id,
-                    'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'NO DISPONIBLE',
-                    'tiene_resposta' => $resposta ? 'SI' : 'NO',
-                    'valor_resposta' => $resposta ? $resposta->valor_resposta : 'N/A'
-                ]);
+                if (!$resposta) {
+                    $preguntasSinResposta[] = [
+                        'pergunta_id' => $pergunta->id,
+                        'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A'
+                    ];
+                    \Log::warning('⚠️ Pregunta sin respuesta encontrada', [
+                        'variavel' => $variavel->tag,
+                        'pergunta_id' => $pergunta->id,
+                        'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
+                        'total_respostas_disponibles' => $respostasUsuario->count()
+                    ]);
+                    continue;
+                }
+                
+                if ($resposta->valor_resposta === null) {
+                    $preguntasSinResposta[] = [
+                        'pergunta_id' => $pergunta->id,
+                        'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
+                        'razon' => 'valor_resposta es NULL'
+                    ];
+                    \Log::warning('⚠️ Pregunta con respuesta NULL', [
+                        'variavel' => $variavel->tag,
+                        'pergunta_id' => $pergunta->id,
+                        'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A'
+                    ]);
+                    continue;
+                }
                 
                 $valorResposta = $this->obterValorRespostaComInversao($resposta, $pergunta);
                 if ($valorResposta !== null) {
@@ -369,15 +411,26 @@ class DadosController extends Controller
                     $pontuacao += $valorResposta;
                     $totalRespostas++;
                     
-                    \Log::info('Sumando valor a puntuación', [
-                        'variavel' => $variavel->tag,
+                    $preguntasProcesadas[] = [
                         'pergunta_id' => $pergunta->id,
+                        'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
                         'valor_original' => $valorOriginal,
-                        'valor_usado' => $valorResposta,
-                        'pontuacao_parcial' => $pontuacao
-                    ]);
+                        'valor_usado' => $valorResposta
+                    ];
                 }
             }
+            
+            // Log detallado de la variable
+            \Log::info('📊 Cálculo de variable completado', [
+                'variavel' => $variavel->tag,
+                'variavel_nome' => $variavel->nome,
+                'total_preguntas_asociadas' => $variavel->perguntas->count(),
+                'preguntas_procesadas' => count($preguntasProcesadas),
+                'preguntas_sin_resposta' => count($preguntasSinResposta),
+                'preguntas_sin_resposta_detalle' => $preguntasSinResposta,
+                'pontuacao_final' => $pontuacao,
+                'total_respostas_usadas' => $totalRespostas
+            ]);
             
             // Solo agregar si hay al menos una respuesta válida
             if ($totalRespostas === 0) {
@@ -671,28 +724,27 @@ class DadosController extends Controller
             return $valor;
         }
         
-        // Usar el ID de la pregunta (ID de la base de datos) para identificar cuáles requieren inversión
-        // Las preguntas que requieren inversión son las que tienen estos IDs: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
-        // IMPORTANTE: Se usa el ID de la base de datos, no numero_da_pergunta, porque los IDs coinciden con los números del CSV
-        $perguntaId = (int)$pergunta->id;
+        // Usar numero_da_pergunta para identificar cuáles requieren inversión
+        // Las preguntas que requieren inversión son las que tienen estos numero_da_pergunta: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
+        $numeroPergunta = (int)($pergunta->numero_da_pergunta ?? 0);
         
         // Log detallado para debug
         \Log::info('Verificando inversión', [
-            'pergunta_id' => $perguntaId,
-            'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
+            'pergunta_id' => $pergunta->id,
+            'numero_da_pergunta' => $numeroPergunta,
             'valor_resposta' => $valor
         ]);
         
-        // Lista de IDs de preguntas que requieren inversión (según el CSV)
+        // Lista de numero_da_pergunta de preguntas que requieren inversión (según el CSV)
         $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
         
-        // Verificar si esta pregunta requiere inversión (usando el ID de la base de datos)
-        if (in_array($perguntaId, $perguntasComInversao, true)) {
+        // Verificar si esta pregunta requiere inversión (usando numero_da_pergunta)
+        if (in_array($numeroPergunta, $perguntasComInversao, true)) {
             // Invertir el valor: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
             $valorInvertido = 6 - $valor;
             \Log::info('✅ APLICANDO INVERSIÓN', [
-                'pergunta_id' => $perguntaId,
-                'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
+                'pergunta_id' => $pergunta->id,
+                'numero_da_pergunta' => $numeroPergunta,
                 'valor_original' => $valor,
                 'valor_invertido' => $valorInvertido
             ]);
@@ -700,8 +752,8 @@ class DadosController extends Controller
         }
         
         \Log::debug('No se aplica inversión', [
-            'pergunta_id' => $perguntaId,
-            'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
+            'pergunta_id' => $pergunta->id,
+            'numero_da_pergunta' => $numeroPergunta,
             'valor' => $valor
         ]);
         

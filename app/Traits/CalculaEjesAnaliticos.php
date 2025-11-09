@@ -9,37 +9,36 @@ trait CalculaEjesAnaliticos
      */
     protected function calcularIndicesDesdeRespostas($respostasUsuario, $formularioId): array
     {
-        // Preguntas que requieren inversión (por ID de la base de datos)
-        // IMPORTANTE: Se usa el ID de la base de datos, no numero_da_pergunta
+        // Preguntas que requieren inversión (por numero_da_pergunta según el CSV)
         $perguntasComInversao = [48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97];
         
-        // Agrupaciones según el CSV (usando IDs de la base de datos)
+        // Agrupaciones según el CSV (usando numero_da_pergunta)
         $indices = [
             'EE' => [28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99],
             'PR' => [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 48, 49, 50, 51, 52, 53, 54, 55, 56, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87],
             'SO' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77],
         ];
         
-        // Cargar todas las preguntas indexadas por ID (no por numero_da_pergunta)
+        // Cargar todas las preguntas indexadas por numero_da_pergunta
         $perguntas = \App\Models\Pergunta::where('formulario_id', $formularioId)
             ->get()
-            ->keyBy('id');
+            ->keyBy('numero_da_pergunta');
         
         $resultados = [];
         
-        foreach ($indices as $indice => $perguntaIds) {
+        foreach ($indices as $indice => $numeroPerguntas) {
             $pontuacao = 0;
             $preguntasProcesadas = 0;
             $preguntasFaltantes = [];
             
-            foreach ($perguntaIds as $perguntaId) {
-                // Buscar la pregunta por ID de la base de datos
-                $pergunta = $perguntas->get($perguntaId);
+            foreach ($numeroPerguntas as $numeroPergunta) {
+                // Buscar la pregunta por numero_da_pergunta
+                $pergunta = $perguntas->get($numeroPergunta);
                 if (!$pergunta) {
-                    $preguntasFaltantes[] = $perguntaId;
-                    \Log::warning('Pregunta no encontrada por ID', [
+                    $preguntasFaltantes[] = $numeroPergunta;
+                    \Log::warning('Pregunta no encontrada por numero_da_pergunta', [
                         'indice' => $indice,
-                        'pergunta_id' => $perguntaId,
+                        'numero_da_pergunta' => $numeroPergunta,
                         'formulario_id' => $formularioId
                     ]);
                     continue;
@@ -58,14 +57,14 @@ trait CalculaEjesAnaliticos
                 }
                 
                 $valorOriginal = (int)$resposta->valor_resposta;
-                // Verificar si requiere inversión usando el ID de la base de datos
-                $necesitaInversion = in_array($perguntaId, $perguntasComInversao, true);
+                // Verificar si requiere inversión usando numero_da_pergunta
+                $necesitaInversion = in_array($numeroPergunta, $perguntasComInversao, true);
                 $valorUsado = $necesitaInversion ? (6 - $valorOriginal) : $valorOriginal;
                 
                 \Log::debug('Calculando índice', [
                     'indice' => $indice,
-                    'pergunta_id' => $perguntaId,
-                    'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
+                    'pergunta_id' => $pergunta->id,
+                    'numero_da_pergunta' => $numeroPergunta,
                     'valor_original' => $valorOriginal,
                     'necesita_inversion' => $necesitaInversion,
                     'valor_usado' => $valorUsado,
@@ -78,7 +77,7 @@ trait CalculaEjesAnaliticos
             
             \Log::info('Índice calculado', [
                 'indice' => $indice,
-                'total_preguntas_esperadas' => count($perguntaIds),
+                'total_preguntas_esperadas' => count($numeroPerguntas),
                 'preguntas_procesadas' => $preguntasProcesadas,
                 'preguntas_faltantes' => count($preguntasFaltantes),
                 'preguntas_faltantes_lista' => $preguntasFaltantes,

@@ -18,7 +18,8 @@ class ActualizarRelacionesPreguntas extends Command
         // Mapeo de tags a IDs de variables
         $variaveis = Variavel::where('formulario_id', 1)->get()->keyBy('tag');
         
-        // Mapeo según el CSV
+        // Mapeo según el CSV analizado (cuando User_Choice=5, estas preguntas aportan valor a cada dimensión)
+        // IMPORTANTE: Estos son los IDs de la base de datos (numero_da_pergunta), no los IDs de la tabla
         $dimensiones_csv = [
             'ExEm' => [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61],
             'RePr' => [28, 29, 30, 31, 32, 33, 34, 35, 56, 57, 58, 59, 60, 61, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99],
@@ -48,15 +49,15 @@ class ActualizarRelacionesPreguntas extends Command
 
                 $variavelId = $variaveis[$tag]->id;
                 
-                foreach ($preguntas as $perguntaId) {
-                    // IMPORTANTE: Los números en $dimensiones_csv son IDs de la base de datos, no numero_da_pergunta
-                    // Buscar la pregunta directamente por ID
+                foreach ($preguntas as $numeroPergunta) {
+                    // IMPORTANTE: Los números en $dimensiones_csv son numero_da_pergunta del CSV (#001, #002, etc.)
+                    // Buscar la pregunta por numero_da_pergunta
                     $pergunta = \App\Models\Pergunta::where('formulario_id', 1)
-                        ->where('id', $perguntaId)
+                        ->where('numero_da_pergunta', $numeroPergunta)
                         ->first();
                     
                     if (!$pergunta) {
-                        $this->error("Pregunta con ID {$perguntaId} no encontrada para {$tag}");
+                        $this->warn("Pregunta con numero_da_pergunta {$numeroPergunta} no encontrada para {$tag}");
                         continue;
                     }
                     
