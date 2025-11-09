@@ -191,6 +191,8 @@ class RelatorioController extends Controller
             ->where('formulario_id', $formulario->id)
             ->get();
 
+        // Calcular puntuaciones para TODAS las dimensiones (EXEM, REPR, DECI, FAPS, EXTR, ASMO)
+        // Todas usan la misma lógica de inversión basada en numero_da_pergunta
         $pontuacoes = [];
         foreach ($variaveis as $variavel) {
             $pontuacao = 0;
@@ -202,8 +204,12 @@ class RelatorioController extends Controller
             }
             
             // Calcular puntuación basada en las respuestas
+            // IMPORTANTE: La misma lógica se aplica para todas las dimensiones
             foreach ($variavel->perguntas as $pergunta) {
                 $resposta = $respostasUsuario->get($pergunta->id);
+                // Aplicar la misma lógica de inversión para todas las dimensiones
+                // Preguntas invertidas: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
+                // Preguntas normales: valor sin cambios
                 $valorResposta = $this->obterValorRespostaComInversao($resposta, $pergunta);
                 if ($valorResposta !== null) {
                     $pontuacao += $valorResposta;
@@ -636,8 +642,17 @@ class RelatorioController extends Controller
 
     /**
      * Obtiene el valor de respuesta aplicando inversión si la pregunta lo requiere
-     * Las preguntas que requieren inversión son las que tienen estos IDs: 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
-     * Inversión: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
+     * 
+     * IMPORTANTE: Esta lógica se aplica uniformemente para TODAS las dimensiones:
+     * EXEM, REPR, DECI, FAPS, EXTR, ASMO
+     * 
+     * Las preguntas que requieren inversión son las que tienen estos numero_da_pergunta: 
+     * 48, 49, 50, 51, 52, 53, 54, 55, 78, 79, 81, 82, 83, 88, 90, 92, 93, 94, 95, 96, 97
+     * 
+     * Lógica de inversión (igual para todas las dimensiones):
+     * - Preguntas invertidas: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
+     *   (En preguntas invertidas: 0 es el valor más alto, 6 es el valor más bajo)
+     * - Preguntas normales: valor sin cambios
      */
     private function obterValorRespostaComInversao($resposta, $pergunta): ?int
     {
@@ -663,6 +678,7 @@ class RelatorioController extends Controller
         // Verificar si esta pregunta requiere inversión (usando numero_da_pergunta)
         if (in_array($numeroPergunta, $perguntasComInversao, true)) {
             // Invertir el valor: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
+            // En preguntas invertidas: 0 es el valor más alto, 6 es el valor más bajo
             $valorInvertido = 6 - $valor;
             \Log::info('✅ APLICANDO INVERSIÓN', [
                 'pergunta_id' => $pergunta->id,

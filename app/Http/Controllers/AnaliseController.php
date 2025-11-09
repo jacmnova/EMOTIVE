@@ -197,6 +197,7 @@ Aqui estão os resultados por dimensão:\n";
         // Verificar si esta pregunta requiere inversión (usando el ID de la base de datos)
         if (in_array($perguntaId, $perguntasComInversao, true)) {
             // Invertir el valor: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
+            // En preguntas invertidas: 0 es el valor más alto, 6 es el valor más bajo
             $valorInvertido = 6 - $valor;
             \Log::info('✅ APLICANDO INVERSIÓN', [
                 'pergunta_id' => $perguntaId,

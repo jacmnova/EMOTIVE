@@ -59,6 +59,8 @@ trait CalculaEjesAnaliticos
                 $valorOriginal = (int)$resposta->valor_resposta;
                 // Verificar si requiere inversión usando numero_da_pergunta
                 $necesitaInversion = in_array($numeroPergunta, $perguntasComInversao, true);
+                // Invertir el valor: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
+                // En preguntas invertidas: 0 es el valor más alto, 6 es el valor más bajo
                 $valorUsado = $necesitaInversion ? (6 - $valorOriginal) : $valorOriginal;
                 
                 \Log::debug('Calculando índice', [
