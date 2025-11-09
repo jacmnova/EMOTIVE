@@ -121,26 +121,40 @@ sudo supervisorctl restart all
 
 ## 🐛 Solución de Problemas
 
-Si después del despliegue hay problemas:
+### Problema: Valores diferentes de 0 cuando todas las respuestas están en 0
 
-1. **Verificar que las relaciones se actualizaron:**
+Si después del despliegue, dimensiones como ASMO, REPR o DECI muestran valores cuando deberían ser 0:
+
+1. **Diagnosticar el problema:**
+   ```bash
+   # Reemplazar {usuario_id} con el ID del usuario que tiene el problema
+   php artisan emotive:diagnosticar-radar {usuario_id} 1 --todas-respuestas
+   ```
+
+2. **Verificar que las relaciones se actualizaron:**
    ```bash
    php artisan tinker
    >>> $variavel = \App\Models\Variavel::where('tag', 'ExEm')->first();
    >>> $variavel->perguntas->count();
    ```
 
-2. **Verificar que las preguntas invertidas están identificadas:**
+3. **Verificar que las preguntas invertidas están identificadas:**
    ```bash
    php artisan tinker
    >>> $pergunta = \App\Models\Pergunta::where('numero_da_pergunta', 48)->first();
    >>> $pergunta->id;
    ```
 
-3. **Limpiar todo el caché:**
+4. **Limpiar todo el caché:**
    ```bash
    php artisan optimize:clear
    ```
+
+### Verificar respuestas del usuario
+
+Si el diagnóstico muestra que hay respuestas con valor > 0:
+- Verificar en la base de datos que todas las respuestas estén realmente en 0
+- Si hay preguntas invertidas, recordar que para resultado 0: normales en 0, invertidas en 6
 
 ## 📦 Archivos a Subir
 
