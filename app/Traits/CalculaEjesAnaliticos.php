@@ -133,19 +133,13 @@ trait CalculaEjesAnaliticos
         $excesso = $pontosPorTag['EXTR'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
         $assedio = $pontosPorTag['ASMO'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
         
-        // Máximos según CSV ALE (línea 5)
-        // Estos son los valores máximos de referencia para convertir a porcentajes (0-100)
-        $maxEE = 276;
-        $maxPR = 234;
-        $maxSO = 186;
-        
-        // Si se proporcionan índices calculados directamente, convertirlos a porcentajes
+        // Si se proporcionan índices calculados directamente, usarlos (valores absolutos)
         // Si no, calcular usando las fórmulas originales como fallback
         if ($indices && isset($indices['EE']) && isset($indices['PR']) && isset($indices['SO'])) {
-            // Convertir valores absolutos a porcentajes (0-100) usando los máximos del CSV
-            $eixo1Total = $maxEE > 0 ? round(($indices['EE'] / $maxEE) * 100, 2) : 0;
-            $eixo2Total = $maxPR > 0 ? round(($indices['PR'] / $maxPR) * 100, 2) : 0;
-            $eixo3Total = $maxSO > 0 ? round(($indices['SO'] / $maxSO) * 100, 2) : 0;
+            // Usar valores absolutos directamente (sin convertir a porcentajes)
+            $eixo1Total = $indices['EE'];
+            $eixo2Total = $indices['PR'];
+            $eixo3Total = $indices['SO'];
         } else {
             // Fallback a fórmulas originales si no hay índices directos
             $eixo1Total = max(0, min(100, ($realizacao['valor'] - $exaustao['valor'] + 100) / 2));
