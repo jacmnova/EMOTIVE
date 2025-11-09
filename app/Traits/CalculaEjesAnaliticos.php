@@ -5,116 +5,104 @@ namespace App\Traits;
 trait CalculaEjesAnaliticos
 {
     /**
-     * Calcula os índices EE, PR y SO directamente desde las respuestas según el CSV
+     * Calcula os índices EE, PR y SO usando la misma lógica del radar
+     * 
+     * EE = EXEM ∪ REPR (unión de preguntas únicas de Exaustão Emocional y Realização Profissional)
+     * PR = DECI ∪ FAPS (unión de preguntas únicas de Cinismo y Fatores Psicossociais)
+     * SO = EXTR ∪ ASMO (unión de preguntas únicas de Excesso de Trabalho y Assédio Moral)
+     * 
+     * Usa las relaciones pergunta_variavel (igual que el radar) y aplica inversión cuando corresponde
      */
     protected function calcularIndicesDesdeRespostas($respostasUsuario, $formularioId): array
     {
-        // Usar helper para identificar preguntas invertidas por texto
-        
-        // Agrupaciones según el CSV ALE (usando numero_da_pergunta)
-        // Extraídas del archivo: EMULADOR - EMOTIVE ALE - perguntas_completas_99 (1).csv
-        // EE = EXEM ∪ REPR (unión de preguntas de Exaustão Emocional y Realização Profissional)
-        // PR = DECI ∪ FAPS (unión de preguntas de Cinismo y Fatores Psicossociais)
-        // SO = EXTR ∪ ASMO (unión de preguntas de Excesso de Trabalho y Assédio Moral)
-        $indices = [
-            'EE' => [28, 29, 30, 33, 34, 37, 38, 39, 40, 41, 43, 44, 45, 47, 55, 56, 61, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99], // 29 preguntas (EXEM ∪ REPR)
-            'PR' => [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 48, 49, 50, 51, 52, 53, 54, 55, 56, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87], // 40 preguntas (DECI ∪ FAPS)
-            'SO' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77], // 31 preguntas (EXTR ∪ ASMO)
-        ];
-        
-        // Cargar todas las preguntas indexadas por numero_da_pergunta
-        $perguntas = \App\Models\Pergunta::where('formulario_id', $formularioId)
+        // Obtener variables desde la BD usando las relaciones pergunta_variavel (igual que el radar)
+        $variaveis = \App\Models\Variavel::with('perguntas')
+            ->where('formulario_id', $formularioId)
             ->get()
-            ->keyBy('numero_da_pergunta');
+            ->keyBy('tag');
+        
+        // Mapeo de ejes a dimensiones
+        $mapeoEjes = [
+            'EE' => ['ExEm', 'RePr'], // EE = EXEM ∪ REPR
+            'PR' => ['DeCi', 'FaPs'], // PR = DECI ∪ FAPS
+            'SO' => ['ExTr', 'AsMo'], // SO = EXTR ∪ ASMO
+        ];
         
         $resultados = [];
         
-        foreach ($indices as $indice => $numeroPerguntas) {
+        foreach ($mapeoEjes as $indice => $tagsDimensiones) {
             $pontuacao = 0;
-            $preguntasProcesadas = 0;
-            $preguntasFaltantes = [];
-            $preguntasSinRespuesta = [];
-            $detallesCalculo = []; // Para debugging
+            $preguntasProcesadas = [];
+            $preguntasIdsUnicas = []; // Para evitar contar preguntas duplicadas
             
-            foreach ($numeroPerguntas as $numeroPergunta) {
-                // Buscar la pregunta por numero_da_pergunta
-                $pergunta = $perguntas->get($numeroPergunta);
-                if (!$pergunta) {
-                    $preguntasFaltantes[] = $numeroPergunta;
-                    \Log::warning('Pregunta no encontrada por numero_da_pergunta', [
+            // Para cada dimensión que pertenece a este eje
+            foreach ($tagsDimensiones as $tagDimension) {
+                $variavel = $variaveis->get($tagDimension);
+                
+                if (!$variavel) {
+                    \Log::warning('Variable no encontrada para eje', [
                         'indice' => $indice,
-                        'numero_da_pergunta' => $numeroPergunta,
-                        'formulario_id' => $formularioId
+                        'tag_dimension' => $tagDimension
                     ]);
                     continue;
                 }
                 
-                // Buscar la respuesta por pregunta_id (ID de la base de datos)
-                $resposta = $respostasUsuario->get($pergunta->id);
-                
-                if (!$resposta || $resposta->valor_resposta === null) {
-                    $preguntasSinRespuesta[] = $numeroPergunta;
-                    \Log::debug('Respuesta no encontrada o nula', [
-                        'indice' => $indice,
+                // Procesar todas las preguntas de esta dimensión (igual que el radar)
+                foreach ($variavel->perguntas as $pergunta) {
+                    // Evitar contar preguntas duplicadas si están en múltiples dimensiones
+                    if (in_array($pergunta->id, $preguntasIdsUnicas)) {
+                        continue; // Ya se procesó esta pregunta
+                    }
+                    $preguntasIdsUnicas[] = $pergunta->id;
+                    
+                    // Buscar la respuesta (igual que el radar)
+                    $resposta = $respostasUsuario->get($pergunta->id);
+                    
+                    if (!$resposta || $resposta->valor_resposta === null) {
+                        \Log::debug('Respuesta no encontrada o nula para eje', [
+                            'indice' => $indice,
+                            'pergunta_id' => $pergunta->id,
+                            'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
+                            'tag_dimension' => $tagDimension
+                        ]);
+                        continue;
+                    }
+                    
+                    $valorOriginal = (int)$resposta->valor_resposta;
+                    
+                    // Validar rango (0-6)
+                    if ($valorOriginal < 0 || $valorOriginal > 6) {
+                        \Log::warning('Valor de respuesta fuera de rango para eje', [
+                            'indice' => $indice,
+                            'pergunta_id' => $pergunta->id,
+                            'valor_original' => $valorOriginal
+                        ]);
+                        continue;
+                    }
+                    
+                    // Aplicar inversión usando helper (igual que el radar)
+                    $necesitaInversion = \App\Helpers\PerguntasInvertidasHelper::precisaInversao($pergunta);
+                    $valorUsado = $necesitaInversion ? (6 - $valorOriginal) : $valorOriginal;
+                    
+                    $pontuacao += $valorUsado;
+                    $preguntasProcesadas[] = [
                         'pergunta_id' => $pergunta->id,
-                        'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A'
-                    ]);
-                    continue;
+                        'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
+                        'tag_dimension' => $tagDimension,
+                        'valor_original' => $valorOriginal,
+                        'invertida' => $necesitaInversion,
+                        'valor_usado' => $valorUsado
+                    ];
                 }
-                
-                $valorOriginal = (int)$resposta->valor_resposta;
-                
-                // Validar que el valor esté en el rango correcto (0-6)
-                if ($valorOriginal < 0 || $valorOriginal > 6) {
-                    \Log::warning('Valor de respuesta fuera de rango', [
-                        'indice' => $indice,
-                        'numero_da_pergunta' => $numeroPergunta,
-                        'valor_original' => $valorOriginal
-                    ]);
-                    continue;
-                }
-                
-                // Verificar si requiere inversión usando helper por texto
-                $necesitaInversion = \App\Helpers\PerguntasInvertidasHelper::precisaInversao($pergunta);
-                
-                // Invertir el valor: 0→6, 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
-                // En preguntas invertidas: 0 es el valor más alto, 6 es el valor más bajo
-                $valorUsado = $necesitaInversion ? (6 - $valorOriginal) : $valorOriginal;
-                
-                // Guardar detalles para debugging
-                $detallesCalculo[] = [
-                    'numero' => $numeroPergunta,
-                    'valor_original' => $valorOriginal,
-                    'invertida' => $necesitaInversion,
-                    'valor_usado' => $valorUsado
-                ];
-                
-                $pontuacao += $valorUsado;
-                $preguntasProcesadas++;
             }
             
-            \Log::info('Índice calculado', [
+            \Log::info('Índice calculado desde relaciones pergunta_variavel', [
                 'indice' => $indice,
-                'total_preguntas_esperadas' => count($numeroPerguntas),
-                'preguntas_procesadas' => $preguntasProcesadas,
-                'preguntas_faltantes' => count($preguntasFaltantes),
-                'preguntas_faltantes_lista' => $preguntasFaltantes,
-                'preguntas_sin_respuesta' => count($preguntasSinRespuesta),
-                'preguntas_sin_respuesta_lista' => $preguntasSinRespuesta,
-                'pontuacao_total' => $pontuacao,
-                'maximo_teorico' => count($numeroPerguntas) * 6
+                'dimensiones' => $tagsDimensiones,
+                'preguntas_procesadas' => count($preguntasProcesadas),
+                'preguntas_unicas' => count($preguntasIdsUnicas),
+                'pontuacao_total' => $pontuacao
             ]);
-            
-            // Validar que se procesaron todas las preguntas esperadas
-            if ($preguntasProcesadas < count($numeroPerguntas)) {
-                \Log::warning('No se procesaron todas las preguntas esperadas', [
-                    'indice' => $indice,
-                    'esperadas' => count($numeroPerguntas),
-                    'procesadas' => $preguntasProcesadas,
-                    'faltantes' => count($preguntasFaltantes),
-                    'sin_respuesta' => count($preguntasSinRespuesta)
-                ]);
-            }
             
             $resultados[$indice] = $pontuacao;
         }
@@ -145,12 +133,19 @@ trait CalculaEjesAnaliticos
         $excesso = $pontosPorTag['EXTR'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
         $assedio = $pontosPorTag['ASMO'] ?? ['valor' => 0, 'faixa' => 'Baixa'];
         
-        // Si se proporcionan índices calculados directamente, usarlos
+        // Máximos según CSV ALE (línea 5)
+        // Estos son los valores máximos de referencia para convertir a porcentajes (0-100)
+        $maxEE = 276;
+        $maxPR = 234;
+        $maxSO = 186;
+        
+        // Si se proporcionan índices calculados directamente, convertirlos a porcentajes
         // Si no, calcular usando las fórmulas originales como fallback
         if ($indices && isset($indices['EE']) && isset($indices['PR']) && isset($indices['SO'])) {
-            $eixo1Total = $indices['EE'];
-            $eixo2Total = $indices['PR'];
-            $eixo3Total = $indices['SO'];
+            // Convertir valores absolutos a porcentajes (0-100) usando los máximos del CSV
+            $eixo1Total = $maxEE > 0 ? round(($indices['EE'] / $maxEE) * 100, 2) : 0;
+            $eixo2Total = $maxPR > 0 ? round(($indices['PR'] / $maxPR) * 100, 2) : 0;
+            $eixo3Total = $maxSO > 0 ? round(($indices['SO'] / $maxSO) * 100, 2) : 0;
         } else {
             // Fallback a fórmulas originales si no hay índices directos
             $eixo1Total = max(0, min(100, ($realizacao['valor'] - $exaustao['valor'] + 100) / 2));
@@ -198,7 +193,7 @@ trait CalculaEjesAnaliticos
         ];
 
         // EIXO 3: SUSTENTABILIDADE OCUPACIONAL
-        $eixo3Total = isset($indices['SO']) ? $indices['SO'] : $eixo3Total;
+        // Ya se calculó arriba, no necesita recalcularse
         $eixo3 = [
             'nome' => 'SUSTENTABILIDADE OCUPACIONAL',
             'descricao' => 'Este eixo reflete a relação entre o esforço exigido e o suporte ético e emocional oferecido pelo ambiente. Mostra se o trabalho é sustentável — isto é, se há equilíbrio entre pressão e respeito.',
