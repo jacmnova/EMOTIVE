@@ -368,6 +368,15 @@ class DadosController extends Controller
         // Calcular puntuaciones para TODAS las dimensiones (EXEM, REPR, DECI, FAPS, EXTR, ASMO)
         // Todas usan la misma lógica de inversión basada en numero_da_pergunta
         $pontuacoes = [];
+        
+        // Para EXTR, necesitamos contar 16 preguntas según CSV MAX
+        // El CSV MAX tiene una pregunta duplicada (#62 y #76 son la misma)
+        // Para que EXTR tenga 16 preguntas, necesitamos contar esa pregunta dos veces
+        $preguntaDuplicadaEXTR = \App\Models\Pergunta::where('formulario_id', $formularioId)
+            ->where('pergunta', 'like', '%Recebo novas demandas antes de conseguir concluir%')
+            ->first();
+        $preguntaDuplicadaEXTRId = $preguntaDuplicadaEXTR ? $preguntaDuplicadaEXTR->id : null;
+        
         foreach ($variaveis as $variavel) {
             $pontuacao = 0;
             $totalRespostas = 0;
@@ -382,7 +391,12 @@ class DadosController extends Controller
             $preguntasProcesadas = [];
             $preguntasSinResposta = [];
             
+            // Para EXTR, verificar si debemos contar la pregunta duplicada dos veces
+            $esEXTR = (strtoupper($variavel->tag ?? '') === 'EXTR');
+            
             foreach ($variavel->perguntas as $pergunta) {
+                // Para EXTR, contar la pregunta duplicada dos veces
+                $contarDosVeces = ($esEXTR && $preguntaDuplicadaEXTRId && $pergunta->id == $preguntaDuplicadaEXTRId);
                 // IMPORTANTE: Verificar que la respuesta se obtenga correctamente
                 $resposta = $respostasUsuario->get($pergunta->id);
                 
@@ -420,14 +434,23 @@ class DadosController extends Controller
                 $valorResposta = $this->obterValorRespostaComInversao($resposta, $pergunta);
                 if ($valorResposta !== null) {
                     $valorOriginal = (int)$resposta->valor_resposta;
-                    $pontuacao += $valorResposta;
-                    $totalRespostas++;
+                    
+                    // Para EXTR, si es la pregunta duplicada, contarla dos veces
+                    if ($contarDosVeces) {
+                        $pontuacao += $valorResposta; // Primera vez
+                        $pontuacao += $valorResposta; // Segunda vez (duplicada)
+                        $totalRespostas += 2; // Contar como 2 respuestas
+                    } else {
+                        $pontuacao += $valorResposta;
+                        $totalRespostas++;
+                    }
                     
                     $preguntasProcesadas[] = [
                         'pergunta_id' => $pergunta->id,
                         'numero_da_pergunta' => $pergunta->numero_da_pergunta ?? 'N/A',
                         'valor_original' => $valorOriginal,
-                        'valor_usado' => $valorResposta
+                        'valor_usado' => $valorResposta,
+                        'contada_dos_veces' => $contarDosVeces
                     ];
                 }
             }
