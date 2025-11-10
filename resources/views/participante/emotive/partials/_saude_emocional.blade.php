@@ -118,7 +118,7 @@
     @if($dadosEXEM && $dadosEXEM['faixa'])
         <div style="margin-bottom: 35px;">
             <!-- Barra de título -->
-            <div style="background: #A4977F; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: #4F3F23; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="color: #FFFFFF;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal; margin: 0;">Exaustão Emocional (ExEm)</h3>
                 <div style="display: flex;align-items: center;gap: 4px; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
                 <div style="background: {{ obterCorBadge($dadosEXEM['faixa']) }};width: 10px;height: 10px;border-radius: 100px;"></div>     
@@ -127,7 +127,7 @@
             </div>
             
             <!-- Contenido -->
-            <div style="background: #FFFFFF; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #E0E0E0; border-top: none;">
+            <div style="background: #F6F6F6; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #E0E0E0; border-top: none;">
                 <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin-bottom: 15px;">
                     {{ $dadosEXEM['descricao'] }}
                 </p>
@@ -164,7 +164,7 @@
     @if($dadosDECI && $dadosDECI['faixa'])
         <div style="margin-bottom: 35px;">
             <!-- Barra de título -->
-            <div style="background: #FF8C00; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: #D79648; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="color: #FFFFFF;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal; margin: 0;">Despersonalização / Cinismo (DeCi)</h3>
                 <div style="display: flex;align-items: center;gap: 4px; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
                 <div style="background: {{ obterCorBadge($dadosDECI['faixa']) }};width: 10px;height: 10px;border-radius: 100px;"></div>     
@@ -173,7 +173,7 @@
             </div>
             
             <!-- Contenido -->
-            <div style="background: #FFFFFF; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #E0E0E0; border-top: none;">
+            <div style="background: #F6F6F6; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #E0E0E0; border-top: none;">
                 <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin-bottom: 15px;">
                     {{ $dadosDECI['descricao'] }}
                 </p>
@@ -210,7 +210,7 @@
     @if($dadosREPR && $dadosREPR['faixa'])
         <div style="margin-bottom: 35px;">
             <!-- Barra de título -->
-            <div style="background: #A9A9A9; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: #A59880; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="color: #FFFFFF;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal; margin: 0;">Realização Profissional (RePr)</h3>
                 <div style="display: flex;align-items: center;gap: 4px; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
                 <div style="background: {{ obterCorBadge($dadosREPR['faixa']) }};width: 10px;height: 10px;border-radius: 100px;"></div>     
@@ -219,7 +219,7 @@
             </div>
             
             <!-- Contenido -->
-            <div style="background: #FFFFFF; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #E0E0E0; border-top: none;">
+            <div style="background: #F6F6F6; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #E0E0E0; border-top: none;">
                 <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin-bottom: 15px;">
                     {{ $dadosREPR['descricao'] }}
                 </p>
@@ -278,7 +278,7 @@
     @if($dadosFAPS && $dadosFAPS['faixa'])
         <div style="margin-bottom: 35px;">
             <!-- Barra de título -->
-            <div style="background: #556B2F; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: #62807C; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="color: #FFFFFF;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal; margin: 0;">Fatores Psicossociais (FaPs)</h3>
                 <div style="display: flex;align-items: center;gap: 4px; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
                 <div style="background: {{ obterCorBadge($dadosFAPS['faixa']) }};width: 10px;height: 10px;border-radius: 100px;"></div>   
@@ -287,7 +287,7 @@
             </div>
             
             <!-- Contenido -->
-            <div style="background: #FFFFFF; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #E0E0E0; border-top: none;">
+            <div style="background: #F6F6F6; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #E0E0E0; border-top: none;">
                 <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin-bottom: 15px;">
                     {{ $dadosFAPS['descricao'] }}
                 </p>
@@ -324,7 +324,7 @@
     @if($dadosASMO && $dadosASMO['faixa'])
         <div style="margin-bottom: 35px;">
             <!-- Barra de título -->
-            <div style="background: #2E9196; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: #0D6486; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="color: #FFFFFF;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal; margin: 0;">Assédio Moral (AsMo)</h3>
                 <div style="display: flex;align-items: center;gap: 4px; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
                 <div style="background: {{ obterCorBadge($dadosASMO['faixa']) }};width: 10px;height: 10px;border-radius: 100px;"></div>    
@@ -333,7 +333,7 @@
             </div>
             
             <!-- Contenido -->
-            <div style="background: #FFFFFF; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #E0E0E0; border-top: none;">
+            <div style="background: #F6F6F6; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #E0E0E0; border-top: none;">
                 <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin-bottom: 15px;">
                     {{ $dadosASMO['descricao'] }}
                 </p>
@@ -370,7 +370,7 @@
     @if($dadosEXTR && $dadosEXTR['faixa'])
         <div style="margin-bottom: 35px;">
             <!-- Barra de título -->
-            <div style="background: #6B5B95; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: #636A99; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="color: #FFFFFF;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal; margin: 0;">Excesso de Trabalho (ExTr)</h3>
                 <div style="display: flex;align-items: center;gap: 4px; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
                 <div style="background: {{ obterCorBadge($dadosEXTR['faixa']) }};width: 10px;height: 10px;border-radius: 100px;"></div>    
@@ -379,7 +379,7 @@
             </div>
             
             <!-- Contenido -->
-            <div style="background: #FFFFFF; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #E0E0E0; border-top: none;">
+            <div style="background: #F6F6F6; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #E0E0E0; border-top: none;">
                 <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin-bottom: 15px;">
                     {{ $dadosEXTR['descricao'] }}
                 </p>

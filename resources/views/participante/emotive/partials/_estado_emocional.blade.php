@@ -52,14 +52,14 @@
             }
         }
         
-        // Definir colores de barras según la dimensión (SAÚDE EMOCIONAL)
+        // Definir colores de barras según la dimensión (fallback)
         $coresBarras = [
-            'EXEM' => '#4F3F23', // Exaustão Emocional (ExEm)
-            'DECI' => '#D79648', // Despersonalização / Cinismo (DeCi)
-            'REPR' => '#A59880', // Realização Profissional (RePr)
-            'FAPS' => '#62807C', // Fatores Psicossociais (FaPs)
-            'ASMO' => '#0D6486', // Assédio Moral (AsMo)
-            'EXTR' => '#636A99', // Excesso de Trabalho (ExTr)
+            'EXEM' => '#DED8C7',
+            'DECI' => '#DED8C7',
+            'REPR' => '#E8C97B',
+            'FAPS' => '#E8C97B',
+            'ASMO' => '#7BC9A8',
+            'EXTR' => '#E8C97B'
         ];
     @endphp
     
@@ -112,18 +112,16 @@
                     $classificacao = 'Sem dados disponíveis para esta dimensão.';
                 }
                 
-                // Color de la barra por dimensión (según especificación)
-                $barraBg = $coresBarras[mb_strtoupper($registro->tag, 'UTF-8')] ?? '#DED8C7';
-                
-                // Color del punto (indicador) según faixa
+                // Color de la barra según a faixa (dinámico)
                 if ($faixa === 'Alta') {
-                    $corPontoFaixa = '#dc3545';
+                    $barraBg = '#dc3545'; // rojo
                 } elseif ($faixa === 'Moderada') {
-                    $corPontoFaixa = '#D9BC5D';
+                    $barraBg = '#D9BC5D'; // amarillo
                 } elseif ($faixa === 'Baixa') {
-                    $corPontoFaixa = '#5DD986';
+                    $barraBg = '#5DD986'; // verde
                 } else {
-                    $corPontoFaixa = '#CCCCCC';
+                    // fallback por dimensión si no hay faixa
+                    $barraBg = $coresBarras[mb_strtoupper($registro->tag, 'UTF-8')] ?? '#DED8C7';
                 }
             @endphp
             
@@ -135,10 +133,7 @@
                 
                 <!-- Barra de resultado con estilo de la imagen (fondo beige, texto blanco) -->
                 <div style="background: {{ $barraBg }}; padding: 10px 15px; margin-bottom: 0; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <span style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: #FFFFFF; font-size: 10px; line-height: normal;">
-                        <span style="display:inline-block; width: 12px; height: 12px; border-radius: 50%; background: {{ $corPontoFaixa }};"></span>
-                        Faixa {{ $faixa ?? 'Indefinida' }}
-                    </span>
+                    <span style="font-weight: bold; color: #FFFFFF;font-size: 10px;font-style: normal;font-weight: 700;line-height: normal;">Faixa {{ $faixa ?? 'Indefinida' }}</span>
                     <span style="font-weight: bold; color: #FFFFFF;font-size: 10px; line-height: normal;">{{ $pontuacao ?? '–' }}</span>
                 </div>
                 
