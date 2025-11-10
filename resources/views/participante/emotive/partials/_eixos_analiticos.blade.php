@@ -45,7 +45,19 @@
                     <!-- Dimensão 1 -->
                     <div>
                         <div style="font-weight: bold; margin-bottom: 10px; color: #000;font-size: 10px;font-style: normal;font-weight: 700;line-height: normal;">{{ $eixo['dimensao1']['nome'] }}</div>
-                        <div style="display: inline-block; padding: 5px 12px; border-radius: 10px; width: 100%; text-align: center; background: {{ $coresBadges[$key][$eixo['dimensao1']['tag']] ?? '#DED8C7' }}; color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal;">
+                        @php
+                            $faixa1 = $eixo['dimensao1']['faixa'] ?? null;
+                            if ($faixa1 === 'Alta') {
+                                $bgFaixa1 = '#dc3545';
+                            } elseif ($faixa1 === 'Moderada') {
+                                $bgFaixa1 = '#D9BC5D';
+                            } elseif ($faixa1 === 'Baixa') {
+                                $bgFaixa1 = '#5DD986';
+                            } else {
+                                $bgFaixa1 = $coresBadges[$key][$eixo['dimensao1']['tag']] ?? '#DED8C7';
+                            }
+                        @endphp
+                        <div style="display: inline-block; padding: 5px 12px; border-radius: 10px; width: 100%; text-align: center; background: {{ $bgFaixa1 }}; color: #FFFFFF;font-size: 10px;font-style: normal;font-weight: 700;line-height: normal;">
                             Faixa {{ $eixo['dimensao1']['faixa'] }}
                         </div>
                     </div>
@@ -53,13 +65,25 @@
                     <!-- Total -->
                     <div style="text-align: center;">
                         <div style="font-weight: bold; color: #000;font-size: 10px;font-style: normal;font-weight: 700;line-height: normal; margin-bottom: 5px;">TOTAL</div>
-                        <div style="display: inline-block; padding: 5px 12px; border-radius: 10px; width: 100%; text-align: center; background: {{ $coresBadges[$key][$eixo['dimensao2']['tag']] ?? '#E8C97B' }}; color: #000;font-size: 14px;font-style: normal;font-weight: 400;line-height: normal;     margin-top: 5px;">{{ round($eixo['total']) }}</div>
+                        <div style="display: inline-block; padding: 5px 12px; border-radius: 10px; width: 100%; text-align: center; background: #D9BC5D; color: #FFFFFF;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal;     margin-top: 5px;">{{ round($eixo['total']) }}</div>
                     </div>
                     
                     <!-- Dimensão 2 -->
                     <div style="text-align: right;">
                         <div style="font-weight: bold; margin-bottom: 10px; color: #000;font-size: 10px;font-style: normal;font-weight: 700;line-height: normal;">{{ $eixo['dimensao2']['nome'] }}</div>
-                        <div style="display: inline-block; padding: 5px 12px; border-radius: 10px; width: 100%; text-align: center; background: {{ $coresBadges[$key][$eixo['dimensao2']['tag']] ?? '#E8C97B' }}; color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal;">
+                        @php
+                            $faixa2 = $eixo['dimensao2']['faixa'] ?? null;
+                            if ($faixa2 === 'Alta') {
+                                $bgFaixa2 = '#dc3545';
+                            } elseif ($faixa2 === 'Moderada') {
+                                $bgFaixa2 = '#D9BC5D';
+                            } elseif ($faixa2 === 'Baixa') {
+                                $bgFaixa2 = '#5DD986';
+                            } else {
+                                $bgFaixa2 = $coresBadges[$key][$eixo['dimensao2']['tag']] ?? '#E8C97B';
+                            }
+                        @endphp
+                        <div style="display: inline-block; padding: 5px 12px; border-radius: 10px; width: 100%; text-align: center; background: {{ $bgFaixa2 }}; color: #FFFFFF;font-size: 10px;font-style: normal;font-weight: 700;line-height: normal;">
                             Faixa {{ $eixo['dimensao2']['faixa'] }}
                         </div>
                     </div>

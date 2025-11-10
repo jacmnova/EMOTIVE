@@ -120,8 +120,9 @@
             <!-- Barra de título -->
             <div style="background: #A4977F; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="color: #FFFFFF;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal; margin: 0;">Exaustão Emocional (ExEm)</h3>
-                <div style="background: {{ obterCorBadge($dadosEXEM['faixa']) }}; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
-                    Faixa {{ $dadosEXEM['faixa'] }}
+                <div style="display: flex;align-items: center;gap: 4px; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
+                <div style="background: {{ obterCorBadge($dadosEXEM['faixa']) }};width: 10px;height: 10px;border-radius: 100px;"></div>     
+                Faixa {{ $dadosEXEM['faixa'] }}
                 </div>
             </div>
             
@@ -165,8 +166,9 @@
             <!-- Barra de título -->
             <div style="background: #FF8C00; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="color: #FFFFFF;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal; margin: 0;">Despersonalização / Cinismo (DeCi)</h3>
-                <div style="background: {{ obterCorBadge($dadosDECI['faixa']) }}; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
-                    Faixa {{ $dadosDECI['faixa'] }}
+                <div style="display: flex;align-items: center;gap: 4px; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
+                <div style="background: {{ obterCorBadge($dadosDECI['faixa']) }};width: 10px;height: 10px;border-radius: 100px;"></div>     
+                Faixa {{ $dadosDECI['faixa'] }}
                 </div>
             </div>
             
@@ -210,8 +212,9 @@
             <!-- Barra de título -->
             <div style="background: #A9A9A9; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="color: #FFFFFF;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal; margin: 0;">Realização Profissional (RePr)</h3>
-                <div style="background: {{ obterCorBadge($dadosREPR['faixa']) }}; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
-                    Faixa {{ $dadosREPR['faixa'] }}
+                <div style="display: flex;align-items: center;gap: 4px; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
+                <div style="background: {{ obterCorBadge($dadosREPR['faixa']) }};width: 10px;height: 10px;border-radius: 100px;"></div>     
+                Faixa {{ $dadosREPR['faixa'] }}
                 </div>
             </div>
             
@@ -277,7 +280,8 @@
             <!-- Barra de título -->
             <div style="background: #556B2F; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="color: #FFFFFF;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal; margin: 0;">Fatores Psicossociais (FaPs)</h3>
-                <div style="background: {{ obterCorBadge($dadosFAPS['faixa']) }}; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
+                <div style="display: flex;align-items: center;gap: 4px; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
+                <div style="background: {{ obterCorBadge($dadosFAPS['faixa']) }};width: 10px;height: 10px;border-radius: 100px;"></div>   
                     Faixa {{ $dadosFAPS['faixa'] }}
                 </div>
             </div>
@@ -322,7 +326,8 @@
             <!-- Barra de título -->
             <div style="background: #2E9196; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="color: #FFFFFF;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal; margin: 0;">Assédio Moral (AsMo)</h3>
-                <div style="background: {{ obterCorBadge($dadosASMO['faixa']) }}; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
+                <div style="display: flex;align-items: center;gap: 4px; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
+                <div style="background: {{ obterCorBadge($dadosASMO['faixa']) }};width: 10px;height: 10px;border-radius: 100px;"></div>    
                     Faixa {{ $dadosASMO['faixa'] }}
                 </div>
             </div>
@@ -367,8 +372,9 @@
             <!-- Barra de título -->
             <div style="background: #6B5B95; padding: 12px 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="color: #FFFFFF;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal; margin: 0;">Excesso de Trabalho (ExTr)</h3>
-                <div style="background: {{ obterCorBadge($dadosEXTR['faixa']) }}; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
-                    Faixa {{ $dadosEXTR['faixa'] }}
+                <div style="display: flex;align-items: center;gap: 4px; color: #FFFFFF; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
+                <div style="background: {{ obterCorBadge($dadosEXTR['faixa']) }};width: 10px;height: 10px;border-radius: 100px;"></div>    
+                Faixa {{ $dadosEXTR['faixa'] }}
                 </div>
             </div>
             
