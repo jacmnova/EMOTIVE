@@ -32,12 +32,12 @@
     
     // Cores específicas para cada dimensão según la imagen
     const coresPorTag = {
-        'EXEM': '#8B4513',   // Dark Brown (marrón oscuro)
-        'REPR': '#8B4513',   // Dark Brown (marrón oscuro)
-        'DECI': '#FF8C00',   // Orange (naranja)
-        'FAPS': '#90EE90',   // Light Green (verde claro)
-        'EXTR': '#9370DB',   // Purple (púrpura)
-        'ASMO': '#4169E1'    // Royal Blue (azul)
+        'EXEM': '#4F3F23',   // Dark Brown (marrón oscuro)
+        'REPR': '#A4977F',   // Dark Brown (marrón oscuro)
+        'DECI': '#D79648',   // Orange (naranja)
+        'FAPS': '#62807C',   // Light Green (verde claro)
+        'EXTR': '#636A99',   // Purple (púrpura)
+        'ASMO': '#005882'    // Royal Blue (azul)
     };
     
     // Colores con transparencia para los segmentos

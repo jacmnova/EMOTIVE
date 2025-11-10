@@ -208,6 +208,9 @@ trait CalculaEjesAnaliticos
                 'faixa' => $realizacao['faixa']
             ],
             'total' => round($eixo1Total, 0),
+            // Faixa total dinâmica baseada nas faixas das dimensões (regra simples: Alta > Moderada > Baixa)
+            'faixa_total' => (in_array('Alta', [$exaustao['faixa'], $realizacao['faixa']]) ? 'Alta'
+                                : (in_array('Moderada', [$exaustao['faixa'], $realizacao['faixa']]) ? 'Moderada' : 'Baixa')),
             'interpretacao' => $this->interpretarEixo1($exaustao['faixa'], $realizacao['faixa'])
         ];
 
@@ -228,6 +231,8 @@ trait CalculaEjesAnaliticos
                 'faixa' => $fatores['faixa']
             ],
             'total' => round($eixo2Total, 0),
+            'faixa_total' => (in_array('Alta', [$cinismo['faixa'], $fatores['faixa']]) ? 'Alta'
+                                : (in_array('Moderada', [$cinismo['faixa'], $fatores['faixa']]) ? 'Moderada' : 'Baixa')),
             'interpretacao' => $this->interpretarEixo2($cinismo['faixa'], $fatores['faixa'])
         ];
 
@@ -249,6 +254,8 @@ trait CalculaEjesAnaliticos
                 'faixa' => $assedio['faixa']
             ],
             'total' => round($eixo3Total, 0),
+            'faixa_total' => (in_array('Alta', [$excesso['faixa'], $assedio['faixa']]) ? 'Alta'
+                                : (in_array('Moderada', [$excesso['faixa'], $assedio['faixa']]) ? 'Moderada' : 'Baixa')),
             'interpretacao' => $this->interpretarEixo3($excesso['faixa'], $assedio['faixa'])
         ];
 

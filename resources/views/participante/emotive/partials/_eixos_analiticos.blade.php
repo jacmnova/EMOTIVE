@@ -38,9 +38,20 @@
             <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin-bottom: 20px;">
                 {{ $eixo['descricao'] }}
             </p>
-            
-            <!-- Barra de resumen con fondo gris claro -->
-            <div style="background: #F5F5F5; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                @php 
+                    // Usar el nombre del eixo (no el de la dimensão) para definir el fondo del card
+                    $name = $eixo['nome'] ?? '';
+                    $color_bg_card = '#F5F5F5'; // fallback
+                    if ($name === 'ENERGIA EMOCIONAL') { 
+                        $color_bg_card = '#A5988033';
+                    } elseif ($name === 'PROPÓSITO E RELAÇÕES') { 
+                        $color_bg_card = '#32403E33';
+                    } elseif ($name === 'SUSTENTABILIDADE OCUPACIONAL') { 
+                        $color_bg_card = '#636A9933';
+                    }
+                @endphp
+            <!-- Barra de resumen con fondo dinámico por eixo -->
+            <div style="background: {{ $color_bg_card }}; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
                 <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center;">
                     <!-- Dimensão 1 -->
                     <div>
@@ -65,7 +76,21 @@
                     <!-- Total -->
                     <div style="text-align: center;">
                         <div style="font-weight: bold; color: #000;font-size: 10px;font-style: normal;font-weight: 700;line-height: normal; margin-bottom: 5px;">TOTAL</div>
-                        <div style="display: inline-block; padding: 5px 12px; border-radius: 10px; width: 100%; text-align: center; background: #D9BC5D; color: #FFFFFF;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal;     margin-top: 5px;">{{ round($eixo['total']) }}</div>
+                        @php
+                            // Determinar cor dinâmica do TOTAL conforme a faixa (Alta/Moderada/Baixa)
+                            // Espera-se que venha em $eixo['faixa_total']; caso não exista, mantém amarelo (#D9BC5D)
+                            $faixaTotal = $eixo['faixa_total'] ?? null;
+                            if ($faixaTotal === 'Alta') {
+                                $bgTotal = '#dc3545';
+                            } elseif ($faixaTotal === 'Moderada') {
+                                $bgTotal = '#D9BC5D';
+                            } elseif ($faixaTotal === 'Baixa') {
+                                $bgTotal = '#5DD986';
+                            } else {
+                                $bgTotal = '#D9BC5D'; // fallback
+                            }
+                        @endphp
+                        <div style="display: inline-block; padding: 5px 12px; border-radius: 10px; width: 100%; text-align: center; background: {{ $bgTotal }}; color: #FFFFFF;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal;     margin-top: 5px;">{{ round($eixo['total']) }}</div>
                     </div>
                     
                     <!-- Dimensão 2 -->
