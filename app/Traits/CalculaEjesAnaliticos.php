@@ -166,8 +166,10 @@ trait CalculaEjesAnaliticos
             $tag = is_array($ponto) ? strtoupper($ponto['tag'] ?? $ponto['tag'] ?? '') : '';
             $valor = is_array($ponto) ? ($ponto['valor'] ?? $ponto['pontuacao'] ?? 0) : 0;
             $faixa = is_array($ponto) ? ($ponto['faixa'] ?? 'Baixa') : 'Baixa';
+            $b = is_array($ponto) ? ($ponto['b'] ?? null) : null;
+            $m = is_array($ponto) ? ($ponto['m'] ?? null) : null;
             
-            $pontosPorTag[$tag] = ['valor' => $valor, 'faixa' => $faixa];
+            $pontosPorTag[$tag] = ['valor' => $valor, 'faixa' => $faixa, 'b' => $b, 'm' => $m];
         }
 
         // Obtener valores de dimensiones para las interpretaciones
@@ -192,6 +194,11 @@ trait CalculaEjesAnaliticos
             $eixo3Total = max(0, min(100, 100 - (($excesso['valor'] + $assedio['valor']) / 2)));
         }
         
+        // Limites DINÁMICOS por eixo a partir de B y M de las dimensiones (sumatoria)
+        $eeLimB = (float)($pontosPorTag['EXEM']['b'] ?? 0) + (float)($pontosPorTag['REPR']['b'] ?? 0);
+        $eeLimM = (float)($pontosPorTag['EXEM']['m'] ?? 0) + (float)($pontosPorTag['REPR']['m'] ?? 0);
+        $faixaTotalEE = $this->classificarIndiceDinamico($eixo1Total, $eeLimB, $eeLimM, 'EE');
+        
         $eixo1 = [
             'nome' => 'ENERGIA EMOCIONAL',
             'descricao' => 'Este eixo mostra o quanto sua energia emocional está sendo renovada ou drenada no trabalho. Ele representa o equilíbrio entre vitalidade e propósito.',
@@ -208,13 +215,16 @@ trait CalculaEjesAnaliticos
                 'faixa' => $realizacao['faixa']
             ],
             'total' => round($eixo1Total, 0),
-            // Faixa total dinâmica baseada nas faixas das dimensões (regra simples: Alta > Moderada > Baixa)
-            'faixa_total' => (in_array('Alta', [$exaustao['faixa'], $realizacao['faixa']]) ? 'Alta'
-                                : (in_array('Moderada', [$exaustao['faixa'], $realizacao['faixa']]) ? 'Moderada' : 'Baixa')),
+            // Faixa total dinâmica baseada nos limites do CSV
+            'faixa_total' => $faixaTotalEE,
             'interpretacao' => $this->interpretarEixo1($exaustao['faixa'], $realizacao['faixa'])
         ];
 
         // EIXO 2: PROPÓSITO E RELAÇÕES
+        $prLimB = (float)($pontosPorTag['DECI']['b'] ?? 0) + (float)($pontosPorTag['FAPS']['b'] ?? 0);
+        $prLimM = (float)($pontosPorTag['DECI']['m'] ?? 0) + (float)($pontosPorTag['FAPS']['m'] ?? 0);
+        $faixaTotalPR = $this->classificarIndiceDinamico($eixo2Total, $prLimB, $prLimM, 'PR');
+        
         $eixo2 = [
             'nome' => 'PROPÓSITO E RELAÇÕES',
             'descricao' => 'Este eixo avalia o grau de conexão emocional e relacional com o ambiente de trabalho — ou seja, se o participante sente pertencimento, confiança e reciprocidade.',
@@ -231,13 +241,16 @@ trait CalculaEjesAnaliticos
                 'faixa' => $fatores['faixa']
             ],
             'total' => round($eixo2Total, 0),
-            'faixa_total' => (in_array('Alta', [$cinismo['faixa'], $fatores['faixa']]) ? 'Alta'
-                                : (in_array('Moderada', [$cinismo['faixa'], $fatores['faixa']]) ? 'Moderada' : 'Baixa')),
+            'faixa_total' => $faixaTotalPR,
             'interpretacao' => $this->interpretarEixo2($cinismo['faixa'], $fatores['faixa'])
         ];
 
         // EIXO 3: SUSTENTABILIDADE OCUPACIONAL
         // Ya se calculó arriba, no necesita recalcularse
+        $soLimB = (float)($pontosPorTag['EXTR']['b'] ?? 0) + (float)($pontosPorTag['ASMO']['b'] ?? 0);
+        $soLimM = (float)($pontosPorTag['EXTR']['m'] ?? 0) + (float)($pontosPorTag['ASMO']['m'] ?? 0);
+        $faixaTotalSO = $this->classificarIndiceDinamico($eixo3Total, $soLimB, $soLimM, 'SO');
+        
         $eixo3 = [
             'nome' => 'SUSTENTABILIDADE OCUPACIONAL',
             'descricao' => 'Este eixo reflete a relação entre o esforço exigido e o suporte ético e emocional oferecido pelo ambiente. Mostra se o trabalho é sustentável — isto é, se há equilíbrio entre pressão e respeito.',
@@ -254,8 +267,7 @@ trait CalculaEjesAnaliticos
                 'faixa' => $assedio['faixa']
             ],
             'total' => round($eixo3Total, 0),
-            'faixa_total' => (in_array('Alta', [$excesso['faixa'], $assedio['faixa']]) ? 'Alta'
-                                : (in_array('Moderada', [$excesso['faixa'], $assedio['faixa']]) ? 'Moderada' : 'Baixa')),
+            'faixa_total' => $faixaTotalSO,
             'interpretacao' => $this->interpretarEixo3($excesso['faixa'], $assedio['faixa'])
         ];
 
@@ -264,6 +276,47 @@ trait CalculaEjesAnaliticos
             'eixo2' => $eixo2,
             'eixo3' => $eixo3
         ];
+    }
+
+    /**
+     * Classifica o TOTAL do índice (EE, PR, SO) conforme os limites do CSV ALE.
+     * O CSV define (linhas Faixa Baixa / Faixa Média / Faixa Alta e Máx):
+     * - EE: Baixa ≤ 92, Moderada ≤ 184, Alta > 184 (Máx 276)
+     * - PR: Baixa ≤ 78, Moderada ≤ 170, Alta > 170 (Máx 234)
+     * - SO: Baixa ≤ 62, Moderada ≤ 154, Alta > 154 (Máx 186)
+     */
+    protected function classificarIndicePorCSV(string $indice, float $valor): string
+    {
+        $limites = [
+            'EE' => ['baixa' => 92, 'media' => 184],
+            'PR' => ['baixa' => 78, 'media' => 170],
+            'SO' => ['baixa' => 62, 'media' => 154],
+        ];
+        
+        $ind = strtoupper($indice);
+        if (!isset($limites[$ind])) {
+            // fallback conservador: usar mesma lógica de dimensões, com cortes 33%/66% do máximo de referência
+            $maxRef = $ind === 'EE' ? 276 : ($ind === 'PR' ? 234 : ($ind === 'SO' ? 186 : 100));
+            $baixa = floor($maxRef / 3);
+            $media = floor(($maxRef * 2) / 3);
+            return $valor <= $baixa ? 'Baixa' : ($valor <= $media ? 'Moderada' : 'Alta');
+        }
+        
+        $lim = $limites[$ind];
+        return $valor <= $lim['baixa'] ? 'Baixa' : ($valor <= $lim['media'] ? 'Moderada' : 'Alta');
+    }
+
+    /**
+     * Classificação dinâmica por eixo usando limites B e M agregados das dimensões
+     * Se B/M não estiverem disponíveis, cai no critério do CSV (por referência)
+     */
+    protected function classificarIndiceDinamico(float $total, float $limBaixo, float $limMedio, string $indice): string
+    {
+        if ($limBaixo > 0 && $limMedio > 0 && $limMedio >= $limBaixo) {
+            return $total <= $limBaixo ? 'Baixa' : ($total <= $limMedio ? 'Moderada' : 'Alta');
+        }
+        // Fallback para limites por CSV conhecidos
+        return $this->classificarIndicePorCSV($indice, $total);
     }
 
     /**
