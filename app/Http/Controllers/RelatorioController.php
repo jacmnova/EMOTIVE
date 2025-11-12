@@ -674,7 +674,6 @@ class RelatorioController extends Controller
             ini_set('memory_limit', '512M');
             
             // Generar URL del relatorio para PDF
-            // La API extrae el contenido del <div class="content"> de la página
             $baseUrl = config('app.url', 'http://localhost:8000');
             
             // Si la URL contiene localhost, cambiarla a 127.0.0.1 para que la API pueda acceder
@@ -683,7 +682,7 @@ class RelatorioController extends Controller
             // Construir la URL con los parámetros
             $relatorioUrl = rtrim($baseUrl, '/') . '/meurelatorio/pdf?formulario_id=' . urlencode($formularioId) . '&usuario_id=' . urlencode($usuarioId);
             
-            \Log::info('Generando PDF desde URL externa', [
+            \Log::info('Generando PDF desde URL', [
                 'url' => $relatorioUrl,
                 'formulario_id' => $formularioId,
                 'usuario_id' => $usuarioId,
@@ -691,11 +690,9 @@ class RelatorioController extends Controller
             ]);
             
             // Llamar al servicio externo de conversión
-            // La API tiene su propio timeout de 30 segundos para obtener la página
-            // No necesitamos verificar la URL antes - la API lo hará
             $pdfServiceUrl = env('PDF_API_URL', 'http://127.0.0.1:8080/convert-url');
             
-            // Preparar los datos según la documentación de la API
+            // Preparar los datos según el formato esperado por el servicio
             $requestData = [
                 'url' => $relatorioUrl
             ];
@@ -716,7 +713,7 @@ class RelatorioController extends Controller
                 'Content-Length: ' . strlen($jsonData)
             ]);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 90); // 90 segundos (la API tiene 30s para obtener la página + tiempo de conversión)
+            curl_setopt($ch, CURLOPT_TIMEOUT, 180); // 180 segundos (la API navega a la URL y convierte a PDF)
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); // 10 segundos para conectar
             
             $pdfContent = curl_exec($ch);
@@ -737,6 +734,12 @@ class RelatorioController extends Controller
                     'error' => $curlError,
                     'http_code' => $httpCode
                 ]);
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json([
+                        'error' => true,
+                        'message' => 'Error al comunicarse con el servicio de PDF: ' . $curlError
+                    ], 500);
+                }
                 return redirect()->back()->with('msgError', 'Error al comunicarse con el servicio de PDF: ' . $curlError);
             }
             
@@ -745,7 +748,7 @@ class RelatorioController extends Controller
                 $errorResponse = json_decode($pdfContent, true);
                 $errorMessage = 'Error del servicio de PDF (código HTTP: ' . $httpCode . ')';
                 
-                // Según la documentación, los códigos de error son:
+                // Códigos de error posibles:
                 // 400: Error al obtener la URL (la URL no es accesible o hay un error HTTP)
                 // 404: No se encontró un div con class='content' en la página
                 // 500: Error al convertir HTML a PDF
@@ -773,15 +776,25 @@ class RelatorioController extends Controller
                     'parsed_response' => $errorResponse
                 ]);
                 
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json([
+                        'error' => true,
+                        'message' => $errorMessage
+                    ], $httpCode);
+                }
+                
                 return redirect()->back()->with('msgError', $errorMessage);
             }
             
             if (empty($pdfContent)) {
                 \Log::error('Respuesta vacía del servicio PDF');
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['error' => 'El servicio de PDF no devolvió contenido.'], 500);
+                }
                 return redirect()->back()->with('msgError', 'El servicio de PDF no devolvió contenido.');
             }
             
-            // Descargar el PDF directamente sin redirecciones
+            // Preparar nombre del archivo
             $fileName = "relatorio_emotive_{$user->name}.pdf";
             
             // Limpiar cualquier output previo
@@ -789,6 +802,28 @@ class RelatorioController extends Controller
                 ob_end_clean();
             }
             
+            // Si es una petición AJAX que espera PDF, retornar el PDF
+            if ($request->ajax() && $request->accepts('application/pdf')) {
+                \Log::info('PDF generado exitosamente (retornando PDF para descarga AJAX)');
+                return response($pdfContent, 200)
+                    ->header('Content-Type', 'application/pdf')
+                    ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"')
+                    ->header('Content-Length', strlen($pdfContent))
+                    ->header('Cache-Control', 'no-cache, must-revalidate')
+                    ->header('Pragma', 'no-cache')
+                    ->header('Expires', '0');
+            }
+            
+            // Si es una petición AJAX/JSON que espera JSON, retornar éxito sin abrir el PDF
+            if ($request->wantsJson() || $request->ajax()) {
+                \Log::info('PDF generado exitosamente (solo ejecución, sin descargar)');
+                return response()->json([
+                    'success' => true,
+                    'message' => 'PDF generado exitosamente'
+                ], 200);
+            }
+            
+            // Descargar el PDF directamente sin redirecciones (solo para peticiones normales)
             return response($pdfContent, 200)
                 ->header('Content-Type', 'application/pdf')
                 ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"')
@@ -804,6 +839,13 @@ class RelatorioController extends Controller
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ]);
+            
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'error' => true,
+                    'message' => 'Error al generar el PDF: ' . $e->getMessage()
+                ], 500);
+            }
             
             return redirect()->back()->with('msgError', 'Error al generar el PDF: ' . $e->getMessage());
         }
