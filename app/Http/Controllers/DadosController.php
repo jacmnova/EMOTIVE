@@ -149,7 +149,28 @@ class DadosController extends Controller
     public function questionarioEditar($id)
     {
         $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login')->with('msgError', 'Debes iniciar sesión para acceder a esta página.');
+        }
+
         $formulario = Formulario::with(['perguntas', 'etapas'])->find($id);
+        
+        if (!$formulario) {
+            return redirect()->route('questionarios.usuario')->with('msgError', 'Formulario no encontrado.');
+        }
+
+        // Verificar que el usuario tenga acceso a este formulario
+        $usuarioFormulario = UsuarioFormulario::where('usuario_id', $user->id)
+            ->where('formulario_id', $id)
+            ->first();
+        
+        if (!$usuarioFormulario && !$user->admin && !$user->gestor && !$user->sa) {
+            \Log::warning('Intento de acceso no autorizado a questionarioEditar', [
+                'auth_user_id' => $user->id,
+                'formulario_id' => $id
+            ]);
+            return redirect()->route('questionarios.usuario')->with('msgError', 'No tienes permiso para acceder a este formulario.');
+        }
 
         $perguntas = $formulario->perguntas;
 
@@ -181,8 +202,32 @@ class DadosController extends Controller
 
     public function salvarRespostas(Request $request)
     {
-        $userId = Auth::user()->id;
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Debes iniciar sesión para realizar esta acción.'
+            ], 401);
+        }
+
+        $userId = $user->id;
         $formularioId = $request->input('formulario_id');
+
+        // Verificar que el usuario tenga acceso a este formulario
+        $usuarioFormulario = UsuarioFormulario::where('usuario_id', $userId)
+            ->where('formulario_id', $formularioId)
+            ->first();
+        
+        if (!$usuarioFormulario && !$user->admin && !$user->gestor && !$user->sa) {
+            \Log::warning('Intento de acceso no autorizado a salvarRespostas', [
+                'auth_user_id' => $userId,
+                'formulario_id' => $formularioId
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No tienes permiso para guardar respuestas en este formulario.'
+            ], 403);
+        }
         $respostas = $request->input('respostas', []);
         $etapaDe = (int)$request->input('etapa_de');
         $etapaAte = (int)$request->input('etapa_ate');
@@ -276,6 +321,12 @@ class DadosController extends Controller
     public function relatorioShow(Request $request)
     {
         try {
+            // Verificar que el usuario esté autenticado
+            $authUser = Auth::user();
+            if (!$authUser) {
+                return redirect()->route('login')->with('msgError', 'Debes iniciar sesión para acceder a esta página.');
+            }
+
             $validated = $request->validate([
                 'formulario_id' => ['required', 'integer', 'exists:formularios,id'],
                 'usuario_id' => ['required', 'integer', 'exists:users,id'],
@@ -283,6 +334,16 @@ class DadosController extends Controller
 
             $formularioId = $validated['formulario_id'];
             $usuarioId = $validated['usuario_id'];
+
+            // Verificar que el usuario autenticado sea el mismo que el usuario_id o sea admin/gestor
+            if ($authUser->id != $usuarioId && !$authUser->admin && !$authUser->gestor && !$authUser->sa) {
+                \Log::warning('Intento de acceso no autorizado a relatorioShow', [
+                    'auth_user_id' => $authUser->id,
+                    'requested_usuario_id' => $usuarioId,
+                    'formulario_id' => $formularioId
+                ]);
+                return redirect()->route('home')->with('msgError', 'No tienes permiso para acceder a este relatorio.');
+            }
 
             $user = User::find($usuarioId);
             if (!$user) {
@@ -804,6 +865,14 @@ class DadosController extends Controller
      */
     public function verificarStatusFormulario(Request $request)
     {
+        $authUser = Auth::user();
+        if (!$authUser) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Debes iniciar sesión para realizar esta acción.'
+            ], 401);
+        }
+
         $validated = $request->validate([
             'formulario_id' => ['required', 'integer', 'exists:formularios,id'],
             'usuario_id' => ['required', 'integer', 'exists:users,id'],
@@ -811,6 +880,19 @@ class DadosController extends Controller
 
         $formularioId = $validated['formulario_id'];
         $usuarioId = $validated['usuario_id'];
+
+        // Verificar que el usuario autenticado sea el mismo que el usuario_id o sea admin/gestor
+        if ($authUser->id != $usuarioId && !$authUser->admin && !$authUser->gestor && !$authUser->sa) {
+            \Log::warning('Intento de acceso no autorizado a verificarStatusFormulario', [
+                'auth_user_id' => $authUser->id,
+                'requested_usuario_id' => $usuarioId,
+                'formulario_id' => $formularioId
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'No tienes permiso para verificar el estado de este formulario.'
+            ], 403);
+        }
 
         $formulario = Formulario::with('perguntas')->findOrFail($formularioId);
         $totalPerguntas = $formulario->perguntas->count();

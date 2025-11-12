@@ -1,7 +1,7 @@
 @if(isset($isPdf) && $isPdf)
-<div class="page-break" style="padding: 40px; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;page-break-after: always;page-break-inside: avoid;">
+<div class="page-break section-pdf" style="padding: 40px; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;page-break-after: avoid;page-break-inside: avoid;">
 @else
-<div style="padding: 40px; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;">
+<div class="section-pdf" style="padding: 40px; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;">
 @endif
     <h1 class="section-title" style="color: #A4977F;font-size: 24px;font-style: normal;font-weight: 700;line-height: normal; margin-bottom: 30px;">RISCO DE DESCARRILAMENTO EMOCIONAL E OCUPACIONAL</h1>
     
@@ -145,7 +145,13 @@
                 $imgPath = function($path) {
                     if (isset($isPdf) && $isPdf) {
                         $fullPath = public_path($path);
-                        return file_exists($fullPath) ? $fullPath : '';
+                        if (file_exists($fullPath)) {
+                            // Usar ruta relativa desde base_path() (chroot)
+                            $basePath = str_replace('\\', '/', realpath(base_path()));
+                            $fullPathNormalized = str_replace('\\', '/', realpath($fullPath));
+                            return str_replace($basePath . '/', '', $fullPathNormalized);
+                        }
+                        return '';
                     }
                     return asset($path);
                 };

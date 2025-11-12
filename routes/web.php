@@ -109,14 +109,15 @@ Route::get('/meus-questionarios', [DadosController::class, 'questionariosUsuario
 
 
 
-Route::get('/meusquestionarios/editar/{id}', [DadosController::class, 'questionarioEditar'])->name('questionarios.editar');
-Route::post('/respostas/salvar', [DadosController::class, 'salvarRespostas'])->name('respostas.salvar');
+Route::get('/meusquestionarios/editar/{id}', [DadosController::class, 'questionarioEditar'])->name('questionarios.editar')->middleware('auth');
+Route::post('/respostas/salvar', [DadosController::class, 'salvarRespostas'])->name('respostas.salvar')->middleware('auth');
 
-Route::post('/usuario-formulario/finalizar', [DadosController::class, 'finalizar'])->name('usuarioFormulario.finalizar');
+Route::post('/usuario-formulario/finalizar', [DadosController::class, 'finalizar'])->name('usuarioFormulario.finalizar')->middleware('auth');
 
 
-Route::get('/meurelatorio/show', [DadosController::class, 'relatorioShow'])->name('relatorio.show');
-Route::post('/formulario/verificar-status', [DadosController::class, 'verificarStatusFormulario'])->name('formulario.verificar-status');
+Route::get('/meurelatorio/show', [DadosController::class, 'relatorioShow'])->name('relatorio.show')->middleware('auth');
+Route::get('/meurelatorio/pdf', [RelatorioController::class, 'relatorioPDF'])->name('relatorio.pdf.view');
+Route::post('/formulario/verificar-status', [DadosController::class, 'verificarStatusFormulario'])->name('formulario.verificar-status')->middleware('auth');
 
 
 Route::get('/variaveis/formulario/{id}', [VariavelController::class, 'getPorFormulario']);
@@ -127,6 +128,8 @@ Route::resource('calculos', CalculosController::class);
 
 Route::get('/relatorio/pdf', [RelatorioController::class, 'gerarPDF'])->name('relatorio.pdf');
 Route::get('/relatorio/pdf/temp/{token}', [RelatorioController::class, 'relatorioPDFTemp'])->name('relatorio.pdf.temp');
+Route::get('/relatorio/pdf/capture/temp/{token}', [RelatorioController::class, 'relatorioPDFCaptureTemp'])->name('relatorio.pdf.capture.temp');
+Route::get('/relatorio/pdf/web/temp/{token}', [RelatorioController::class, 'relatorioPDFWebTemp'])->name('relatorio.pdf.web.temp');
 
 
 Route::get('/dashadmin', [DashboardController::class, 'index'])->name('dashboard.admin');

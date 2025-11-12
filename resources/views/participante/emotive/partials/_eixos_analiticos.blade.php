@@ -1,9 +1,18 @@
-@if(isset($isPdf) && $isPdf)
-<div class="page-break" style="padding: 40px; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;page-break-after: always;page-break-inside: avoid;">
+@php
+    $isPdfMode = isset($isPdf) && $isPdf;
+    $padding = $isPdfMode ? '18pt' : '40px';
+    $marginBottom = $isPdfMode ? '12pt' : '30px';
+    $titleSize = $isPdfMode ? '18pt' : '24px';
+    $subtitleSize = $isPdfMode ? '12pt' : '16px';
+    $textSize = $isPdfMode ? '10pt' : '10px';
+    $footerMargin = $isPdfMode ? '20pt' : '50px';
+@endphp
+@if($isPdfMode)
+<div class="section-pdf" style="padding: {{ $padding }}; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box; font-family: 'DejaVu Sans', sans-serif;">
 @else
-<div style="padding: 40px; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;">
+<div class="section-pdf" style="padding: {{ $padding }}; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;">
 @endif
-    <h1 class="section-title" style="color: #A4977F;font-size: 24px;font-style: normal;font-weight: 700;line-height: normal; margin-bottom: 30px;">ÍNDICE EIXOS ANALÍTICOS E.MO.TI.VE</h1>
+    <h1 style="color: #A4977F; font-size: {{ $titleSize }}; font-style: normal; font-weight: 700; line-height: 1.2; margin: 0 0 {{ $marginBottom }} 0; font-family: 'DejaVu Sans', sans-serif;">ÍNDICE EIXOS ANALÍTICOS E.MO.TI.VE</h1>
     
     @php
         $eixos = [
@@ -68,7 +77,7 @@
                                 $bgFaixa1 = $coresBadges[$key][$eixo['dimensao1']['tag']] ?? '#DED8C7';
                             }
                         @endphp
-                        <div style="display: inline-block; padding: 5px 12px; border-radius: 10px; width: 100%; text-align: center; background: {{ $bgFaixa1 }}; color: #FFFFFF;font-size: 10px;font-style: normal;font-weight: 700;line-height: normal;">
+                        <div class="fail-pdf" style="display: inline-block; padding: 5px 12px; border-radius: 10px; width: 100%; text-align: center; background: {{ $bgFaixa1 }}; color: #FFFFFF;font-size: 10px;font-style: normal;font-weight: 700;line-height: normal;">
                             Faixa {{ $eixo['dimensao1']['faixa'] }}
                         </div>
                     </div>
@@ -108,7 +117,7 @@
                                 $bgFaixa2 = $coresBadges[$key][$eixo['dimensao2']['tag']] ?? '#E8C97B';
                             }
                         @endphp
-                        <div style="display: inline-block; padding: 5px 12px; border-radius: 10px; width: 100%; text-align: center; background: {{ $bgFaixa2 }}; color: #FFFFFF;font-size: 10px;font-style: normal;font-weight: 700;line-height: normal;">
+                        <div class="fail-pdf" style="display: inline-block; padding: 5px 12px; border-radius: 10px; width: 100%; text-align: center; background: {{ $bgFaixa2 }}; color: #FFFFFF;font-size: 10px;font-style: normal;font-weight: 700;line-height: normal;">
                             Faixa {{ $eixo['dimensao2']['faixa'] }}
                         </div>
                     </div>
@@ -137,7 +146,13 @@
                 $imgPath = function($path) {
                     if (isset($isPdf) && $isPdf) {
                         $fullPath = public_path($path);
-                        return file_exists($fullPath) ? $fullPath : '';
+                        if (file_exists($fullPath)) {
+                            // Usar ruta relativa desde base_path() (chroot)
+                            $basePath = str_replace('\\', '/', realpath(base_path()));
+                            $fullPathNormalized = str_replace('\\', '/', realpath($fullPath));
+                            return str_replace($basePath . '/', '', $fullPathNormalized);
+                        }
+                        return '';
                     }
                     return asset($path);
                 };

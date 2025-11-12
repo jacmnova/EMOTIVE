@@ -1,27 +1,36 @@
-@if(isset($isPdf) && $isPdf)
-<div class="page-break" style="padding: 40px; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;page-break-after: always;page-break-inside: avoid;">
+@php
+    $isPdfMode = isset($isPdf) && $isPdf;
+    $padding = $isPdfMode ? '18pt' : '40px';
+    $marginBottom = $isPdfMode ? '12pt' : '30px';
+    $titleSize = $isPdfMode ? '18pt' : '24px';
+    $subtitleSize = $isPdfMode ? '12pt' : '16px';
+    $textSize = $isPdfMode ? '10pt' : '10px';
+    $footerMargin = $isPdfMode ? '20pt' : '50px';
+@endphp
+@if($isPdfMode)
+<div class="section-pdf-large" style="padding: {{ $padding }}; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box; font-family: 'DejaVu Sans', sans-serif;">
 @else
-<div style="padding: 40px; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;">
+<div class="section-pdf-large" style="padding: 40px; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;">
 @endif
-    <h1 class="section-title" style="color: #A4977F;font-size: 24px;font-style: normal;font-weight: 700;line-height: normal; margin-bottom: 30px;">ESTADO EMOCIONAL E PSICOSSOCIAL</h1>
+    <h1 style="color: #A4977F; font-size: {{ $titleSize }}; font-style: normal; font-weight: 700; line-height: 1.2; margin: 0 0 {{ $marginBottom }} 0; font-family: 'DejaVu Sans', sans-serif;">ESTADO EMOCIONAL E PSICOSSOCIAL</h1>
     
     <!-- Como Ler Seus Resultados -->
-    <div style="margin-bottom: 40px;">
-        <h2 class="section-subtitle" style="color: #2E9196;font-size: 16px;font-style: normal;font-weight: 400;line-height: normal; margin-bottom: 15px;">Como Ler Seus Resultados</h2>
-        <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin-bottom: 15px;">
+    <div style="margin-bottom: {{ $isPdfMode ? '15pt' : '40px' }}; page-break-inside: avoid;">
+        <h2 style="color: #2E9196; font-size: {{ $subtitleSize }}; font-style: normal; font-weight: 400; line-height: 1.3; margin: 0 0 8pt 0; font-family: 'DejaVu Sans', sans-serif;">Como Ler Seus Resultados</h2>
+        <p style="color: #000; font-size: {{ $textSize }}; font-style: normal; font-weight: 400; line-height: 1.4; text-align: justify; margin: 0 0 8pt 0; font-family: 'DejaVu Sans', sans-serif;">
             Cada dimensão é apresentada em faixas de pontuação, representando níveis de atenção:
         </p>
-        <ul style="line-height: 1.8; padding-left: 25px; margin-bottom: 20px; list-style: none;">
-            <li style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; margin-bottom: 8px;">Faixa Baixa: equilíbrio emocional saudável, sem sinais de risco.</li>
-            <li style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; margin-bottom: 8px;">Faixa Moderada: pontos de atenção que merecem acompanhamento.</li>
-            <li style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; margin-bottom: 8px;">Faixa Alta: indica necessidade de reflexão e cuidado ativo.</li>
+        <ul style="line-height: 1.5; padding-left: 20pt; margin: 8pt 0; list-style: disc; font-family: 'DejaVu Sans', sans-serif;">
+            <li style="color: #000; font-size: {{ $textSize }}; font-style: normal; font-weight: 400; line-height: 1.4; margin-bottom: 4pt; font-family: 'DejaVu Sans', sans-serif;">Faixa Baixa: equilíbrio emocional saudável, sem sinais de risco.</li>
+            <li style="color: #000; font-size: {{ $textSize }}; font-style: normal; font-weight: 400; line-height: 1.4; margin-bottom: 4pt; font-family: 'DejaVu Sans', sans-serif;">Faixa Moderada: pontos de atenção que merecem acompanhamento.</li>
+            <li style="color: #000; font-size: {{ $textSize }}; font-style: normal; font-weight: 400; line-height: 1.4; margin-bottom: 4pt; font-family: 'DejaVu Sans', sans-serif;">Faixa Alta: indica necessidade de reflexão e cuidado ativo.</li>
         </ul>
         
-        <div style="background: #F8F5ED; padding: 15px; margin: 20px 0; border-radius: 4px;">
-            <p style="margin: 0; font-weight: bold; color: #000;font-size: 10px;font-style: normal;line-height: normal;">Importante: Nenhum resultado define você. Ele mostra apenas como você está neste momento, diante de condições específicas do ambiente e das demandas atuais.</p>
+        <div style="background: #F8F5ED; padding: {{ $isPdfMode ? '10pt' : '15px' }}; margin: {{ $isPdfMode ? '10pt' : '20px' }} 0; border-radius: 4px; page-break-inside: avoid;">
+            <p style="margin: 0; font-weight: bold; color: #000; font-size: {{ $textSize }}; font-style: normal; line-height: 1.4; font-family: 'DejaVu Sans', sans-serif;">Importante: Nenhum resultado define você. Ele mostra apenas como você está neste momento, diante de condições específicas do ambiente e das demandas atuais.</p>
         </div>
         
-        <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin-bottom: 15px;">
+        <p style="color: #000; font-size: {{ $textSize }}; font-style: normal; font-weight: 400; line-height: 1.4; text-align: justify; margin: {{ $isPdfMode ? '8pt' : '15px' }} 0 0 0; font-family: 'DejaVu Sans', sans-serif;">
             As seções seguintes oferecem interpretações personalizadas, orientações práticas e sugestões de desenvolvimento. Cada texto foi cuidadosamente elaborado para promover autocompreensão, autocuidado e ação positiva.
         </p>
     </div>
@@ -125,21 +134,21 @@
                 }
             @endphp
             
-            <div style="margin-bottom: 35px;">
+            <div style="margin-bottom: {{ $isPdfMode ? '15pt' : '35px' }}; page-break-inside: avoid;">
                 <!-- Título de la dimensión -->
-                <h2 class="section-subtitle" style="color: #2E9196;font-size: 16px;font-style: normal;font-weight: 400;line-height: normal; margin-bottom: 15px;">
+                <h2 style="color: #2E9196; font-size: {{ $subtitleSize }}; font-style: normal; font-weight: 400; line-height: 1.3; margin: 0 0 8pt 0; font-family: 'DejaVu Sans', sans-serif;">
                     {{ $registro->nome }} ({{ mb_strtoupper($registro->tag, 'UTF-8') }})
                 </h2>
                 
                 <!-- Barra de resultado con estilo de la imagen (fondo beige, texto blanco) -->
-                <div style="background: {{ $barraBg }}; padding: 10px 15px; margin-bottom: 0; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <span style="font-weight: bold; color: #FFFFFF;font-size: 10px;font-style: normal;font-weight: 700;line-height: normal;">Faixa {{ $faixa ?? 'Indefinida' }}</span>
-                    <span style="font-weight: bold; color: #FFFFFF;font-size: 10px; line-height: normal;">{{ $pontuacao ?? '–' }}</span>
+                <div style="background: {{ $barraBg }}; padding: {{ $isPdfMode ? '6pt 10pt' : '10px 15px' }}; margin-bottom: 0; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; font-family: 'DejaVu Sans', sans-serif;">
+                    <span style="font-weight: bold; color: #FFFFFF; font-size: {{ $textSize }}; font-style: normal; font-weight: 700; line-height: 1.2; font-family: 'DejaVu Sans', sans-serif;">Faixa {{ $faixa ?? 'Indefinida' }}</span>
+                    <span style="font-weight: bold; color: #FFFFFF; font-size: {{ $textSize }}; line-height: 1.2; font-family: 'DejaVu Sans', sans-serif;">{{ $pontuacao ?? '–' }}</span>
                 </div>
                 
                 <!-- Caja de texto blanca con bordes redondeados y sombra sutil -->
-                <div style="background: #FFFFFF; padding: 15px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #E0E0E0; border-top: none;">
-                    <p style="color: #000;font-size: 10px;font-style: normal;font-weight: 400;line-height: normal; text-align: justify; margin: 0;">
+                <div style="background: #FFFFFF; padding: {{ $isPdfMode ? '10pt' : '15px' }}; border-radius: 0 0 8px 8px; border: 1px solid #E0E0E0; border-top: none; font-family: 'DejaVu Sans', sans-serif;">
+                    <p style="color: #000; font-size: {{ $textSize }}; font-style: normal; font-weight: 400; line-height: 1.4; text-align: justify; margin: 0; font-family: 'DejaVu Sans', sans-serif;">
                         {{ $classificacao }}
                     </p>
                 </div>
@@ -148,24 +157,29 @@
     @endif
     
     <!-- Footer -->
-    <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; gap: 20px; align-items: center;">
+    <div style="margin-top: {{ $footerMargin }}; padding-top: {{ $isPdfMode ? '12pt' : '20px' }}; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; page-break-inside: avoid; font-family: 'DejaVu Sans', sans-serif;">
+        <div style="display: flex; gap: {{ $isPdfMode ? '10pt' : '20px' }}; align-items: center;">
             @php
                 $imgPath = function($path) {
                     if (isset($isPdf) && $isPdf) {
                         $fullPath = public_path($path);
-                        return file_exists($fullPath) ? $fullPath : '';
+                        if (file_exists($fullPath)) {
+                            // Usar ruta relativa desde base_path() (chroot)
+                            $basePath = str_replace('\\', '/', realpath(base_path()));
+                            $fullPathNormalized = str_replace('\\', '/', realpath($fullPath));
+                            return str_replace($basePath . '/', '', $fullPathNormalized);
+                        }
+                        return '';
                     }
                     return asset($path);
                 };
             @endphp
-            <img src="{{ $imgPath('img/felipelli-logo.png') }}" alt="Fellipelli Consultoria" style="height: 30px;">
-            <img src="{{ $imgPath('img/emotive-logo.png') }}" alt="E.MO.TI.VE" style="height: 30px;">
+            <img src="{{ $imgPath('img/felipelli-logo.png') }}" alt="Fellipelli Consultoria" style="height: {{ $isPdfMode ? '20pt' : '30px' }}; max-height: 20pt;">
+            <img src="{{ $imgPath('img/emotive-logo.png') }}" alt="E.MO.TI.VE" style="height: {{ $isPdfMode ? '20pt' : '30px' }}; max-height: 20pt;">
         </div>
-        <div style="text-align: right;">
-            <p style="font-size: 8px; color: #999; margin: 0;">Todos os direitos reservados a Fellipelli Consultoria</p>
-            <p style="font-size: 8px; color: #999; margin: 5px 0 0 0;">Pág. 04</p>
+        <div style="text-align: right; font-family: 'DejaVu Sans', sans-serif;">
+            <p style="font-size: {{ $isPdfMode ? '6pt' : '8px' }}; color: #999; margin: 0; font-family: 'DejaVu Sans', sans-serif;">Todos os direitos reservados a Fellipelli Consultoria</p>
+            <p style="font-size: {{ $isPdfMode ? '6pt' : '8px' }}; color: #999; margin: 2pt 0 0 0; font-family: 'DejaVu Sans', sans-serif;">Pág. 04</p>
         </div>
     </div>
 </div>
-

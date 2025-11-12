@@ -107,7 +107,7 @@
                                                 <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}"  title="Visualizar Relatório" class="btn btn-sm text-info">
                                                     <i class="fa-regular fa-rectangle-list"></i>
                                                 </a>
-                                                <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}"  title="Imprimir Relatório" target="_blank" class="btn btn-sm text-danger">
+                                                <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}"  title="Imprimir Relatório" class="btn btn-sm text-danger">
                                                     <i class="fas fa-file-pdf"></i>
                                                 </a>
                                             @else
@@ -118,7 +118,7 @@
                                             <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario->id, 'usuario_id' => $user->id]) }}"  title="Visualizar Relatório" class="btn btn-sm text-info">
                                                 <i class="fa-regular fa-rectangle-list"></i>
                                             </a>
-                                            <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}"  title="Imprimir Relatório" target="_blank" class="btn btn-sm text-danger">
+                                            <a href="{{ route('relatorio.pdf', ['user' => $user->id, 'formulario' => $formulario->formulario->id]) }}"  title="Imprimir Relatório" class="btn btn-sm text-danger">
                                                 <i class="fas fa-file-pdf"></i>
                                             </a>
                                         @endif
