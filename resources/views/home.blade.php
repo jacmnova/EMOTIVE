@@ -71,7 +71,7 @@
     <div class="float-right d-none d-sm-block">
     <b>Version</b> {{ config('app.version') }}
     </div>
-    <strong>Copyright © 2000-2024 <a href="https://www.fellipelli.com.br">Fellipelli</a>.</strong> All rights reserved.
+    <strong>Copyright © 2000-2025 <a href="https://www.fellipelli.com.br">Fellipelli</a>.</strong> All rights reserved.
 @stop
 
 

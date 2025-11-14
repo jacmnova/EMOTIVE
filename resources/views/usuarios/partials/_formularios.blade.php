@@ -32,12 +32,19 @@
                             <td>{{ $formulario->formulario->perguntaCount() }}</td>
                             <td>{{ $formulario->created_at->translatedFormat('d \d\e F \d\e Y \à\s H:i') }}</td>
                             <td>
+                                @php
+                                    $statusLabel = [
+                                        'novo' => 'Pendente',
+                                        'pendente' => 'Em andamento',
+                                        'completo' => 'Concluído'
+                                    ][$formulario->status] ?? strtoupper($formulario->status);
+                                @endphp
                                 @if($formulario->status == 'novo')
-                                    <label class="badge badge-primary">{{ strtoupper($formulario->status) }}</label>
+                                    <label class="badge badge-primary">{{ $statusLabel }}</label>
                                 @elseif($formulario->status == 'pendente')
-                                    <label class="badge badge-warning">{{ strtoupper($formulario->status) }}</label>
+                                    <label class="badge badge-warning">{{ $statusLabel }}</label>
                                 @else
-                                    <label class="badge badge-success">{{ strtoupper($formulario->status) }}</label>
+                                    <label class="badge badge-success">{{ $statusLabel }}</label>
                                 @endif
                             </td>
                             <td>
@@ -81,12 +88,19 @@
                         <p class="mb-1"><strong>Habilitado em:</strong> {{ $formulario->created_at->translatedFormat('d \d\e F \d\e Y \à\s H:i') }}</p>
                         <p class="mb-1">
                             <strong>Status:</strong>
+                            @php
+                                $statusLabel = [
+                                    'novo' => 'Pendente',
+                                    'pendente' => 'Em andamento',
+                                    'completo' => 'Concluído'
+                                ][$formulario->status] ?? strtoupper($formulario->status);
+                            @endphp
                             @if($formulario->status == 'novo')
-                                <span class="badge badge-primary">{{ strtoupper($formulario->status) }}</span>
+                                <span class="badge badge-primary">{{ $statusLabel }}</span>
                             @elseif($formulario->status == 'pendente')
-                                <span class="badge badge-warning">{{ strtoupper($formulario->status) }}</span>
+                                <span class="badge badge-warning">{{ $statusLabel }}</span>
                             @else
-                                <span class="badge badge-success">{{ strtoupper($formulario->status) }}</span>
+                                <span class="badge badge-success">{{ $statusLabel }}</span>
                             @endif
                         </p>
                         @if($formulario->status === 'completo')

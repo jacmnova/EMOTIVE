@@ -1,5 +1,9 @@
 @extends('adminlte::auth.login')
 
+@section('auth_header')
+    Entre para iniciar uma nova sessão
+@stop
+
 @section('auth_body')
 
     {{-- SweetAlert de sessão expirada --}}

@@ -79,12 +79,18 @@
                                             'pendente' => 'warning',
                                             'completo' => 'success'
                                         ][$formulario->status];
+                                        
+                                        $statusLabel = [
+                                            'novo' => 'Pendente',
+                                            'pendente' => 'Em andamento',
+                                            'completo' => 'Concluído'
+                                        ][$formulario->status];
                                     @endphp
-                                    <span class="badge badge-{{ $statusClass }}">{{ strtoupper($formulario->status) }}</span>
+                                    <span class="badge badge-{{ $statusClass }}">{{ $statusLabel }}</span>
                                 </td>
                                 <td>
                                     @if($formulario->status !== 'completo')
-                                        <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm text-secondary">
+                                        <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm btn-primary" style="font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                             <i class="fa-regular fa-circle-play mr-1"></i> Responder
                                         </a>
                                     @else
@@ -160,14 +166,20 @@
                                             'pendente' => 'warning',
                                             'completo' => 'success'
                                         ][$formulario->status];
+                                        
+                                        $statusLabel = [
+                                            'novo' => 'Pendente',
+                                            'pendente' => 'Em andamento',
+                                            'completo' => 'Concluído'
+                                        ][$formulario->status];
                                     @endphp
-                                    <span class="badge badge-{{ $statusClass }}">{{ strtoupper($formulario->status) }}</span>
+                                    <span class="badge badge-{{ $statusClass }}">{{ $statusLabel }}</span>
                                 </p>
                             </div>
                             <div class="card-footer bg-light border-top">
                                 <div class="d-flex flex-wrap justify-content-start gap-2">
                                     @if($formulario->status !== 'completo')
-                                        <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm text-secondary">
+                                        <a href="{{ route('questionarios.editar', $formulario->formulario->id) }}" class="btn btn-sm btn-primary" style="font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                             <i class="fa-regular fa-circle-play mr-1"></i> Responder
                                         </a>
                                     @else

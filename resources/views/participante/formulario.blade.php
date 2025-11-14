@@ -169,7 +169,20 @@
                     case 'formulario_concluido':
                         config.title = 'Formulário finalizado!';
                         config.text = 'Você respondeu 100% das perguntas.';
+                        config.showDenyButton = true;
+                        config.showCancelButton = true;
                         config.confirmButtonText = 'Ir para o início';
+                        config.denyButtonText = 'Ver relatório';
+                        config.cancelButtonText = 'Baixar o relatório (.pdf)';
+                        config.confirmButtonColor = '#3085d6';
+                        config.denyButtonColor = '#28a745';
+                        config.cancelButtonColor = '#dc3545';
+                        config.preDeny = () => {
+                            // Ver relatório - ejecutar antes de cerrar el modal
+                            const relatorioUrl = "{!! route('relatorio.show', ['formulario_id' => $formulario->id, 'usuario_id' => $user->id]) !!}";
+                            window.location.href = relatorioUrl;
+                            return true; // Permitir el cierre del modal (la redirección cambiará la página)
+                        };
                         break;
                     case 'etapa_incompleta':
                         config.icon = 'info';
@@ -182,9 +195,16 @@
                         config.showConfirmButton = false;
                 }
 
-                Swal.fire(config).then(() => {
+                Swal.fire(config).then((result) => {
                     if (data.status === 'formulario_concluido') {
-                        window.location.href = "{{ route('questionarios.usuario') }}";
+                        if (result.isConfirmed) {
+                            // Ir para o início
+                            window.location.href = "{{ route('questionarios.usuario') }}";
+                        } else if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
+                            // Baixar o relatório (.pdf)
+                            gerarPDFRelatorio({{ $user->id }}, {{ $formulario->id }});
+                        }
+                        // Nota: El botón "Ver relatório" se maneja en preDeny
                     } else {
                         const url = new URL(window.location.href);
                         url.searchParams.set('scroll', 'top');
@@ -200,6 +220,97 @@
 
     enviarFormulario('formulario-perguntas');
     enviarFormulario('formulario-perguntas-mobile');
+
+    // Função para gerar PDF do relatório (similar à função gerarPDF do index)
+    function gerarPDFRelatorio(userId, formularioId) {
+        // Mostrar loading
+        Swal.fire({
+            title: 'Gerando PDF...',
+            text: 'Por favor, aguarde enquanto processamos seu relatório.',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Gerar a URL do relatório que será convertida
+        const informeUrl = '{{ config("app.url") }}/meurelatorio/pdf?formulario_id=' + formularioId + '&usuario_id=' + userId;
+
+        // Configuração da requisição POST ao serviço de conversão
+        fetch('https://api-convet-pdf-g3nia.up.railway.app/convert-url', {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'omit',
+            headers: {
+                'Accept': 'application/pdf',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "url": informeUrl
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                const contentType = response.headers.get('Content-Type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json().then(data => {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Aviso',
+                            text: 'O serviço retornou JSON em vez de PDF.',
+                            confirmButtonText: 'OK'
+                        });
+                        throw new Error('Resposta JSON em vez de PDF');
+                    });
+                }
+                return response.blob();
+            } else {
+                return response.text().then(text => {
+                    let errorMsg = `Erro ${response.status}: Erro no serviço de conversão.`;
+                    try {
+                        const jsonError = JSON.parse(text);
+                        errorMsg = jsonError.detail || jsonError.message || errorMsg;
+                    } catch (e) {
+                        if (text) errorMsg += ' ' + text.substring(0, 200);
+                    }
+                    throw new Error(errorMsg);
+                });
+            }
+        })
+        .then(pdfBlob => {
+            if (pdfBlob) {
+                const url = window.URL.createObjectURL(pdfBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Relatorio_${userId}_${formularioId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'PDF Baixado',
+                    text: 'O relatório foi baixado com sucesso.',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            }
+        })
+        .catch(error => {
+            let errorMessage = error.message || 'Verifique a conexão ou o serviço.';
+            if (error.message.includes('CORS') || error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+                errorMessage = 'Erro de CORS: O servidor não permite requisições deste domínio.';
+            }
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro ao Baixar',
+                text: `Não foi possível baixar o PDF: ${errorMessage}`,
+                confirmButtonText: 'OK'
+            });
+        });
+    }
 </script>
 
 <script>

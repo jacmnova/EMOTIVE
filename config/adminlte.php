@@ -63,9 +63,9 @@ return [
     |
     */
 
-    'logo' => '<b>E</b>MOTIVE',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-    'logo_img_class' => 'brand-image img-circle elevation-1',
+    'logo' => '',
+    'logo_img' => 'vendor/adminlte/dist/img/icon_emotive.png',
+    'logo_img_class' => 'width-100',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
     'logo_img_alt' => 'Admin Logo',
@@ -86,7 +86,7 @@ return [
     'auth_logo' => [
         'enabled' => false,
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+            'path' => 'vendor/adminlte/dist/img/icon_emotive.png',
             'alt' => 'Auth Logo',
             'class' => '',
             'width' => 50,
@@ -113,11 +113,10 @@ return [
         'enabled' => true,
         'mode' => 'fullscreen',
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+            'path' => 'vendor/adminlte/dist/img/icon_emotive.png',
             'alt' => 'AdminLTE Preloader Image',
-            'effect' => 'animation__shake',
-            'width' => 60,
-            'height' => 60,
+            'effect' => 'width-200-px animation__shake',
+            
         ],
     ],
 
@@ -531,6 +530,16 @@ return [
                     'type' => 'js',
                     'asset' => false,
                     'location' => '//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js',
+                ],
+            ],
+        ],
+        'CustomCSS' => [
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'css',
+                    'asset' => true,
+                    'location' => 'css/admin_custom.css',
                 ],
             ],
         ],

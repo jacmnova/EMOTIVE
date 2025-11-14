@@ -1,5 +1,5 @@
 <!-- Botão flutuante do WhatsApp que abre conversa diretamente -->
-<a class="whatsapp-float" href="https://wa.me/5541987017929" target="_blank">
+<a class="whatsapp-float" href="https://wa.me/551142807100" target="_blank" title="Falar conosco - instrumentos@fellipelli.com.br">
     <i class="fa-brands fa-whatsapp fa-2x"></i>
 </a>
 
