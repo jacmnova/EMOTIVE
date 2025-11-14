@@ -21,6 +21,7 @@ use App\Http\Controllers\FormularioEtapaController;
 use App\Http\Controllers\UsuarioFormularioController;
 
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\ContatoController;
 
 use App\Http\Controllers\AnaliseController;
 
@@ -48,6 +49,8 @@ Route::get('/template', function () {
 Route::get('/faqs', function () {
     return view('faqs.index');
 })->name('faqs.index');
+
+Route::post('/contato/enviar', [ContatoController::class, 'enviarMensagem'])->name('contato.enviar');
 
 
 

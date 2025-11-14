@@ -103,9 +103,9 @@ Esses riscos passaram a ser formalmente reconhecidos como parte do Programa de G
         </div>
         
         <div class="text-center mt-5 mb-4">
-            <a href="{{ route('home') }}" class="btn btn-lg btn-primary" style="background-color: #0087a0; border-color: #0087a0; padding: 12px 40px; font-size: 18px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 135, 160, 0.3); transition: all 0.3s ease;">
+            <button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#modalContato" style="background-color: #0087a0; border-color: #0087a0; padding: 12px 40px; font-size: 18px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 135, 160, 0.3); transition: all 0.3s ease;">
                 <i class="fas fa-comments mr-2"></i>Falar conosco
-            </a>
+            </button>
         </div>
     
     <div class="card-footer text-right">
@@ -115,6 +115,54 @@ Esses riscos passaram a ser formalmente reconhecidos como parte do Programa de G
 
 
     @include('layouts.partials.whatsapp')
+
+    <!-- Modal de Contato -->
+    <div class="modal fade" id="modalContato" tabindex="-1" role="dialog" aria-labelledby="modalContatoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #0087a0 0%, #006d82 100%); color: white;">
+                    <h5 class="modal-title" id="modalContatoLabel" style="color: white; font-weight: 600;">
+                        <i class="fas fa-comments mr-2"></i>Falar conosco
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar" style="color: white;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="formContato">
+                    @csrf
+                    <div class="modal-body" style="padding: 2rem;">
+                        <p style="color: #555; margin-bottom: 1.5rem;">
+                            Tem alguma dúvida adicional ou interesse em aplicar o E.MO.TI.VE na sua empresa? Envie sua mensagem e entraremos em contato em breve.
+                        </p>
+                        
+                        <div class="form-group">
+                            <label for="nomeContato" style="color: #333; font-weight: 600;">Nome <span style="color: #dc3545;">*</span></label>
+                            <input type="text" class="form-control" id="nomeContato" name="nome" required placeholder="Seu nome completo">
+                            <div class="invalid-feedback"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emailContato" style="color: #333; font-weight: 600;">Email <span style="color: #dc3545;">*</span></label>
+                            <input type="email" class="form-control" id="emailContato" name="email" required placeholder="seu@email.com">
+                            <div class="invalid-feedback"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mensagemContato" style="color: #333; font-weight: 600;">Mensagem <span style="color: #dc3545;">*</span></label>
+                            <textarea class="form-control" id="mensagemContato" name="mensagem" rows="5" required placeholder="Digite sua mensagem aqui..."></textarea>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" style="background-color: #0087a0; border-color: #0087a0;">
+                            <i class="fas fa-paper-plane mr-2"></i>Enviar mensagem
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 @stop
 
@@ -192,6 +240,100 @@ Esses riscos passaram a ser formalmente reconhecidos como parte do Programa de G
 @stop
 
 @section('js')
-    <script> console.log("Usando Script de JS"); </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            $('#formContato').on('submit', function(e) {
+                e.preventDefault();
+                
+                const form = $(this);
+                const submitBtn = form.find('button[type="submit"]');
+                const originalText = submitBtn.html();
+                
+                // Desabilitar botão e mostrar loading
+                submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Enviando...');
+                
+                // Limpar erros anteriores
+                form.find('.is-invalid').removeClass('is-invalid');
+                form.find('.invalid-feedback').text('');
+                
+                $.ajax({
+                    url: '{{ route("contato.enviar") }}',
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || $('input[name="_token"]').val()
+                    },
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Mensagem enviada!',
+                                text: response.message,
+                                confirmButtonColor: '#0087a0'
+                            }).then(() => {
+                                $('#modalContato').modal('hide');
+                                form[0].reset();
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Erro na requisição:', xhr);
+                        
+                        if (xhr.status === 422) {
+                            // Erros de validação
+                            const errors = xhr.responseJSON?.errors || {};
+                            $.each(errors, function(key, value) {
+                                const input = form.find('[name="' + key + '"]');
+                                input.addClass('is-invalid');
+                                input.siblings('.invalid-feedback').text(value[0]);
+                            });
+                            
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro de validação',
+                                text: 'Por favor, corrija os erros no formulário.',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        } else if (xhr.status === 419) {
+                            // Erro de token CSRF
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Sessão expirada',
+                                text: 'Por favor, recarregue a página e tente novamente.',
+                                confirmButtonColor: '#dc3545'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else if (xhr.status === 404) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Rota não encontrada',
+                                text: 'A rota de contato não foi encontrada. Por favor, contate o administrador.',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro',
+                                text: xhr.responseJSON?.message || 'Erro ao enviar mensagem. Status: ' + xhr.status + '. Por favor, tente novamente.',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        }
+                    },
+                    complete: function() {
+                        submitBtn.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+            
+            // Limpar erros ao fechar o modal
+            $('#modalContato').on('hidden.bs.modal', function() {
+                $('#formContato')[0].reset();
+                $('#formContato').find('.is-invalid').removeClass('is-invalid');
+                $('#formContato').find('.invalid-feedback').text('');
+            });
+        });
+    </script>
 @stop
 

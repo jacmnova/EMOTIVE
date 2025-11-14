@@ -27,7 +27,7 @@
     </p>
     
     <div style="text-align: center; page-break-inside: avoid;">
-        <img src="{{ $imgPath('img/estrutura-modelo.png') }}" style="max-width: 100%; height: 553px; margin: 0 auto; display: block;" alt="Estrutura do Modelo E.MO.TI.VE">
+        <img src="{{ $imgPath('img/imagen_rel_emotive.png) }}" style="max-width: 100%; height: 553px; margin: 0 auto; display: block;" alt="Estrutura do Modelo E.MO.TI.VE">
     </div>
     <!-- Footer -->
     <div style="margin-top: {{ $footerMargin }}; padding-top: {{ $isPdfMode ? '12pt' : '20px' }}; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; page-break-inside: avoid; font-family: 'DejaVu Sans', sans-serif;">

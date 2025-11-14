@@ -4,6 +4,25 @@
     Entre para iniciar uma nova sessão
 @stop
 
+@section('auth_footer')
+    {{-- Mostrar solo "Recuperar senha", ocultar "Registrar um novo membro" --}}
+    @php
+        $passResetUrl = View::getSection('password_reset_url') ?? config('adminlte.password_reset_url', 'password/reset');
+        if (config('adminlte.use_route_url', false)) {
+            $passResetUrl = $passResetUrl ? route($passResetUrl) : '';
+        } else {
+            $passResetUrl = $passResetUrl ? url($passResetUrl) : '';
+        }
+    @endphp
+    @if($passResetUrl)
+        <p class="my-0">
+            <a href="{{ $passResetUrl }}">
+                {{ __('adminlte::adminlte.i_forgot_my_password') }}
+            </a>
+        </p>
+    @endif
+@stop
+
 @section('auth_body')
 
     {{-- SweetAlert de sessão expirada --}}
@@ -70,3 +89,14 @@
     </form>
 
 @endsection
+
+@section('css')
+    <style>
+        .login-logo img,
+        .login-box .login-logo img {
+            width: 360px !important;
+            height: 135px !important;
+            object-fit: contain;
+        }
+    </style>
+@stop

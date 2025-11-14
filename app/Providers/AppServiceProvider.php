@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\App;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Configurar idioma para português brasileiro
+        App::setLocale('pt-br');
+        Config::set('app.locale', 'pt-br');
+
         Gate::define('sa', function (User $user): bool {
             return $user->sa == 1;
         });
