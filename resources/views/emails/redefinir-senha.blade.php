@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Recuperação de Senha - Sistema Burnout</title>
+    <title>Recuperação de Senha - E.MO.TI.VE</title>
 </head>
 <body style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;">
     <div style="max-width: 600px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
@@ -13,7 +13,7 @@
 
         <p>Olá {{ $usuario->name }},</p>
 
-        <p>Recebemos uma solicitação para redefinir sua senha no <strong>Sistema Burnout</strong>.</p>
+        <p>Recebemos uma solicitação para redefinir sua senha no <strong>E.MO.TI.VE</strong>.</p>
 
         <p style="text-align: center;">
             <a href="{{ $url }}" style="background-color: #2d89ef; color: #fff; padding: 12px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
@@ -28,7 +28,7 @@
 
         <p style="margin-top: 30px; font-size: 14px; color: #777;">
             Atenciosamente,<br>
-            <strong>Equipe Sistema Burnout | Fellipelli</strong>
+            <strong>Equipe Fellipelli</strong>
         </p>
     </div>
 </body>
