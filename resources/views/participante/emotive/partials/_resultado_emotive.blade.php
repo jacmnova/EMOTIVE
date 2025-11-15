@@ -18,7 +18,7 @@
     <div style="margin-bottom: {{ $marginBottom }}; page-break-inside: avoid;">
         <h2 style="color: #2E9196; font-size: {{ $subtitleSize }}; font-style: normal; font-weight: 400; line-height: 1.3; margin: 0 0 8pt 0; font-family: 'DejaVu Sans', sans-serif;">Dados do respondente</h2>
         <div style="color: #000; font-size: {{ $textSize }}; font-style: normal; font-weight: 400; line-height: 1.4; font-family: 'DejaVu Sans', sans-serif;">
-            <p style="margin: {{ $isPdfMode ? '3pt' : '5px' }} 0; font-family: 'DejaVu Sans', sans-serif;"><strong>Formulário:</strong> {{ $formulario->label }} – {{ $formulario->nome }}</p>
+            <p style="margin: {{ $isPdfMode ? '3pt' : '5px' }} 0; font-family: 'DejaVu Sans', sans-serif;"><strong>Formulário:</strong>  {{ $formulario->nome }}</p>
             <p style="margin: {{ $isPdfMode ? '3pt' : '5px' }} 0; font-family: 'DejaVu Sans', sans-serif;"><strong>Participante:</strong> {{ $user->name }} ({{ $user->email }})</p>
             <p style="margin: {{ $isPdfMode ? '3pt' : '5px' }} 0; font-family: 'DejaVu Sans', sans-serif;"><strong>Data:</strong> {{ \Carbon\Carbon::parse($respostasUsuario->first()->created_at ?? now())->format('d/m/Y') }}</p>
             <p style="margin: {{ $isPdfMode ? '3pt' : '5px' }} 0; font-family: 'DejaVu Sans', sans-serif;"><strong>Respostas registradas:</strong> {{ $respostasUsuario->count() }} de {{ $formulario->perguntas->count() }}</p>

@@ -469,9 +469,9 @@ trait CalculaEjesAnaliticos
     {
         $interpretacoes = [
             'Alta-Alta' => [
-                'interpretacao' => 'Engajamento em Excesso',
-                'significado' => 'Energia e propósito coexistem, mas o corpo pode estar pagando o preço.',
-                'orientacoes' => 'Valorize pausas, reconheça sinais de fadiga e equilibre ambição com autocuidado.'
+                'interpretacao' => '⚠️ Estado Crítico',
+                'significado' => 'Alto risco de esgotamento. A sensação de impotência e perda de propósito indica necessidade de pausa e apoio.',
+                'orientacoes' => 'Reduza o ritmo, priorize descanso, converse com sua liderança e reflita sobre o que dá sentido ao seu trabalho.'
             ],
             'Alta-Moderada' => [
                 'interpretacao' => 'Estado de Esforço Contínuo',
@@ -479,26 +479,26 @@ trait CalculaEjesAnaliticos
                 'orientacoes' => 'Preserve seus espaços de recuperação e delegue tarefas. Sustente a motivação sem comprometer a saúde.'
             ],
             'Alta-Baixa' => [
-                'interpretacao' => '⚠️ Estado Crítico',
-                'significado' => 'Alto risco de esgotamento. A sensação de impotência e perda de propósito indica necessidade de pausa e apoio.',
-                'orientacoes' => 'Reduza o ritmo, priorize descanso, converse com sua liderança e reflita sobre o que dá sentido ao seu trabalho.'
+                'interpretacao' => 'Engajamento em Excesso',
+                'significado' => 'Energia e propósito coexistem, mas o corpo pode estar pagando o preço.',
+                'orientacoes' => 'Valorize pausas, reconheça sinais de fadiga e equilibre ambição com autocuidado.'
             ],
-            'Moderada-Alta' => [
+            'Moderada-Baixa' => [
                 'interpretacao' => 'Equilíbrio Dinâmico',
                 'significado' => 'Boa realização com cansaço controlado. Indica produtividade saudável.',
                 'orientacoes' => 'Mantenha rituais de descanso e reconheça conquistas. Esse é um ponto ótimo.'
+            ],
+            'Moderada-Alta' => [
+                'interpretacao' => 'Desânimo Progressivo',
+                'significado' => 'Esforço emocional sem retorno de propósito. Pode evoluir para desmotivação.',
+                'orientacoes' => 'Busque feedbacks e alinhe expectativas. Reencontre significado nas atividades.'
             ],
             'Moderada-Moderada' => [
                 'interpretacao' => 'Estado de Manutenção',
                 'significado' => 'Equilíbrio funcional. Nem sobrecarregado, nem entediado.',
                 'orientacoes' => 'Continue cuidando do ritmo e do engajamento. Práticas de gratidão ajudam a fortalecer esse equilíbrio.'
             ],
-            'Moderada-Baixa' => [
-                'interpretacao' => 'Desânimo Progressivo',
-                'significado' => 'Esforço emocional sem retorno de propósito. Pode evoluir para desmotivação.',
-                'orientacoes' => 'Busque feedbacks e alinhe expectativas. Reencontre significado nas atividades.'
-            ],
-            'Baixa-Alta' => [
+            'Baixa-Baixa' => [
                 'interpretacao' => '💚 Zona de Vitalidade',
                 'significado' => 'Estado ideal. Boa energia e satisfação no trabalho.',
                 'orientacoes' => 'Continue praticando hábitos saudáveis, compartilhando boas práticas e inspirando colegas.'
@@ -508,7 +508,7 @@ trait CalculaEjesAnaliticos
                 'significado' => 'Rotina estável, mas com espaço para mais propósito.',
                 'orientacoes' => 'Defina novos desafios e metas inspiradoras.'
             ],
-            'Baixa-Baixa' => [
+            'Baixa-Alta' => [
                 'interpretacao' => 'Apatia Emocional',
                 'significado' => 'Baixo estresse, mas também baixo envolvimento. Indica tédio ou falta de desafio.',
                 'orientacoes' => 'Reavalie seus objetivos e busque oportunidades que reativem seu entusiasmo.'
@@ -525,22 +525,22 @@ trait CalculaEjesAnaliticos
     protected function interpretarEixo2($cinismoFaixa, $fatoresFaixa): array
     {
         $interpretacoes = [
-            'Alta-Alta' => [
-                'interpretacao' => 'Cansaço Relacional',
-                'significado' => 'O ambiente é bom, mas há esgotamento pessoal. O cinismo pode vir de excesso de exposição ou idealismo frustrado.',
-                'orientacoes' => 'Tire pausas de interação, sem se isolar. Retome o propósito em pequenas vitórias.'
+            'Alta-Baixa' => [
+                'interpretacao' => '⚠️ Isolamento e Desconfiança',
+                'significado' => 'Indica desgaste relacional e perda de vínculo com o ambiente. Pode haver sensação de injustiça ou frieza no time.',
+                'orientacoes' => 'Reabra canais de diálogo. Se possível, busque apoio em pessoas de confiança e em práticas colaborativas.'
             ],
             'Alta-Moderada' => [
                 'interpretacao' => 'Proteção Emocional',
                 'significado' => 'Tentativa de se proteger de tensões. O ambiente oferece algum suporte, mas há barreiras emocionais.',
                 'orientacoes' => 'Trabalhe a empatia e reforce vínculos leves e sinceros.'
             ],
-            'Alta-Baixa' => [
-                'interpretacao' => '⚠️ Isolamento e Desconfiança',
-                'significado' => 'Indica desgaste relacional e perda de vínculo com o ambiente. Pode haver sensação de injustiça ou frieza no time.',
-                'orientacoes' => 'Reabra canais de diálogo. Se possível, busque apoio em pessoas de confiança e em práticas colaborativas.'
+            'Alta-Alta' => [
+                'interpretacao' => 'Cansaço Relacional',
+                'significado' => 'O ambiente é bom, mas há esgotamento pessoal. O cinismo pode vir de excesso de exposição ou idealismo frustrado.',
+                'orientacoes' => 'Tire pausas de interação, sem se isolar. Retome o propósito em pequenas vitórias.'
             ],
-            'Moderada-Alta' => [
+            'Moderada-Baixa' => [
                 'interpretacao' => 'Conexão Consciente',
                 'significado' => 'Relacionamento saudável com limites claros.',
                 'orientacoes' => 'Mantenha equilíbrio e evite absorver tensões alheias.'
@@ -550,12 +550,12 @@ trait CalculaEjesAnaliticos
                 'significado' => 'Conexões estáveis, porém pouco afetivas.',
                 'orientacoes' => 'Estimule momentos de reconhecimento e humanização nas relações.'
             ],
-            'Moderada-Baixa' => [
+            'Moderada-Alta' => [
                 'interpretacao' => 'Desencanto',
                 'significado' => 'Sensação de distância emocional e falta de suporte.',
                 'orientacoes' => 'Invista em comunicação e peça clareza sobre expectativas.'
             ],
-            'Baixa-Alta' => [
+            'Baixa-Baixa' => [
                 'interpretacao' => '💚 Pertencimento Saudável',
                 'significado' => 'Relações de confiança, empatia e apoio mútuo.',
                 'orientacoes' => 'Continue nutrindo o ambiente com colaboração e reconhecimento.'
@@ -565,7 +565,7 @@ trait CalculaEjesAnaliticos
                 'significado' => 'Boa convivência, ainda que nem sempre profunda.',
                 'orientacoes' => 'Cultive pequenas atitudes de escuta e feedbacks positivos.'
             ],
-            'Baixa-Baixa' => [
+            'Baixa-Alta' => [
                 'interpretacao' => 'Engajamento Solitário',
                 'significado' => 'Você se mantém aberto e positivo mesmo em contextos frios.',
                 'orientacoes' => 'Proteja sua energia e incentive práticas coletivas de cooperação.'

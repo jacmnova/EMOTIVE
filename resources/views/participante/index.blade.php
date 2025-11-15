@@ -60,7 +60,7 @@
                         @foreach ($questionarios as $formulario)
                             <tr>
                                 <td>
-                                    <label class="badge badge-dark">{{ $formulario->formulario->label }}</label> |
+                                    <!-- <label class="badge badge-dark">{{ $formulario->formulario->label }}</label> | -->
                                     {{ $formulario->formulario->nome }}
                                 </td>
                                 <td>{{ $formulario->formulario->perguntaCount() }}</td>
