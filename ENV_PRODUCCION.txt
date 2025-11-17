@@ -2,7 +2,7 @@ APP_NAME=Emotive
 APP_ENV=production
 APP_KEY=
 APP_DEBUG=false
-APP_URL=https://emotive.g3nia.com
+APP_URL=https://emotive.fellipelli.com.br
 
 LOG_CHANNEL=stack
 LOG_DEPRECATIONS_CHANNEL=null
@@ -29,12 +29,12 @@ REDIS_PASSWORD=null
 REDIS_PORT=6379
 
 MAIL_MAILER=smtp
-MAIL_HOST=smtp.gmail.com
+MAIL_HOST=smtp.office365.com
 MAIL_PORT=587
-MAIL_USERNAME=g3nia@gafi.com.br
-MAIL_PASSWORD=gtngzxulcmgtdgda
+MAIL_USERNAME=naoresponda@fellipelli.com.br
+MAIL_PASSWORD=N&343745452317ad
 MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS="g3nia@gafi.com.br"
+MAIL_FROM_ADDRESS="naoresponda@fellipelli.com.br"
 MAIL_FROM_NAME="${APP_NAME}"
 
 AWS_ACCESS_KEY_ID=

@@ -1,6 +1,6 @@
 # 🚀 Guía Completa de Despliegue en EC2 con Dominio y SSL
 
-Guía paso a paso para desplegar tu aplicación Laravel en AWS EC2 con el dominio `emotive.g3nia.com`, certificado SSL y despliegue automático con GitHub Actions.
+Guía paso a paso para desplegar tu aplicación Laravel en AWS EC2 con el dominio `emotive.fellipelli.com.br`, certificado SSL y despliegue automático con GitHub Actions.
 
 ---
 
@@ -79,7 +79,7 @@ ssh -i tu-key.pem ec2-user@TU_IP_PUBLICA
 
 1. **Clic en "Agregar"** o **"Add"**
 2. **Tipo**: `A`
-3. **Nombre/Host**: `emotive` (esto creará `emotive.g3nia.com`)
+3. **Nombre/Host**: `emotive` (esto creará `emotive.fellipelli.com.br`)
 4. **Valor/Points to**: **Pega la IP pública de tu EC2** (la que copiaste en el paso 1.2)
 5. **TTL**: `600` (10 minutos) o `3600` (1 hora)
 6. **Guardar**
@@ -90,9 +90,9 @@ Espera 5-30 minutos y verifica:
 
 ```bash
 # En tu máquina local
-dig emotive.g3nia.com
+dig emotive.fellipelli.com.br
 # O
-nslookup emotive.g3nia.com
+nslookup emotive.fellipelli.com.br
 ```
 
 Deberías ver tu IP pública de EC2.
@@ -197,7 +197,7 @@ sudo nano /etc/nginx/conf.d/laravel.conf
 ```nginx
 server {
     listen 80;
-    server_name emotive.g3nia.com;
+    server_name emotive.fellipelli.com.br;
     root /var/www/laravel/public;
 
     add_header X-Frame-Options "SAMEORIGIN";
@@ -238,11 +238,11 @@ sudo systemctl reload nginx
 
 ### Paso 5.3: Obtener Certificado SSL
 
-**IMPORTANTE**: Asegúrate de que el dominio `emotive.g3nia.com` ya apunte a tu IP antes de continuar.
+**IMPORTANTE**: Asegúrate de que el dominio `emotive.fellipelli.com.br` ya apunte a tu IP antes de continuar.
 
 ```bash
 # Obtener certificado SSL automáticamente
-sudo certbot --nginx -d emotive.g3nia.com
+sudo certbot --nginx -d emotive.fellipelli.com.br
 
 # Seguir las instrucciones:
 # - Email: tu email
@@ -289,7 +289,7 @@ cat ~/.ssh/github_deploy
 4. **Agregar estos secrets**:
 
    - **Nombre**: `SSH_HOST`
-     **Valor**: `TU_IP_PUBLICA` (o `emotive.g3nia.com` si ya está configurado)
+     **Valor**: `TU_IP_PUBLICA` (o `emotive.fellipelli.com.br` si ya está configurado)
 
    - **Nombre**: `SSH_USER`
      **Valor**: `ec2-user` (o `ubuntu` si es Ubuntu)
@@ -324,7 +324,7 @@ APP_NAME=Emotive
 APP_ENV=production
 APP_KEY=
 APP_DEBUG=false
-APP_URL=https://emotive.g3nia.com
+APP_URL=https://emotive.fellipelli.com.br
 
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -404,7 +404,7 @@ chmod +x deploy.sh
 
 ### Paso 8.1: Verificar que el Sitio Funciona
 
-1. **Abre tu navegador**: https://emotive.g3nia.com
+1. **Abre tu navegador**: https://emotive.fellipelli.com.br
 2. **Verifica el certificado SSL**: Debe mostrar un candado verde
 3. **Prueba la aplicación**: Login, navegación, etc.
 
@@ -514,13 +514,13 @@ sudo systemctl restart nginx php-fpm mysqld
 ## ✅ Checklist Final
 
 - [ ] Instancia EC2 creada y funcionando
-- [ ] Dominio `emotive.g3nia.com` apunta a la IP de EC2
+- [ ] Dominio `emotive.fellipelli.com.br` apunta a la IP de EC2
 - [ ] Certificado SSL instalado y funcionando
 - [ ] Base de datos creada y configurada
 - [ ] Archivo `.env` configurado
 - [ ] Migrations, seeders y factories ejecutados
 - [ ] GitHub Actions configurado y funcionando
-- [ ] Sitio accesible en https://emotive.g3nia.com
+- [ ] Sitio accesible en https://emotive.fellipelli.com.br
 - [ ] Despliegue automático probado y funcionando
 
 ---

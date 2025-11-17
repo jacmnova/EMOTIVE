@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Script para configurar Nginx con SSL para emotive.g3nia.com
+# Script para configurar Nginx con SSL para emotive.fellipelli.com.br
 # Uso: sudo ./configurar-nginx-ssl.sh
 
-DOMAIN="emotive.g3nia.com"
+DOMAIN="emotive.fellipelli.com.br"
 APP_ROOT="/var/www/laravel/public"
 
 echo "🌐 Configurando Nginx para $DOMAIN..."

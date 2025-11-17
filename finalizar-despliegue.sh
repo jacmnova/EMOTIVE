@@ -143,7 +143,7 @@ if [ ! -f "$NGINX_CONF" ]; then
     sudo tee "$NGINX_CONF" > /dev/null <<EOF
 server {
     listen 80;
-    server_name emotive.g3nia.com;
+    server_name emotive.fellipelli.com.br;
     root /var/www/laravel/public;
 
     add_header X-Frame-Options "SAMEORIGIN";
@@ -352,7 +352,7 @@ echo "  ✅ DESPLIEGUE COMPLETADO"
 echo "════════════════════════════════════════════════════════════════"
 echo ""
 echo "📋 Verificaciones finales:"
-echo "  1. Abre https://emotive.g3nia.com en tu navegador"
+echo "  1. Abre https://emotive.fellipelli.com.br en tu navegador"
 echo "  2. Verifica que el sitio carga correctamente"
 echo "  3. Prueba el login y funcionalidades principales"
 echo ""
