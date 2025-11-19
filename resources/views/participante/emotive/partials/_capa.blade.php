@@ -70,7 +70,7 @@
     
 
     <div style="position: relative; z-index: 2; margin-top: {{ $isPdfMode ? 'auto' : '40px' }}; margin-bottom: {{ $isPdfMode ? '30pt' : '0' }}; font-family: 'DejaVu Sans', sans-serif;">
-        <div style="text-align: center; background: white; padding: {{ $isPdfMode ? '15pt' : '25px' }}; color: #333; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; z-index: 1; width: {{ $isPdfMode ? '75%' : '50%' }}; margin: auto; border-top-left-radius: 12px; border-top-right-radius: 12px; font-family: 'DejaVu Sans', sans-serif;">
+        <div style="text-align: center; background: white; padding: {{ $isPdfMode ? '15pt' : '25px' }}; color: #333; position: relative; z-index: 1; width: {{ $isPdfMode ? '75%' : '50%' }}; margin: auto; border-top-left-radius: 12px; border-top-right-radius: 12px; font-family: 'DejaVu Sans', sans-serif;">
             <h3 style="font-size: {{ $isPdfMode ? '14pt' : '1.3rem' }}; font-weight: bold; margin: 0 0 6pt 0; color: #A59880; text-align: center; font-family: 'DejaVu Sans', sans-serif;">{{ $user->name }}</h3>
             <p style="font-size: {{ $isPdfMode ? '10pt' : '0.95rem' }}; margin: 3pt 0; color: #666; font-family: 'DejaVu Sans', sans-serif;">Relatório Questionário de Riscos Psicossociais</p>
             <p style="font-size: {{ $isPdfMode ? '9pt' : '0.9rem' }}; margin: 3pt 0; color: #888; font-family: 'DejaVu Sans', sans-serif;">Respondido em {{ \Carbon\Carbon::parse($respostasUsuario->first()->created_at ?? now())->format('d/m/Y') }}</p>

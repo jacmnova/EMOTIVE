@@ -8,11 +8,13 @@
     $footerMargin = $isPdfMode ? '20pt' : '50px';
 @endphp
 @if($isPdfMode)
-<div class="section-pdf" style="padding: {{ $padding }}; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box; font-family: 'DejaVu Sans', sans-serif;">
+<div class="page-a4">
+    <div class="page-a4-content">
+    <h1 style="color: #A4977F; font-size: {{ $titleSize }}; font-style: normal; font-weight: 700; line-height: 1.2; margin: 0 0 {{ $marginBottom }} 0; font-family: 'DejaVu Sans', sans-serif;">RELATÓRIO E.MO.TI.VE®</h1>
 @else
 <div class="section-pdf" style="padding: {{ $padding }}; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;">
-@endif
     <h1 style="color: #A4977F; font-size: {{ $titleSize }}; font-style: normal; font-weight: 700; line-height: 1.2; margin: 0 0 {{ $marginBottom }} 0; font-family: 'DejaVu Sans', sans-serif;">RELATÓRIO E.MO.TI.VE®</h1>
+@endif
     
     <div style="margin-bottom: {{ $marginBottom }};">
         <h2 style="color: #2E9196; font-size: {{ $subtitleSize }}; font-style: normal; font-weight: 400; line-height: 1.3; margin: 0 0 8pt 0; font-family: 'DejaVu Sans', sans-serif;">Ferramenta de Autoconhecimento e Prevenção de Riscos Psicossociais</h2>
@@ -65,7 +67,10 @@
             <li style="margin-bottom: 4pt; font-family: 'DejaVu Sans', sans-serif;">Este instrumento visa promover prevenção e bem-estar, não substituir avaliações clínicas especializadas</li>
         </ul>
     </div>
-    
+    @if($isPdfMode)
+    </div>
+    @include('participante.emotive.partials._footer_pdf', ['pageNumber' => '01'])
+    @else
     <!-- Footer -->
     @php
         $imgPath = function($path) {
@@ -82,7 +87,7 @@
             return asset($path);
         };
     @endphp
-    <div style="margin-top: {{ $footerMargin }}; padding-top: {{ $isPdfMode ? '12pt' : '20px' }}; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; page-break-inside: avoid; font-family: 'DejaVu Sans', sans-serif;">
+    <div class="section-pdf-footer" style="margin-top: {{ $footerMargin }}; padding-top: {{ $isPdfMode ? '12pt' : '20px' }}; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; page-break-inside: avoid; font-family: 'DejaVu Sans', sans-serif;">
         <div style="display: flex; gap: {{ $isPdfMode ? '10pt' : '2vh' }}; align-items: center;">
         <img src="{{ $imgPath('img/felipelli-logo.png') }}" alt="Fellipelli Consultoria" style="height: {{ $isPdfMode ? '20pt' : 'auto' }}; max-height: 20pt;">
         <img src="{{ $imgPath('img/emotive-logo.png') }}" alt="E.MO.TI.VE" style="height: {{ $isPdfMode ? '20pt' : 'auto' }}; max-height: 20pt;">
@@ -92,5 +97,6 @@
             <p style="font-size: {{ $isPdfMode ? '6pt' : '0.8rem' }}; color: #999; margin: 0; font-family: 'DejaVu Sans', sans-serif;">Pág. 01</p>
         </div>
     </div>
+    @endif
 </div>
 

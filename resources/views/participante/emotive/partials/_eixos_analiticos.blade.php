@@ -8,11 +8,13 @@
     $footerMargin = $isPdfMode ? '20pt' : '50px';
 @endphp
 @if($isPdfMode)
-<div class="section-pdf" style="padding: {{ $padding }}; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box; font-family: 'DejaVu Sans', sans-serif;">
+<div class="page-a4">
+    <div class="page-a4-content">
+    <h1 style="color: #A4977F; font-size: {{ $titleSize }}; font-style: normal; font-weight: 700; line-height: 1.2; margin: 0 0 {{ $marginBottom }} 0; font-family: 'DejaVu Sans', sans-serif;">ÍNDICE EIXOS ANALÍTICOS E.MO.TI.VE</h1>
 @else
 <div class="section-pdf" style="padding: {{ $padding }}; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;">
-@endif
     <h1 style="color: #A4977F; font-size: {{ $titleSize }}; font-style: normal; font-weight: 700; line-height: 1.2; margin: 0 0 {{ $marginBottom }} 0; font-family: 'DejaVu Sans', sans-serif;">ÍNDICE EIXOS ANALÍTICOS E.MO.TI.VE</h1>
+@endif
     
     @php
         $eixos = [
@@ -138,9 +140,12 @@
             </div>
         </div>
     @endforeach
-    
+    @if($isPdfMode)
+    </div>
+    @include('participante.emotive.partials._footer_pdf', ['pageNumber' => '06'])
+    @else
     <!-- Footer -->
-    <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
+    <div class="section-pdf-footer" style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
         <div style="display: flex; gap: 20px; align-items: center;">
             @php
                 $imgPath = function($path) {
@@ -165,5 +170,6 @@
             <p style="font-size: 8px; color: #999; margin: 5px 0 0 0;">Pág. 06</p>
         </div>
     </div>
+    @endif
 </div>
 

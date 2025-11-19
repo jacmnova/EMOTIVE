@@ -6,6 +6,37 @@
     $subtitleSize = $isPdfMode ? '12pt' : '16px';
     $textSize = $isPdfMode ? '10pt' : '10px';
     $footerMargin = $isPdfMode ? '20pt' : '50px';
+    
+    // Ordenar las variables según el orden deseado, solo las últimas 3: FAPS, ASMO, EXTR
+    $ordemDimensoes = ['FAPS', 'ASMO', 'EXTR'];
+    $variaveisOrdenadas = [];
+    
+    // Ordenar variables según el orden deseado, solo si tienen puntuación
+    foreach ($ordemDimensoes as $tag) {
+        foreach($variaveis as $variavel) {
+            if (mb_strtoupper($variavel->tag, 'UTF-8') === $tag) {
+                // Verificar si tiene puntuación
+                $temPontuacao = false;
+                foreach($pontuacoes as $pontos) {
+                    if (mb_strtoupper($variavel->tag, 'UTF-8') === mb_strtoupper($pontos['tag'] ?? '', 'UTF-8')) {
+                        $temPontuacao = true;
+                        break;
+                    }
+                }
+                if ($temPontuacao) {
+                    $variaveisOrdenadas[] = $variavel;
+                }
+                break;
+            }
+        }
+    }
+    
+    // Definir colores de barras según la dimensión (fallback)
+    $coresBarras = [
+        'FAPS' => '#E8C97B',
+        'ASMO' => '#7BC9A8',
+        'EXTR' => '#E8C97B'
+    ];
 @endphp
 @if($isPdfMode)
 <div class="page-a4">
@@ -16,64 +47,7 @@
     <h1 style="color: #A4977F; font-size: {{ $titleSize }}; font-style: normal; font-weight: 700; line-height: 1.2; margin: 0 0 {{ $marginBottom }} 0; font-family: 'DejaVu Sans', sans-serif;">ESTADO EMOCIONAL E PSICOSSOCIAL</h1>
 @endif
     
-    <!-- Como Ler Seus Resultados -->
-    <div style="margin-bottom: {{ $isPdfMode ? '15pt' : '40px' }}; page-break-inside: avoid;">
-        <h2 style="color: #2E9196; font-size: {{ $subtitleSize }}; font-style: normal; font-weight: 400; line-height: 1.3; margin: 0 0 8pt 0; font-family: 'DejaVu Sans', sans-serif;">Como Ler Seus Resultados</h2>
-        <p style="color: #000; font-size: {{ $textSize }}; font-style: normal; font-weight: 400; line-height: 1.4; text-align: justify; margin: 0 0 8pt 0; font-family: 'DejaVu Sans', sans-serif;">
-            Cada dimensão é apresentada em faixas de pontuação, representando níveis de atenção:
-        </p>
-        <ul style="line-height: 1.5; padding-left: 20pt; margin: 8pt 0; list-style: disc; font-family: 'DejaVu Sans', sans-serif;">
-            <li style="color: #000; font-size: {{ $textSize }}; font-style: normal; font-weight: 400; line-height: 1.4; margin-bottom: 4pt; font-family: 'DejaVu Sans', sans-serif;">Faixa Baixa: equilíbrio emocional saudável, sem sinais de risco.</li>
-            <li style="color: #000; font-size: {{ $textSize }}; font-style: normal; font-weight: 400; line-height: 1.4; margin-bottom: 4pt; font-family: 'DejaVu Sans', sans-serif;">Faixa Moderada: pontos de atenção que merecem acompanhamento.</li>
-            <li style="color: #000; font-size: {{ $textSize }}; font-style: normal; font-weight: 400; line-height: 1.4; margin-bottom: 4pt; font-family: 'DejaVu Sans', sans-serif;">Faixa Alta: indica necessidade de reflexão e cuidado ativo.</li>
-        </ul>
-        
-        <div style="background: #F8F5ED; padding: {{ $isPdfMode ? '10pt' : '15px' }}; margin: {{ $isPdfMode ? '10pt' : '20px' }} 0; border-radius: 4px; page-break-inside: avoid;">
-            <p style="margin: 0; font-weight: bold; color: #000; font-size: {{ $textSize }}; font-style: normal; line-height: 1.4; font-family: 'DejaVu Sans', sans-serif;">Importante: Nenhum resultado define você. Ele mostra apenas como você está neste momento, diante de condições específicas do ambiente e das demandas atuais.</p>
-        </div>
-        
-        <p style="color: #000; font-size: {{ $textSize }}; font-style: normal; font-weight: 400; line-height: 1.4; text-align: justify; margin: {{ $isPdfMode ? '8pt' : '15px' }} 0 0 0; font-family: 'DejaVu Sans', sans-serif;">
-            As seções seguintes oferecem interpretações personalizadas, orientações práticas e sugestões de desenvolvimento. Cada texto foi cuidadosamente elaborado para promover autocompreensão, autocuidado e ação positiva.
-        </p>
-    </div>
-    
-    <!-- Dimensões (EXEM, DECI, REPR, FAPS, ASMO, EXTR) -->
-    @php
-        // Ordenar las variables según el orden deseado, pero solo las que tienen puntuaciones
-        $ordemDimensoes = ['EXEM', 'DECI', 'REPR', 'FAPS', 'ASMO', 'EXTR'];
-        $variaveisOrdenadas = [];
-        
-        // Ordenar variables según el orden deseado, solo si tienen puntuación (misma lógica que _resultado_emotive)
-        foreach ($ordemDimensoes as $tag) {
-            foreach($variaveis as $variavel) {
-                if (mb_strtoupper($variavel->tag, 'UTF-8') === $tag) {
-                    // Verificar si tiene puntuación (misma lógica que _resultado_emotive)
-                    $temPontuacao = false;
-                    foreach($pontuacoes as $pontos) {
-                        if (mb_strtoupper($variavel->tag, 'UTF-8') === mb_strtoupper($pontos['tag'] ?? '', 'UTF-8')) {
-                            $temPontuacao = true;
-                            break;
-                        }
-                    }
-                    if ($temPontuacao) {
-                        $variaveisOrdenadas[] = $variavel;
-                    }
-                    break;
-                }
-            }
-        }
-        
-        // Definir colores de barras según la dimensión (fallback)
-        $coresBarras = [
-            'EXEM' => '#DED8C7',
-            'DECI' => '#DED8C7',
-            'REPR' => '#E8C97B',
-            'FAPS' => '#E8C97B',
-            'ASMO' => '#7BC9A8',
-            'EXTR' => '#E8C97B'
-        ];
-    @endphp
-    
+    <!-- Dimensões (FAPS, ASMO, EXTR) -->
     @if(empty($variaveisOrdenadas) || empty($pontuacoes))
         <div style="background: #FFF3CD; padding: 20px; border-radius: 4px; border-left: 4px solid #FFC107; margin: 30px 0;">
             <p style="color: #856404; font-size: 12px; font-weight: 600; margin: 0 0 10px 0;">
@@ -87,7 +61,7 @@
     @else
         @foreach($variaveisOrdenadas as $registro)
             @php
-                // Buscar la puntuación correspondiente (misma lógica que _resultado_emotive)
+                // Buscar la puntuación correspondiente
                 $pontuacao = null;
                 $faixa = null;
                 foreach($pontuacoes as $pontos) {
@@ -159,10 +133,10 @@
     @endif
     @if($isPdfMode)
     </div>
-    @include('participante.emotive.partials._footer_pdf', ['pageNumber' => '04'])
+    @include('participante.emotive.partials._footer_pdf', ['pageNumber' => '05'])
     @else
     <!-- Footer -->
-    <div style="margin-top: {{ $footerMargin }}; padding-top: {{ $isPdfMode ? '12pt' : '20px' }}; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; page-break-inside: avoid; font-family: 'DejaVu Sans', sans-serif;">
+    <div class="section-pdf-footer" style="margin-top: {{ $footerMargin }}; padding-top: {{ $isPdfMode ? '12pt' : '20px' }}; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; page-break-inside: avoid; font-family: 'DejaVu Sans', sans-serif;">
         <div style="display: flex; gap: {{ $isPdfMode ? '10pt' : '20px' }}; align-items: center;">
             @php
                 $imgPath = function($path) {
@@ -184,8 +158,9 @@
         </div>
         <div style="text-align: right; font-family: 'DejaVu Sans', sans-serif;">
             <p style="font-size: {{ $isPdfMode ? '6pt' : '8px' }}; color: #999; margin: 0; font-family: 'DejaVu Sans', sans-serif;">Todos os direitos reservados a Fellipelli Consultoria</p>
-            <p style="font-size: {{ $isPdfMode ? '6pt' : '8px' }}; color: #999; margin: 2pt 0 0 0; font-family: 'DejaVu Sans', sans-serif;">Pág. 04</p>
+            <p style="font-size: {{ $isPdfMode ? '6pt' : '8px' }}; color: #999; margin: 2pt 0 0 0; font-family: 'DejaVu Sans', sans-serif;">Pág. 05</p>
         </div>
     </div>
     @endif
 </div>
+

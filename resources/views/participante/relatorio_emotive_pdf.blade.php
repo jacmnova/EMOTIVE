@@ -9,6 +9,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* Configuración de página A4 */
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+        
+        @page :first {
+            margin: 0;
+        }
+        
+        @page :not(:first) {
+            margin: 0;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -20,6 +34,8 @@
             background: white;
             color: #333;
             width: 100%;
+            max-width: 595.28pt; /* Ancho exacto de A4 en portrait */
+            margin: 0 auto;
             overflow-x: hidden;
         }
         
@@ -28,7 +44,8 @@
             background: white;
             color: #333;
             width: 100%;
-            margin: 0;
+            max-width: 595.28pt; /* Ancho exacto de A4 en portrait */
+            margin: 0 auto;
             padding: 0;
         }
         
@@ -47,12 +64,31 @@
             font-family: 'Quicksand', sans-serif !important;
         }
         
+        /* Permitir que las secciones se dividan automáticamente en múltiples páginas */
+        .relatorio-emotive > div {
+            page-break-inside: auto;
+            min-height: 0;
+        }
+        
+        /* Evitar cortes en elementos críticos */
+        h1, h2, h3 {
+            page-break-after: avoid;
+            page-break-inside: avoid;
+        }
+        
+        img, table, canvas {
+            page-break-inside: avoid;
+            max-width: 100%;
+            height: auto;
+        }
+        
         .page-break {
             page-break-after: always;
-            margin-bottom: 50px;
-            padding-bottom: 50px;
+            margin-bottom: 0;
+            padding-bottom: 0;
             border-bottom: 2px dashed #ddd;
             width: 100%;
+            max-width: 595.28pt;
             box-sizing: border-box;
             font-family: 'Quicksand', sans-serif !important;
         }
@@ -82,6 +118,7 @@
             margin: 20px 0;
             border-radius: 4px;
             font-family: 'Quicksand', sans-serif !important;
+            page-break-inside: avoid;
         }
         
         .quote-box {
@@ -91,6 +128,7 @@
             margin: 20px 0;
             font-style: italic;
             font-family: 'Quicksand', sans-serif !important;
+            page-break-inside: avoid;
         }
         
         .faixa-badge {
@@ -118,26 +156,96 @@
             color: #721c24;
         }
         
+        /* Clase base para páginas A4 - cada sección es una página completa */
+        .page-a4 {
+            width: 100%;
+            max-width: 595.28pt; /* Ancho exacto de A4 */
+            height: 842pt; /* Altura exacta de A4 */
+            min-height: 842pt;
+            max-height: 842pt;
+            margin: 0 auto;
+            padding: 18pt;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            page-break-after: always;
+            page-break-inside: avoid;
+            font-family: 'DejaVu Sans', sans-serif;
+            position: relative;
+        }
+        
+        .page-a4-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .page-a4-footer {
+            margin-top: auto;
+            flex-shrink: 0;
+            padding-top: 12pt;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            page-break-inside: avoid;
+        }
+
         .container-portada {
-            height: 800px;
+            height: 842pt;
+            min-height: 842pt;
+            max-height: 842pt;
             gap: 10% !important;
-            min-height: 900px !important;
+            page-break-after: always;
+            display: flex;
+            flex-direction: column;
         }
 
         .section-pdf {
-            border-bottom: 4px dashed #CCC;
+            min-height: 842pt !important;
+            max-height: 842pt !important;
+            display: block;
+          
+            height: 842pt;
+            position: relative;
         }
 
         .section-pdf-large {
-           
+            / min-height: 842pt !important;
+            max-height: 842pt !important;
+            display: block;
+            
+            height: 842pt;
+            position: relative;
+        }
+
+        .section-pdf-footer {
+            position: absolute;
+            bottom: 20px;
+            width: 90%;
         }
 
         .fail-pdf {
             width: 80% !important;
         }
 
-        .grafico-radar-emotive-pdf{
-            width: 100%; max-height: 350px; height: auto;
+        .grafico-radar-emotive-pdf {
+            width: 100%; 
+            max-height: 350px; 
+            height: auto;
+            page-break-inside: avoid;
+        }
+        
+        /* Evitar cortes en contenedores de gráficos */
+        .graficos-container,
+        .chart-container {
+            page-break-inside: avoid;
+        }
+        
+        /* Mejorar el espaciado entre secciones */
+        .relatorio-emotive > div + div {
+            margin-top: 0;
         }
     </style>
 </head>
@@ -147,7 +255,8 @@
         @include('participante.emotive.partials._introducao')
         @include('participante.emotive.partials._estrutura_modelo')
         @include('participante.emotive.partials._resultado_emotive')
-        @include('participante.emotive.partials._estado_emocional')
+        @include('participante.emotive.partials._estado_emocional_parte1')
+        @include('participante.emotive.partials._estado_emocional_parte2')
         @include('participante.emotive.partials._eixos_analiticos')
         @include('participante.emotive.partials._risco_descarrilamento')
         @include('participante.emotive.partials._saude_emocional')

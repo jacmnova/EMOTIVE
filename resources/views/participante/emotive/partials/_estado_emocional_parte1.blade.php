@@ -6,6 +6,37 @@
     $subtitleSize = $isPdfMode ? '12pt' : '16px';
     $textSize = $isPdfMode ? '10pt' : '10px';
     $footerMargin = $isPdfMode ? '20pt' : '50px';
+    
+    // Ordenar las variables según el orden deseado, solo las primeras 3: EXEM, DECI, REPR
+    $ordemDimensoes = ['EXEM', 'DECI', 'REPR'];
+    $variaveisOrdenadas = [];
+    
+    // Ordenar variables según el orden deseado, solo si tienen puntuación
+    foreach ($ordemDimensoes as $tag) {
+        foreach($variaveis as $variavel) {
+            if (mb_strtoupper($variavel->tag, 'UTF-8') === $tag) {
+                // Verificar si tiene puntuación
+                $temPontuacao = false;
+                foreach($pontuacoes as $pontos) {
+                    if (mb_strtoupper($variavel->tag, 'UTF-8') === mb_strtoupper($pontos['tag'] ?? '', 'UTF-8')) {
+                        $temPontuacao = true;
+                        break;
+                    }
+                }
+                if ($temPontuacao) {
+                    $variaveisOrdenadas[] = $variavel;
+                }
+                break;
+            }
+        }
+    }
+    
+    // Definir colores de barras según la dimensión (fallback)
+    $coresBarras = [
+        'EXEM' => '#DED8C7',
+        'DECI' => '#DED8C7',
+        'REPR' => '#E8C97B',
+    ];
 @endphp
 @if($isPdfMode)
 <div class="page-a4">
@@ -37,43 +68,7 @@
         </p>
     </div>
     
-    <!-- Dimensões (EXEM, DECI, REPR, FAPS, ASMO, EXTR) -->
-    @php
-        // Ordenar las variables según el orden deseado, pero solo las que tienen puntuaciones
-        $ordemDimensoes = ['EXEM', 'DECI', 'REPR', 'FAPS', 'ASMO', 'EXTR'];
-        $variaveisOrdenadas = [];
-        
-        // Ordenar variables según el orden deseado, solo si tienen puntuación (misma lógica que _resultado_emotive)
-        foreach ($ordemDimensoes as $tag) {
-            foreach($variaveis as $variavel) {
-                if (mb_strtoupper($variavel->tag, 'UTF-8') === $tag) {
-                    // Verificar si tiene puntuación (misma lógica que _resultado_emotive)
-                    $temPontuacao = false;
-                    foreach($pontuacoes as $pontos) {
-                        if (mb_strtoupper($variavel->tag, 'UTF-8') === mb_strtoupper($pontos['tag'] ?? '', 'UTF-8')) {
-                            $temPontuacao = true;
-                            break;
-                        }
-                    }
-                    if ($temPontuacao) {
-                        $variaveisOrdenadas[] = $variavel;
-                    }
-                    break;
-                }
-            }
-        }
-        
-        // Definir colores de barras según la dimensión (fallback)
-        $coresBarras = [
-            'EXEM' => '#DED8C7',
-            'DECI' => '#DED8C7',
-            'REPR' => '#E8C97B',
-            'FAPS' => '#E8C97B',
-            'ASMO' => '#7BC9A8',
-            'EXTR' => '#E8C97B'
-        ];
-    @endphp
-    
+    <!-- Dimensões (EXEM, DECI, REPR) -->
     @if(empty($variaveisOrdenadas) || empty($pontuacoes))
         <div style="background: #FFF3CD; padding: 20px; border-radius: 4px; border-left: 4px solid #FFC107; margin: 30px 0;">
             <p style="color: #856404; font-size: 12px; font-weight: 600; margin: 0 0 10px 0;">
@@ -87,7 +82,7 @@
     @else
         @foreach($variaveisOrdenadas as $registro)
             @php
-                // Buscar la puntuación correspondiente (misma lógica que _resultado_emotive)
+                // Buscar la puntuación correspondiente
                 $pontuacao = null;
                 $faixa = null;
                 foreach($pontuacoes as $pontos) {
@@ -162,7 +157,7 @@
     @include('participante.emotive.partials._footer_pdf', ['pageNumber' => '04'])
     @else
     <!-- Footer -->
-    <div style="margin-top: {{ $footerMargin }}; padding-top: {{ $isPdfMode ? '12pt' : '20px' }}; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; page-break-inside: avoid; font-family: 'DejaVu Sans', sans-serif;">
+    <div class="section-pdf-footer" style="margin-top: {{ $footerMargin }}; padding-top: {{ $isPdfMode ? '12pt' : '20px' }}; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; page-break-inside: avoid; font-family: 'DejaVu Sans', sans-serif;">
         <div style="display: flex; gap: {{ $isPdfMode ? '10pt' : '20px' }}; align-items: center;">
             @php
                 $imgPath = function($path) {
@@ -189,3 +184,4 @@
     </div>
     @endif
 </div>
+

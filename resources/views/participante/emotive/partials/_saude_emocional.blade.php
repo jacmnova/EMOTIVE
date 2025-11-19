@@ -110,11 +110,13 @@
 @endphp
 <!-- PRIMERA PÁGINA: EXEM, DECI, REPR -->
 @if($isPdfMode)
-<div class="section-pdf-large" style="padding: {{ $padding }}; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box; font-family: 'DejaVu Sans', sans-serif;">
+<div class="page-a4">
+    <div class="page-a4-content">
+    <h1 style="color: #A4977F; font-size: {{ $titleSize }}; font-style: normal; font-weight: 700; line-height: 1.2; margin: 0 0 {{ $isPdfMode ? '10pt' : '15px' }} 0; font-family: 'DejaVu Sans', sans-serif;">SAÚDE EMOCIONAL</h1>
 @else
 <div class="section-pdf-large" style="padding: {{ $padding }}; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;">
-@endif
     <h1 style="color: #A4977F; font-size: {{ $titleSize }}; font-style: normal; font-weight: 700; line-height: 1.2; margin: 0 0 {{ $isPdfMode ? '10pt' : '15px' }} 0; font-family: 'DejaVu Sans', sans-serif;">SAÚDE EMOCIONAL</h1>
+@endif
     <h2 style="color: #2E9196; font-size: {{ $subtitleSize }}; font-style: normal; font-weight: 400; line-height: 1.3; margin: 0 0 {{ $isPdfMode ? '10pt' : '20px' }} 0; font-family: 'DejaVu Sans', sans-serif;">Análise Geral</h2>
     
     <div style="margin-bottom: {{ $marginBottom }}; page-break-inside: avoid;">
@@ -278,9 +280,12 @@
             </div>
         </div>
     @endif
-    
+    @if($isPdfMode)
+    </div>
+    @include('participante.emotive.partials._footer_pdf', ['pageNumber' => '08'])
+    @else
     <!-- Footer -->
-    <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
+    <div class="section-pdf-footer" style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
         <div style="display: flex; gap: 20px; align-items: center;">
             <img src="{{ $imgPath('img/felipelli-logo.png') }}" alt="Fellipelli Consultoria" style="height: 30px;">
             <img src="{{ $imgPath('img/emotive-logo.png') }}" alt="E.MO.TI.VE" style="height: 30px;">
@@ -290,15 +295,18 @@
             <p style="font-size: 8px; color: #999; margin: 5px 0 0 0;">Pág. 08</p>
         </div>
     </div>
+    @endif
 </div>
 
 <!-- SEGUNDA PÁGINA: FAPS, ASMO, EXTR -->
 @if($isPdfMode)
-<div class="section-pdf-large" style="padding: {{ $padding }}; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box; font-family: 'DejaVu Sans', sans-serif;">
+<div class="page-a4">
+    <div class="page-a4-content">
+    <h1 style="color: #A4977F; font-size: {{ $titleSize }}; font-style: normal; font-weight: 700; line-height: 1.2; margin: 0 0 {{ $isPdfMode ? '10pt' : '15px' }} 0; font-family: 'DejaVu Sans', sans-serif;">SAÚDE EMOCIONAL</h1>
 @else
 <div class="section-pdf-large" style="padding: {{ $padding }}; max-width: 595.28pt; width: 100%; margin: 0 auto; box-sizing: border-box;">
-@endif
     <h1 style="color: #A4977F; font-size: {{ $titleSize }}; font-style: normal; font-weight: 700; line-height: 1.2; margin: 0 0 {{ $isPdfMode ? '10pt' : '15px' }} 0; font-family: 'DejaVu Sans', sans-serif;">SAÚDE EMOCIONAL</h1>
+@endif
     <h2 class="section-subtitle" style="color: #2E9196;font-size: 16px;font-style: normal;font-weight: 400;line-height: normal; margin-bottom: 20px;">Análise Geral</h2>
     
     <!-- FATORES PSICOSSOCIAIS (FAPS) -->
@@ -463,9 +471,12 @@
             Em conclusão, você está em um ponto de equilíbrio que, embora desafiador, oferece inúmeras oportunidades de crescimento. Ao continuar investindo em autocuidado e desenvolvimento pessoal, você poderá transformar essas vulnerabilidades em áreas de força. Você já possui os recursos internos necessários para prosperar e alcançar um estado de bem-estar mais pleno. Continue a jornada com confiança e cuidado consigo mesmo.
         </p>
     </div>
-    
+    @if($isPdfMode)
+    </div>
+    @include('participante.emotive.partials._footer_pdf', ['pageNumber' => '09'])
+    @else
     <!-- Footer -->
-    <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
+    <div class="section-pdf-footer" style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
         <div style="display: flex; gap: 20px; align-items: center;">
             <img src="{{ $imgPath('img/felipelli-logo.png') }}" alt="Fellipelli Consultoria" style="height: 30px;">
             <img src="{{ $imgPath('img/emotive-logo.png') }}" alt="E.MO.TI.VE" style="height: 30px;">
@@ -475,4 +486,5 @@
             <p style="font-size: 8px; color: #999; margin: 5px 0 0 0;">Pág. 09</p>
         </div>
     </div>
+    @endif
 </div>
