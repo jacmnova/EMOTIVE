@@ -402,7 +402,7 @@
         const informeUrl = '{{ config("app.url") }}/meurelatorio/pdf?formulario_id=' + formularioId + '&usuario_id=' + userId;
 
         // 3. Configuración de la petición POST al servicio de conversión de Railway
-        fetch('https://api-convet-pdf-g3nia.up.railway.app/convert-url', {
+        fetch('https://api-convet-pdf-g3nia.up.railway.app/convert-url-paginated', {
             method: 'POST',
             mode: 'cors', // Permitir CORS explícitamente
             credentials: 'omit', // No enviar cookies
