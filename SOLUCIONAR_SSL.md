@@ -208,3 +208,4 @@ sudo certbot renew --dry-run
 - [ ] Nginx recargado
 - [ ] Sitio accesible en HTTPS con candado verde 🔒
 
+
