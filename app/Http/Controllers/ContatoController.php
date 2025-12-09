@@ -35,8 +35,8 @@ class ContatoController extends Controller
             $mensagem = $request->input('mensagem');
             $emailSoporte = 'instrumentos@fellipelli.com.br';
 
-            // Enviar email
-            Mail::send('emails.contato-soporte', [
+            // Enviar email usando el mailer SMTP configurado
+            Mail::mailer('smtp')->send('emails.contato-soporte', [
                 'nome' => $nome,
                 'email' => $email,
                 'mensagem' => $mensagem,
@@ -61,5 +61,6 @@ class ContatoController extends Controller
         }
     }
 }
+
 
 
