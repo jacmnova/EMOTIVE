@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground: #374151;
+  --background: #ffffff;
+  --primary: #0d9488;
+  --primary-light: #14b8a6;
+  --gold: #b8860b;
+  --gold-light: #d4a84b;
+  --panel-bg: #f3f4f6;
+  --footer-bg: #1f2937;
+  --beige: #e8e4df;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-quicksand), "Quicksand", system-ui, sans-serif;
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Botones primarios estilo prototipo */
+.btn-primary {
+  @apply bg-primary text-white font-medium rounded-lg px-4 py-2 hover:bg-primary-dark transition;
+}
+
+/* Sidebar link activo (gold – estilo prototipo) */
+.sidebar-link-active {
+  @apply text-gold-dark font-medium border-l-2 border-gold bg-gold/10;
+}

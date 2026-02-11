@@ -1,0 +1,11 @@
+# Configuración para deploy en Railway
+# Si el repo es monorepo, en Railway → Service → Settings → Root Directory = migrations/backend-api
+
+[build]
+# Railpack/Nixpacks detectan Python y ejecutan pip install -r requirements.txt
+
+[deploy]
+startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+preDeployCommand = "alembic upgrade head"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
