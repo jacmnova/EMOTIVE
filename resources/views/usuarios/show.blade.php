@@ -115,8 +115,9 @@
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-        // 2. Generar la URL del informe que será convertida
-        const informeUrl = '{{ config("app.url") }}/meurelatorio/pdf?formulario_id=' + formularioId + '&usuario_id=' + userId;
+        // 2. Generar la URL del informe que será convertida (usar el dominio actual para asegurar URL pública)
+        const baseUrl = window.location.origin;
+        const informeUrl = baseUrl + '/meurelatorio/pdf?formulario_id=' + formularioId + '&usuario_id=' + userId;
 
         // 3. Configuración de la petición POST al servicio de conversión de Railway
         fetch('https://api-convet-pdf-g3nia.up.railway.app/convert-url-paginated', {

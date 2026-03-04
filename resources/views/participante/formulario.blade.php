@@ -234,8 +234,9 @@
             }
         });
 
-        // Gerar a URL do relatório que será convertida
-        const informeUrl = '{{ config("app.url") }}/meurelatorio/pdf?formulario_id=' + formularioId + '&usuario_id=' + userId;
+        // Gerar a URL do relatório que será convertida (usar o domínio atual para garantir URL pública)
+        const baseUrl = window.location.origin;
+        const informeUrl = baseUrl + '/meurelatorio/pdf?formulario_id=' + formularioId + '&usuario_id=' + userId;
 
         // Configuração da requisição POST ao serviço de conversão
         fetch('https://api-convet-pdf-g3nia.up.railway.app/convert-url-paginated', {
