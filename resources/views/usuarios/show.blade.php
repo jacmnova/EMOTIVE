@@ -103,3 +103,121 @@
     @include('usuarios.partials._formularios')
 
 @stop
+
+@section('js')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function gerarPDF(userId, formularioId) {
+        // 1. Mostrar loading y deshabilitar botón
+        const btn = event.target.closest('button');
+        const originalHTML = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        // 2. Generar la URL del informe que será convertida
+        const informeUrl = '{{ config("app.url") }}/meurelatorio/pdf?formulario_id=' + formularioId + '&usuario_id=' + userId;
+
+        // 3. Configuración de la petición POST al servicio de conversión de Railway
+        fetch('https://api-convet-pdf-g3nia.up.railway.app/convert-url-paginated', {
+            method: 'POST',
+            mode: 'cors', // Permitir CORS explícitamente
+            credentials: 'omit', // No enviar cookies
+            headers: {
+                'Accept': 'application/pdf', // Indicamos que esperamos un PDF
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "url": informeUrl
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                // El servicio respondió exitosamente.
+                // Verificamos si realmente recibimos un PDF.
+                const contentType = response.headers.get('Content-Type');
+
+                if (contentType && contentType.includes('application/json')) {
+                    // Si el servicio responde OK pero devuelve JSON (ej. un link de descarga), 
+                    // maneja esa lógica aquí.
+                    return response.json().then(data => {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Conversión OK, pero no es un PDF',
+                            text: 'El servicio externo devolvió JSON. Si esperabas el archivo, revisa el endpoint.',
+                            confirmButtonText: 'OK'
+                        });
+                        throw new Error('Respuesta JSON en lugar de PDF');
+                    });
+                }
+
+                // 4. Si la respuesta es un archivo, la procesamos como BLOB.
+                return response.blob(); 
+            } else {
+                // Manejar errores de respuesta HTTP (4xx, 5xx)
+                return response.text().then(text => {
+                    let errorMsg = `Error ${response.status}: Error en el servicio de conversión.`;
+                    try {
+                        const jsonError = JSON.parse(text);
+                        errorMsg = jsonError.detail || jsonError.message || errorMsg;
+                    } catch (e) {
+                        // Si no es JSON, usar el texto tal cual
+                        if (text) errorMsg += ' ' + text.substring(0, 200);
+                    }
+                    throw new Error(errorMsg);
+                });
+            }
+        })
+        .then(pdfBlob => {
+            // 5. Crear el enlace de descarga y simular el clic.
+            if (pdfBlob) {
+                // Creamos una URL temporal para el Blob
+                const url = window.URL.createObjectURL(pdfBlob);
+                
+                // Creamos un elemento <a> oculto para forzar la descarga
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Relatorio_${userId}_${formularioId}.pdf`; // Nombre del archivo
+                document.body.appendChild(a);
+                
+                // Simulamos el clic
+                a.click();
+                
+                // Limpiamos la URL temporal y el elemento <a>
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'PDF Descargado',
+                    text: 'El informe se ha descargado correctamente.',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            }
+        })
+        .catch(error => {
+            // 6. Manejo de errores de red o del throw anterior
+            let errorMessage = error.message || 'Verifica la conexión o el servicio.';
+            
+            // Detectar errores de CORS específicamente
+            if (error.message.includes('CORS') || error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+                errorMessage = 'Error de CORS: El servidor de Railway no permite peticiones desde este dominio. Contacta al administrador para configurar CORS en el servidor.';
+            }
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de Descarga',
+                text: `No fue posible descargar el PDF: ${errorMessage}`,
+                confirmButtonText: 'OK'
+            });
+            console.error('Error al generar y descargar PDF:', error);
+        })
+        .finally(() => {
+            // Restaurar el botón siempre
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
+        });
+    }
+</script>
+@stop

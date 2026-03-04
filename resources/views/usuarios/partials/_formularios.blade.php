@@ -52,9 +52,9 @@
                                     <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario_id, 'usuario_id' => $usuario->id]) }}" class="btn btn-sm btn-tool" title="Relatório">
                                         <i class="fa-regular fa-rectangle-list" style="color: #008ca5"></i>
                                     </a>
-                                    <a href="{{ route('relatorio.pdf', ['user' => $usuario->id, 'formulario' => $formulario->formulario_id]) }}" class="btn btn-sm btn-tool">
+                                    <button onclick="gerarPDF({{ $usuario->id }}, {{ $formulario->formulario_id }})" title="Imprimir Relatório" class="btn btn-sm btn-tool">
                                         <i class="fas fa-file-pdf" style="color: #008ca5"></i>
-                                    </a>
+                                    </button>
                                 @endif
                             </td>
                             <td>
@@ -108,9 +108,9 @@
                                 <a href="{{ route('relatorio.show', ['formulario_id' => $formulario->formulario_id, 'usuario_id' => $usuario->id]) }}" class="btn btn-sm btn-tool" title="Relatório">
                                     <i class="fa-regular fa-rectangle-list" style="color: #008ca5"></i>
                                 </a>
-                                <a href="{{ route('relatorio.pdf', ['user' => $usuario->id, 'formulario' => $formulario->formulario_id]) }}" class="btn btn-sm btn-tool" target="_blank">
+                                <button onclick="gerarPDF({{ $usuario->id }}, {{ $formulario->formulario_id }})" title="Imprimir Relatório" class="btn btn-sm btn-tool">
                                     <i class="fas fa-file-pdf" style="color: #008ca5"></i>
-                                </a>
+                                </button>
                             </div>
                             <p class="small text-muted">Finalizado em: {{ $formulario->updated_at->translatedFormat('d \d\e F \d\e Y \à\s H:i') }}</p>
                         @else
