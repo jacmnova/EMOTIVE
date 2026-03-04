@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             PerguntasBurnOutSeeder::class, // php artisan db:seed --class=PerguntasBurnOutSeeder
             VarPerguntaBurnOutSeeder::class, // php artisan db:seed --class=VarPerguntaBurnOutSeeder
             EtapaSeeder::class, // php artisan db:seed --class=EtapaSeeder
+            RespostasSeeder::class, // respuestas de prueba para Burnout 99
         ]);
     }
 }
