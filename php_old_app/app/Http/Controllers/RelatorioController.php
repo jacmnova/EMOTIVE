@@ -661,50 +661,31 @@ class RelatorioController extends Controller
         if (!$request->has('formulario') || !$request->has('user')) {
             return redirect()->back()->with('msgError', 'Parámetros faltantes para generar el PDF.');
         }
-        
+
+        $user = User::findOrFail($request->user);
+
+        // Si no hay servicio externo configurado, usar DomPDF (misma lógica que el relatorio por usuario)
+        $pdfServiceUrl = env('PDF_API_URL', '');
+        if (empty($pdfServiceUrl)) {
+            \Log::info('PDF_API_URL no configurado, generando PDF con DomPDF');
+            return $this->gerarPDFConDomPDF($request);
+        }
+
         $formularioId = $request->formulario;
         $usuarioId = $request->user;
 
-        $user = User::findOrFail($usuarioId);
-        
         try {
-            // Aumentar tiempo de ejecución de PHP antes de hacer la llamada
-            set_time_limit(600); // 10 minutos
+            set_time_limit(600);
             ini_set('max_execution_time', 600);
             ini_set('memory_limit', '512M');
-            
-            // Generar URL del relatorio para PDF
+
             $baseUrl = config('app.url', 'http://localhost:8000');
-            
-            // Si la URL contiene localhost, cambiarla a 127.0.0.1 para que la API pueda acceder
             $baseUrl = str_replace('localhost', '127.0.0.1', $baseUrl);
-            
-            // Construir la URL con los parámetros
             $relatorioUrl = rtrim($baseUrl, '/') . '/meurelatorio/pdf?formulario_id=' . urlencode($formularioId) . '&usuario_id=' . urlencode($usuarioId);
-            
-            \Log::info('Generando PDF desde URL', [
-                'url' => $relatorioUrl,
-                'formulario_id' => $formularioId,
-                'usuario_id' => $usuarioId,
-                'base_url' => $baseUrl
-            ]);
-            
-            // Llamar al servicio externo de conversión
-            $pdfServiceUrl = env('PDF_API_URL', 'http://127.0.0.1:8080/convert-url');
-            
-            // Preparar los datos según el formato esperado por el servicio
-            $requestData = [
-                'url' => $relatorioUrl
-            ];
-            
+
+            $requestData = ['url' => $relatorioUrl];
             $jsonData = json_encode($requestData);
-            
-            \Log::info('Enviando solicitud al servicio PDF', [
-                'service_url' => $pdfServiceUrl,
-                'url_enviada' => $relatorioUrl,
-                'json_data' => $jsonData
-            ]);
-            
+
             $ch = curl_init($pdfServiceUrl);
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -713,34 +694,19 @@ class RelatorioController extends Controller
                 'Content-Length: ' . strlen($jsonData)
             ]);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 180); // 180 segundos (la API navega a la URL y convierte a PDF)
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); // 10 segundos para conectar
-            
+            curl_setopt($ch, CURLOPT_TIMEOUT, 180);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+
             $pdfContent = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $curlError = curl_error($ch);
             $curlInfo = curl_getinfo($ch);
             curl_close($ch);
-            
-            \Log::info('Respuesta del servicio PDF', [
-                'http_code' => $httpCode,
-                'content_length' => strlen($pdfContent),
-                'curl_error' => $curlError,
-                'content_type' => $curlInfo['content_type'] ?? 'unknown'
-            ]);
-            
+
+            // Si falla la conexión al servicio externo, usar DomPDF (misma descarga que por usuario)
             if ($curlError) {
-                \Log::error('Error en curl al llamar servicio PDF', [
-                    'error' => $curlError,
-                    'http_code' => $httpCode
-                ]);
-                if ($request->wantsJson() || $request->ajax()) {
-                    return response()->json([
-                        'error' => true,
-                        'message' => 'Error al comunicarse con el servicio de PDF: ' . $curlError
-                    ], 500);
-                }
-                return redirect()->back()->with('msgError', 'Error al comunicarse con el servicio de PDF: ' . $curlError);
+                \Log::warning('Servicio PDF no disponible, usando DomPDF', ['error' => $curlError]);
+                return $this->gerarPDFConDomPDF($request);
             }
             
             if ($httpCode !== 200) {
@@ -851,10 +817,12 @@ class RelatorioController extends Controller
         }
     }
     
-    // Método antiguo - mantener por compatibilidad pero ya no se usa
-    private function gerarPDFAntiguo(Request $request)
+    /**
+     * Genera el PDF del relatorio con DomPDF (sin depender del servicio externo en 8080).
+     * Misma lógica que la descarga de relatorio por usuario; se usa cuando PDF_API_URL no está disponible.
+     */
+    private function gerarPDFConDomPDF(Request $request)
     {
-        // Este método ya no se usa - se mantiene solo por referencia
         $formularioId = $request->formulario;
         $usuarioId = $request->user;
 
